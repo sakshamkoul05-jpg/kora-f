@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kora House — website
 
-## Getting Started
+Marketing site for Kora House, a six-room hilltop guesthouse in McLeodganj,
+Himachal Pradesh. Built against `../kora-house-build-spec.md`, using the
+Stitch designs in `../kora-house-stitch-prompts.md` as layout reference only
+(the build spec's facts win where the two disagree).
 
-First, run the development server:
+## Stack
+
+Next.js 16 (App Router, Turbopack) + TypeScript + Tailwind CSS v4. No
+database, auth, or payments yet — see "Where this stopped" below.
+
+## Getting started
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build order status
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Per the spec's step 5 ("Stop. Review with the hosts before anything below
+this line."), this build covers **steps 1–4 only**:
 
-## Learn More
+1. ✅ Design tokens, typography, grain treatment, base layout, header and footer
+2. ✅ Homepage — including the balcony section and the mala scroll indicator
+3. ✅ Rooms index with kitchen/floor filters, and room detail
+4. ✅ The House, Experiences (with the kora path animation), Getting Here, FAQ
 
-To learn more about Next.js, take a look at the following resources:
+**Not started:** the booking flow, Razorpay, Auth.js, guest accounts, or the
+admin CRM (spec steps 6–7). "Check availability" / "Book" buttons currently
+link to `/rooms` and the room detail page says booking is coming soon — there
+is no live booking path yet, by design.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## TODO_CONFIRM — facts pending confirmation from the hosts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All of these live as `null` values or comments in `lib/site.ts` and
+`lib/rooms.ts`, not invented numbers in the UI. Nothing below has been
+guessed at; get these from Rohitash and Ashish before shipping:
 
-## Deploy on Vercel
+- **Phone / WhatsApp number** (`lib/site.ts`) — currently carries the number
+  from the brief, unconfirmed.
+- **Host name spelling** for Rohitash and Ashish, and how each wants to be
+  named on the site.
+- **Caretaker name spelling** for Suraj.
+- **Google review listing URL** (`site.googleReviewUrl`) — placeholder only,
+  needed to link out to the real 4.7★ / 69-review listing.
+- **Per-room data** for all six rooms (`lib/rooms.ts`): real names (currently
+  "Room 1"–"Room 6" placeholders), occupancy, bed configuration, size in m²,
+  and nightly rate. Do not invent these — ask.
+- **Cancellation / booking policy** — not defined anywhere yet; the FAQ page
+  says this is being finalised.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## PHOTOS_PENDING
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Every image on the site is a flat placeholder block (`bg-ink/10`). Do not
+source images from the Google Business Profile, Google Maps, or the Places
+API — those are owner/guest-uploaded and not licensed for reuse, and review
+text must never be copied onto the site (link to the Google listing instead).
+
+Ask Rohitash and Ashish directly for:
+
+- Original files of the photos already on their Google profile
+- The balcony at different times of day — sunrise is the single most
+  valuable image for this site
+- One clear photo of each of the six rooms
+- Dining area, exterior approach, and a photo of the hosts
+
+Once photos arrive, wire them through `next/image` (AVIF/WebP, blur
+placeholders) — see spec §7 for the size budget (hero under 200KB).
+
+## Animation notes
+
+Six pieces of animation from Tibetan material culture are implemented:
+mala scroll indicator, prayer-wheel booking progress (component not yet
+needed — no booking flow exists yet), kora path draw (Experiences page),
+khata page-transition veil (root layout), butter-lamp CTA hover glow, and
+prayer-flag hero sway. All respect `prefers-reduced-motion` — verified both
+via the global CSS reduced-motion rule in `app/globals.css` and via explicit
+`matchMedia` checks in each interactive component (`MalaIndicator`,
+`PrayerFlags`, `KoraPathDraw`). None of it runs past booking step one or in
+admin, because neither exists yet.
+
+## No "nine rooms"
+
+The Stitch prompt pack was written against a fictional nine-room concept.
+The property has six. Every page here uses `lib/rooms.ts` (six entries) as
+the single source of truth — do not reintroduce "nine" anywhere.

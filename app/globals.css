@@ -1,26 +1,190 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-ink: #1e2a2e;
+  --color-maroon: #6e2230;
+  --color-butter: #e8b04b;
+  --color-deodar: #3e5648;
+  --color-mist: #e9ecea;
+  --color-paper: #fdfcfa;
+
+  --hairline: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--color-ink) 22%, transparent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--color-ink);
+  --color-maroon: var(--color-maroon);
+  --color-butter: var(--color-butter);
+  --color-deodar: var(--color-deodar);
+  --color-mist: var(--color-mist);
+  --color-paper: var(--color-paper);
+
+  --font-display: var(--font-marcellus), Georgia, serif;
+  --font-body: var(--font-karla), system-ui, sans-serif;
+  --font-data: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-kora: 2px;
+
+  --tracking-eyebrow: 0.18em;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* This site does not ship a dark theme — the Mist background and Ink Slate
+     text are the brand, in both light and dark OS modes. */
+}
+
+* {
+  border-color: var(--hairline);
+}
+
+html {
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-mist);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-data {
+  font-family: var(--font-data);
+}
+
+.eyebrow {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.hairline {
+  border: 1px solid var(--hairline);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--hairline);
+}
+
+.hairline-b {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Kora arc divider: a single hairline arc instead of a straight rule */
+.arc-divider {
+  display: block;
+  width: 100%;
+  height: 48px;
+  color: var(--hairline-strong);
+}
+
+/* Mala bead settle: a weighted overshoot, not a linear scale-in. */
+@keyframes mala-settle {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.4);
+  }
+  80% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.mala-settle {
+  animation: mala-settle 500ms ease-out;
+}
+
+/* Khata veil: fast, low-opacity sweep with a slight vertical drift. */
+@keyframes khata-sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.khata-veil {
+  animation: khata-sweep 380ms ease-out;
+}
+
+/* Butter lamp hover: an irregular flicker driven by layered offset pulses
+   rather than a single smooth sine, kept to a very low amplitude. */
+@keyframes lamp-flicker {
+  0%,
+  100% {
+    box-shadow: 0 0 12px 1px color-mix(in srgb, var(--color-butter) 45%, transparent);
+  }
+  22% {
+    box-shadow: 0 0 15px 2px color-mix(in srgb, var(--color-butter) 55%, transparent);
+  }
+  41% {
+    box-shadow: 0 0 10px 1px color-mix(in srgb, var(--color-butter) 38%, transparent);
+  }
+  63% {
+    box-shadow: 0 0 16px 2px color-mix(in srgb, var(--color-butter) 60%, transparent);
+  }
+  78% {
+    box-shadow: 0 0 11px 1px color-mix(in srgb, var(--color-butter) 42%, transparent);
+  }
+}
+.lamp-hover {
+  transition: box-shadow 200ms ease-out;
+}
+.lamp-hover:hover,
+.lamp-hover:focus-visible {
+  animation: lamp-flicker 1.8s ease-in-out infinite;
+}
+
+/* Prayer flag sway: staggered, slightly desynced periods per segment. */
+@keyframes flag-sway-a {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes flag-sway-b {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-2.4deg);
+  }
+}
+.flag-sway-a {
+  animation: flag-sway-a 3.6s ease-in-out infinite;
+  transform-origin: top center;
+}
+.flag-sway-b {
+  animation: flag-sway-b 4.3s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

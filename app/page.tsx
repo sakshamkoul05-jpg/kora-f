@@ -1,69 +1,138 @@
-import Image from "next/image";
+import { ArcDivider } from "@/components/ArcDivider";
+import { DeckledEdge } from "@/components/DeckledEdge";
+import { MalaIndicator } from "@/components/MalaIndicator";
+import { PrayerFlags } from "@/components/PrayerFlags";
+import { PrimaryButton } from "@/components/PrimaryButton";
+import { RoomCard } from "@/components/RoomCard";
+import { rooms } from "@/lib/rooms";
+import { site } from "@/lib/site";
+import Link from "next/link";
 
-export default function Home() {
+const sections = [
+  { id: "hero", label: "Welcome" },
+  { id: "balcony", label: "The balcony" },
+  { id: "house-teaser", label: "The house" },
+  { id: "rooms-preview", label: "Rooms" },
+  { id: "experiences-teaser", label: "Experiences" },
+] as const;
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <>
+      <MalaIndicator sections={[...sections]} />
+
+      {/* 1. Hero */}
+      <section id="hero" className="relative overflow-hidden bg-ink text-mist">
+        <PrayerFlags />
+        <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 pb-24 pt-32 md:px-8 md:pb-32 md:pt-40">
+          <p className="eyebrow text-butter">McLeodganj, Himachal Pradesh</p>
+          <h1 className="font-display text-4xl leading-[1.1] md:text-6xl">
+            A house on the hill, <br className="hidden md:block" />
+            not a hotel
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="max-w-md text-mist/75">
+            Six rooms above the temple road. Quiet, secluded, and run by its
+            hosts — with a common balcony that is the reason most people
+            book.
           </p>
+          <PrimaryButton href="/rooms">Check availability</PrimaryButton>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <DeckledEdge fill="var(--color-mist)" className="bottom-0" flip />
+      </section>
+
+      {/* 2. Balcony — the property's single strongest asset, its own section */}
+      <section id="balcony" className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+        <div className="grid gap-10 md:grid-cols-2 md:items-center">
+          <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10" aria-hidden />
+          <div>
+            <p className="eyebrow text-maroon">The common balcony</p>
+            <h2 className="mt-2 font-display text-3xl md:text-4xl">
+              One view, shared by everyone who stays
+            </h2>
+            <p className="mt-4 text-ink/70">
+              The house opens onto the valley from a shared balcony — the
+              first thing hosts mention and the last thing guests remember.
+              Mornings here are unhurried; the hills do the rest.
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <ArcDivider className="mx-auto max-w-6xl text-ink/10" />
+
+      {/* 3. The house teaser */}
+      <section id="house-teaser" className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+        <div className="grid gap-10 md:grid-cols-3">
+          <div>
+            <p className="eyebrow text-ink/50">Hilltop &amp; secluded</p>
+            <p className="mt-2 text-sm text-ink/70">
+              Set above the town, quiet and secure, with the hills at the
+              door.
+            </p>
+          </div>
+          <div>
+            <p className="eyebrow text-ink/50">Run by its hosts</p>
+            <p className="mt-2 text-sm text-ink/70">
+              {site.hosts.map((h) => h.name).join(" and ")} guide guests
+              around the town and stay reachable on WhatsApp throughout the
+              stay.
+            </p>
+          </div>
+          <div>
+            <p className="eyebrow text-ink/50">Homely, not hotel-like</p>
+            <p className="mt-2 text-sm text-ink/70">
+              Six rooms, a shared dining area, and a balcony — budget-friendly
+              and built for slow travellers.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/house"
+          className="mt-8 inline-block text-sm text-maroon underline underline-offset-4"
+        >
+          More about the house →
+        </Link>
+      </section>
+
+      {/* 4. Rooms preview */}
+      <section id="rooms-preview" className="bg-paper py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-5 md:px-8">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-3xl md:text-4xl">Six rooms</h2>
+            <Link href="/rooms" className="text-sm text-maroon underline underline-offset-4">
+              See all rooms →
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {rooms.slice(0, 3).map((room) => (
+              <RoomCard key={room.slug} room={room} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Experiences teaser */}
+      <section id="experiences-teaser" className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+        <div className="grid gap-8 md:grid-cols-2 md:items-center">
+          <div>
+            <p className="eyebrow text-deodar">Within a morning&apos;s walk</p>
+            <h2 className="mt-2 font-display text-3xl md:text-4xl">
+              The temple, the kora, the town
+            </h2>
+            <p className="mt-4 text-ink/70">
+              Everything worth doing near Kora House is reachable on foot —
+              the hosts will point the way.
+            </p>
+            <Link
+              href="/experiences"
+              className="mt-6 inline-block text-sm text-maroon underline underline-offset-4"
+            >
+              See experiences →
+            </Link>
+          </div>
+          <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10" aria-hidden />
+        </div>
+      </section>
+    </>
   );
 }
