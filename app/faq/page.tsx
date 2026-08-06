@@ -48,7 +48,7 @@ export default function FaqPage() {
         ))}
       </div>
 
-      <div className="hairline mt-12 rounded-[var(--radius-kora)] p-6 text-center">
+      <div className="hairline mt-12 rounded-[var(--radius-card)] p-6 text-center">
         <p className="font-display">Still unsure?</p>
         <p className="mt-1 text-sm text-ink/60">Message the house on WhatsApp.</p>
         <a

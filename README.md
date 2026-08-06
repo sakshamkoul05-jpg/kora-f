@@ -52,12 +52,25 @@ guessed at; get these from Rohitash and Ashish before shipping:
 - **Cancellation / booking policy** — not defined anywhere yet; the FAQ page
   says this is being finalised.
 
-## PHOTOS_PENDING
+## Photography
 
-Every image on the site is a flat placeholder block (`bg-ink/10`). Do not
-source images from the Google Business Profile, Google Maps, or the Places
-API — those are owner/guest-uploaded and not licensed for reuse, and review
-text must never be copied onto the site (link to the Google listing instead).
+Two different kinds of image on this site, handled two different ways:
+
+**Location/culture photography (real, in place today).** Nine photos of
+McLeodganj, Dharamshala and the surrounding area — hero, balcony-view stand-in,
+monastery, prayer flags, Triund, Dharamkot, temple architecture, street,
+Himalayas backdrop — sourced from Wikimedia Commons under free licences
+(CC BY / CC BY-SA), credited in `lib/image-credits.ts` and on the public
+`/credits` page, with a hover credit on each photo. These are real places
+near the property, not the property itself.
+
+**Property photography (still PHOTOS_PENDING).** Rooms, the actual balcony,
+the dining area, exterior, and photos of the hosts are all still the warm
+`PhotoPending` placeholder (`components/PhotoPending.tsx`) — not a flat grey
+box, but not a real photo either. Do not source these from the Google
+Business Profile, Google Maps, or the Places API — those are owner/guest-
+uploaded and not licensed for reuse, and review text must never be copied
+onto the site (link to the Google listing instead).
 
 Ask Rohitash and Ashish directly for:
 
@@ -67,8 +80,11 @@ Ask Rohitash and Ashish directly for:
 - One clear photo of each of the six rooms
 - Dining area, exterior approach, and a photo of the hosts
 
-Once photos arrive, wire them through `next/image` (AVIF/WebP, blur
-placeholders) — see spec §7 for the size budget (hero under 200KB).
+Once those arrive, swap them in via `next/image` (AVIF/WebP, blur
+placeholders) in place of `PhotoPending` — see spec §7 for the size budget
+(hero under 200KB). Never substitute a stock photo of an unrelated person
+for a host or caretaker photo — the placeholder stays a placeholder until
+the real one exists.
 
 ## Animation notes
 
@@ -81,6 +97,26 @@ via the global CSS reduced-motion rule in `app/globals.css` and via explicit
 `matchMedia` checks in each interactive component (`MalaIndicator`,
 `PrayerFlags`, `KoraPathDraw`). None of it runs past booking step one or in
 admin, because neither exists yet.
+
+## Redesign notes
+
+The first pass (cool-bone "quiet monastery" palette, 2px architectural radii,
+no real photography) was rejected by the client: not enough visible Tibetan
+culture, not enough real place photography, and it read as too austere for a
+"premium resort" booking site. This pass responds with:
+
+- **Warm palette.** Ink and Mist shifted from cool slate/bone to warm
+  espresso/parchment. Maroon, Butter Lamp gold and Deodar green — the
+  Tibetan monastic colours — are unchanged, they weren't the problem.
+- **Visible cultural motifs, not just animation.** A five-colour prayer-flag
+  strip (`​.prayer-flag-strip`) in the header, and a cloud-scroll flourish
+  divider (`TibetanDivider`) at section boundaries — literal, restrained,
+  not a busy pattern.
+- **Real photography** of McLeodganj and nearby places throughout (see
+  "Photography" above), instead of flat grey blocks everywhere.
+- **Softer card radii** (`--radius-card`, 16px) for photos and content
+  cards, while small UI (buttons, pills) stays crisp (`--radius-kora`, 4px)
+  — the "rustic but still premium" split.
 
 ## No "nine rooms"
 

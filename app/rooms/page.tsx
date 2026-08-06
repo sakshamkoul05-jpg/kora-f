@@ -20,7 +20,7 @@ export default function RoomsIndexPage() {
       </p>
 
       {groundFloorRoom && (
-        <div className="hairline mt-8 max-w-xl rounded-[var(--radius-kora)] bg-paper p-5">
+        <div className="hairline mt-8 max-w-xl rounded-[var(--radius-card)] bg-paper p-5">
           <p className="eyebrow text-maroon">Mobility note</p>
           <p className="mt-1 text-sm text-ink/70">
             The house has a significant number of stairs and no lift.{" "}
@@ -40,7 +40,7 @@ export default function RoomsIndexPage() {
         <p className="eyebrow text-ink/50">Shared spaces</p>
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           {sharedSpaces.map((space) => (
-            <div key={space.name} className="hairline rounded-[var(--radius-kora)] p-4">
+            <div key={space.name} className="hairline rounded-[var(--radius-card)] p-4">
               <p className="font-display">{space.name}</p>
               <p className="mt-1 text-sm text-ink/60">{space.description}</p>
             </div>

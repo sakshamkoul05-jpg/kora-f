@@ -9,6 +9,13 @@ export function Header() {
 
   return (
     <header className="hairline-b sticky top-0 z-50 bg-mist/95 backdrop-blur-sm">
+      <div className="prayer-flag-strip" aria-hidden>
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:px-8">
         <Link href="/" className="font-display text-lg tracking-wide">
           {site.name}

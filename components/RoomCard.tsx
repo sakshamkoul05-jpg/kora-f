@@ -1,13 +1,14 @@
 import Link from "next/link";
 import type { Room } from "@/lib/rooms";
+import { PhotoPending } from "./PhotoPending";
 
 export function RoomCard({ room }: { room: Room }) {
   return (
     <Link
       href={`/rooms/${room.slug}`}
-      className="hairline group flex flex-col overflow-hidden rounded-[var(--radius-kora)] bg-paper transition-colors hover:border-ink/30"
+      className="hairline group flex flex-col overflow-hidden rounded-[var(--radius-card)] bg-paper transition-colors hover:border-ink/30"
     >
-      <div className="aspect-[4/3] w-full bg-ink/10" aria-hidden />
+      <PhotoPending label="Photo coming soon" className="aspect-[4/3] w-full" />
       <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-baseline justify-between gap-2">
           <p className="font-display text-lg">{room.name}</p>

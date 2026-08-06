@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PhotoPending } from "@/components/PhotoPending";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { getRoomBySlug, rooms } from "@/lib/rooms";
 import { site } from "@/lib/site";
@@ -42,9 +43,12 @@ export default async function RoomDetailPage({
       </Link>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10 sm:col-span-2 sm:row-span-2" aria-hidden />
-        <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10" aria-hidden />
-        <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10" aria-hidden />
+        <PhotoPending
+          label="Photo coming soon"
+          className="aspect-[4/3] rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2"
+        />
+        <PhotoPending label="Photo coming soon" className="aspect-[4/3] rounded-[var(--radius-card)]" />
+        <PhotoPending label="Photo coming soon" className="aspect-[4/3] rounded-[var(--radius-card)]" />
       </div>
 
       <div className="mt-10 grid gap-10 md:grid-cols-[1fr_360px]">
@@ -80,7 +84,7 @@ export default async function RoomDetailPage({
           </div>
         </div>
 
-        <aside className="hairline h-fit rounded-[var(--radius-kora)] bg-paper p-6">
+        <aside className="hairline h-fit rounded-[var(--radius-card)] bg-paper p-6">
           <p className="font-data text-sm text-ink/50">Nightly rate</p>
           <p className="mt-1 font-display text-2xl">
             {room.nightlyRate ? `₹${room.nightlyRate}` : "On request"}

@@ -1,15 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --color-ink: #1e2a2e;
+  /* Warm, rustic-premium palette. Ink shifted from cool slate to a warm
+     espresso brown-black; Mist and Paper shifted from cool bone to warm
+     parchment/ivory. Maroon, Butter Lamp and Deodar are unchanged — they're
+     the Tibetan monastic colours (maroon robes, gold gilding, forest green)
+     and already did the job. Sky is new, for the five-colour prayer-flag
+     accent set (blue/white/red/green/yellow -> sky/paper/maroon/deodar/butter). */
+  --color-ink: #2a2119;
   --color-maroon: #6e2230;
   --color-butter: #e8b04b;
   --color-deodar: #3e5648;
-  --color-mist: #e9ecea;
-  --color-paper: #fdfcfa;
+  --color-sky: #2f4a6b;
+  --color-mist: #f3ead8;
+  --color-paper: #faf4e8;
 
-  --hairline: color-mix(in srgb, var(--color-ink) 12%, transparent);
-  --hairline-strong: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  --hairline: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--color-ink) 24%, transparent);
 }
 
 @theme inline {
@@ -17,6 +24,7 @@
   --color-maroon: var(--color-maroon);
   --color-butter: var(--color-butter);
   --color-deodar: var(--color-deodar);
+  --color-sky: var(--color-sky);
   --color-mist: var(--color-mist);
   --color-paper: var(--color-paper);
 
@@ -24,7 +32,10 @@
   --font-body: var(--font-karla), system-ui, sans-serif;
   --font-data: var(--font-plex-mono), ui-monospace, monospace;
 
-  --radius-kora: 2px;
+  /* Small UI (buttons, pills, inputs) stays crisp; photos and cards get a
+     softer, more lived-in radius — the "rustic premium resort" split. */
+  --radius-kora: 4px;
+  --radius-card: 16px;
 
   --tracking-eyebrow: 0.18em;
 }
@@ -82,6 +93,46 @@ body {
   width: 100%;
   height: 48px;
   color: var(--hairline-strong);
+}
+
+/* Five-colour prayer-flag accent strip: blue/white/red/green/yellow, the
+   traditional order (sky, air, fire, water, earth). Used sparingly as a
+   literal, visible marker of Tibetan material culture. */
+.prayer-flag-strip {
+  display: flex;
+  height: 4px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 999px;
+}
+.prayer-flag-strip > span {
+  flex: 1 1 0;
+}
+.prayer-flag-strip > span:nth-child(1) {
+  background: var(--color-sky);
+}
+.prayer-flag-strip > span:nth-child(2) {
+  background: var(--color-paper);
+}
+.prayer-flag-strip > span:nth-child(3) {
+  background: var(--color-maroon);
+}
+.prayer-flag-strip > span:nth-child(4) {
+  background: var(--color-deodar);
+}
+.prayer-flag-strip > span:nth-child(5) {
+  background: var(--color-butter);
+}
+
+/* Warm scrim for legible type over real photography — ink-tinted rather
+   than flat black, so it stays inside the palette. */
+.photo-scrim {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-ink) 78%, transparent) 0%,
+    color-mix(in srgb, var(--color-ink) 32%, transparent) 45%,
+    transparent 75%
+  );
 }
 
 /* Mala bead settle: a weighted overshoot, not a linear scale-in. */

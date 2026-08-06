@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { nav, site } from "@/lib/site";
 import { ArcDivider } from "./ArcDivider";
+import { TibetanDivider } from "./TibetanDivider";
 
 export function Footer() {
   return (
@@ -42,8 +43,16 @@ export function Footer() {
           </nav>
         </div>
       </div>
-      <div className="hairline-t border-mist/10 px-5 py-4 text-center text-xs text-mist/40 md:px-8">
-        © {new Date().getFullYear()} {site.name}
+      <div className="hairline-t border-mist/10 px-5 py-6 md:px-8">
+        <TibetanDivider lineTone="text-mist/15" />
+        <div className="mt-4 flex flex-col items-center gap-1 text-center text-xs text-mist/40">
+          <p>
+            © {new Date().getFullYear()} {site.name}
+          </p>
+          <Link href="/credits" className="hover:text-mist/70">
+            Photo credits
+          </Link>
+        </div>
       </div>
     </footer>
   );

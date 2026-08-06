@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { PhotoCredit } from "@/components/PhotoCredit";
+import { placeImages } from "@/lib/image-credits";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Getting Here — Kora House" };
 
 export default function GettingHerePage() {
   const mapsUrl = `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}`;
+  const mapsEmbedUrl = `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}&z=15&output=embed`;
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
@@ -13,7 +17,15 @@ export default function GettingHerePage() {
 
       <div className="mt-10 grid gap-10 md:grid-cols-2">
         <div>
-          <div className="aspect-[4/3] rounded-[var(--radius-kora)] bg-ink/10" aria-hidden />
+          <div className="hairline overflow-hidden rounded-[var(--radius-card)]">
+            <iframe
+              title="Map showing the location of Kora House"
+              src={mapsEmbedUrl}
+              className="aspect-[4/3] w-full grayscale-[15%]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
           <a
             href={mapsUrl}
             target="_blank"
@@ -22,6 +34,17 @@ export default function GettingHerePage() {
           >
             Open in Google Maps
           </a>
+
+          <div className="group relative mt-6 aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]">
+            <Image
+              src={placeImages.dharamshalaHimalayas.file}
+              alt={placeImages.dharamshalaHimalayas.alt}
+              fill
+              className="object-cover"
+              sizes="(min-width: 768px) 50vw, 100vw"
+            />
+            <PhotoCredit image={placeImages.dharamshalaHimalayas} />
+          </div>
         </div>
 
         <div className="space-y-8">

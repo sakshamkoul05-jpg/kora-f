@@ -1,15 +1,39 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { KoraPathDraw } from "@/components/KoraPathDraw";
+import { PhotoCredit } from "@/components/PhotoCredit";
+import { TibetanDivider } from "@/components/TibetanDivider";
+import { placeImages, type PlaceImage } from "@/lib/image-credits";
 
 export const metadata: Metadata = { title: "Experiences — Kora House" };
 
-const stops = [
-  { name: "Tsuglagkhang Temple", note: "The Dalai Lama's temple complex." },
-  { name: "Lhagyal Ri kora", note: "The circumambulation walk around the hill." },
-  { name: "Dharamkot", note: "A quieter village further up the ridge." },
-  { name: "Bhagsu Falls", note: "A short walk beyond Bhagsu village." },
-  { name: "Triund trailhead", note: "The starting point for the Triund trek." },
-] as const;
+const stops: { name: string; note: string; photo: PlaceImage }[] = [
+  {
+    name: "Tsuglagkhang Temple",
+    note: "The Dalai Lama's temple complex.",
+    photo: placeImages.templeArchitecturalDetail,
+  },
+  {
+    name: "Lhagyal Ri kora",
+    note: "The circumambulation walk around the hill, past Namgyal Monastery.",
+    photo: placeImages.monasteryNamgyal,
+  },
+  {
+    name: "Dharamkot",
+    note: "A quieter village further up the ridge.",
+    photo: placeImages.dharamkotHouses,
+  },
+  {
+    name: "Bhagsu",
+    note: "The village and falls a short walk beyond McLeodganj.",
+    photo: placeImages.prayerFlagsBhagsu,
+  },
+  {
+    name: "Triund trailhead",
+    note: "The starting point for the Triund trek.",
+    photo: placeImages.triundTrek,
+  },
+];
 
 export default function ExperiencesPage() {
   return (
@@ -23,11 +47,27 @@ export default function ExperiencesPage() {
         <KoraPathDraw />
       </div>
 
-      <div className="mt-14 grid gap-4 sm:grid-cols-2">
+      <div className="mt-6">
+        <TibetanDivider />
+      </div>
+
+      <div className="mt-14 grid gap-6 sm:grid-cols-2">
         {stops.map((stop) => (
-          <div key={stop.name} className="hairline rounded-[var(--radius-kora)] p-5">
-            <p className="font-display">{stop.name}</p>
-            <p className="mt-1 text-sm text-ink/60">{stop.note}</p>
+          <div key={stop.name} className="overflow-hidden rounded-[var(--radius-card)] bg-paper">
+            <div className="group relative aspect-[16/10]">
+              <Image
+                src={stop.photo.file}
+                alt={stop.photo.alt}
+                fill
+                className="object-cover"
+                sizes="(min-width: 640px) 50vw, 100vw"
+              />
+              <PhotoCredit image={stop.photo} />
+            </div>
+            <div className="p-5">
+              <p className="font-display text-lg">{stop.name}</p>
+              <p className="mt-1 text-sm text-ink/60">{stop.note}</p>
+            </div>
           </div>
         ))}
       </div>

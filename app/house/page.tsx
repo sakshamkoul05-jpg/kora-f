@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { PhotoCredit } from "@/components/PhotoCredit";
+import { TibetanDivider } from "@/components/TibetanDivider";
+import { placeImages } from "@/lib/image-credits";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = { title: "The House — Kora House" };
@@ -26,9 +30,28 @@ export default function HousePage() {
         A house that&apos;s run, not managed
       </h1>
 
+      <div className="group relative mt-10 aspect-[21/9] overflow-hidden rounded-[var(--radius-card)]">
+        <Image
+          src={placeImages.mcleodganjStreet.file}
+          alt={placeImages.mcleodganjStreet.alt}
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <PhotoCredit image={placeImages.mcleodganjStreet} />
+      </div>
+      <p className="mt-2 text-xs text-ink/40">
+        McLeodganj, just down the hill from the house. Photos of the house
+        itself are on their way from the hosts.
+      </p>
+
+      <div className="mt-6">
+        <TibetanDivider />
+      </div>
+
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
         {character.map((item) => (
-          <div key={item.title} className="hairline rounded-[var(--radius-kora)] p-5">
+          <div key={item.title} className="hairline rounded-[var(--radius-card)] p-5">
             <p className="font-display">{item.title}</p>
             <p className="mt-2 text-sm text-ink/70">{item.body}</p>
           </div>
