@@ -6,27 +6,31 @@ export function RoomCard({ room }: { room: Room }) {
   return (
     <Link
       href={`/rooms/${room.slug}`}
-      className="hairline group flex flex-col overflow-hidden rounded-[var(--radius-card)] bg-paper transition-colors hover:border-ink/30"
+      className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-ink/10 bg-paper-raised transition-colors duration-300 hover:border-ink/25"
     >
       <PhotoPending label="Photo coming soon" className="aspect-[4/3] w-full" />
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="font-display text-lg">{room.name}</p>
-          <span className="eyebrow text-ink/50">{room.floor} floor</span>
+
+      <div className="flex flex-1 flex-col gap-3 p-6">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="display-md">{room.name}</p>
+          <span className="eyebrow shrink-0 text-ink/40">{room.floor}</span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          <span className="rounded-[var(--radius-kora)] bg-deodar/10 px-2 py-0.5 text-xs text-deodar">
+
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] tracking-wide text-deodar">
             {room.hasKitchen ? "Self-catering" : "No kitchen"}
           </span>
           {room.noStairsFromEntrance && (
-            <span className="rounded-[var(--radius-kora)] bg-maroon/10 px-2 py-0.5 text-xs text-maroon">
-              No stairs from entrance
+            <span className="rounded-[var(--radius-kora)] bg-maroon/12 px-2.5 py-1 text-[11px] tracking-wide text-maroon">
+              No stairs
             </span>
           )}
         </div>
-        {room.notes && <p className="text-sm text-ink/60">{room.notes}</p>}
-        <p className="mt-auto pt-2 font-data text-sm text-ink/70">
-          {room.nightlyRate ? `From ₹${room.nightlyRate}/night` : "Rate available on request"}
+
+        {room.notes && <p className="text-sm leading-relaxed text-ink-soft">{room.notes}</p>}
+
+        <p className="mt-auto border-t border-ink/10 pt-4 font-data text-sm text-ink-soft">
+          {room.nightlyRate ? `From ₹${room.nightlyRate} / night` : "Rate on request"}
         </p>
       </div>
     </Link>

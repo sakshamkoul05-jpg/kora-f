@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Karla, Marcellus } from "next/font/google";
 import { Footer } from "@/components/Footer";
-import { GrainOverlay } from "@/components/GrainOverlay";
 import { Header } from "@/components/Header";
+import { PaperTexture } from "@/components/PaperTexture";
 import { KhataTransition } from "@/components/KhataTransition";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${marcellus.variable} ${karla.variable} ${plexMono.variable} h-full`}>
       <body className="flex min-h-full flex-col">
-        <GrainOverlay />
+        <PaperTexture />
         <KhataTransition>
           <Header />
           <main className="flex-1">{children}</main>

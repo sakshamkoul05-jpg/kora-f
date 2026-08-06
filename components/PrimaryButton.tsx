@@ -9,7 +9,7 @@ export function PrimaryButton({ className, ...props }: Props) {
   return (
     <Link
       {...props}
-      className={`lamp-hover inline-block rounded-[var(--radius-kora)] bg-maroon px-6 py-3 text-center font-display text-sm text-mist transition-opacity hover:opacity-95 ${className ?? ""}`}
+      className={`lamp-hover inline-block rounded-[var(--radius-kora)] bg-maroon px-8 py-3.5 text-center font-display text-[15px] tracking-wide text-paper transition-colors hover:bg-maroon-deep ${className ?? ""}`}
     />
   );
 }

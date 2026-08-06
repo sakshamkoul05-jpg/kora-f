@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Ornament } from "@/components/Ornament";
 import { PhotoPending } from "@/components/PhotoPending";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { getRoomBySlug, rooms } from "@/lib/rooms";
@@ -37,63 +38,72 @@ export default async function RoomDetailPage({
   ].filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-      <Link href="/rooms" className="text-sm text-ink/50 hover:text-ink">
+    <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
+      <Link
+        href="/rooms"
+        className="eyebrow text-ink/45 transition-colors hover:text-ink"
+      >
         ← All rooms
       </Link>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
         <PhotoPending
           label="Photo coming soon"
-          className="aspect-[4/3] rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2"
+          className="aspect-[4/3] rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2 sm:aspect-auto"
         />
-        <PhotoPending label="Photo coming soon" className="aspect-[4/3] rounded-[var(--radius-card)]" />
-        <PhotoPending label="Photo coming soon" className="aspect-[4/3] rounded-[var(--radius-card)]" />
+        <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
+        <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
       </div>
 
-      <div className="mt-10 grid gap-10 md:grid-cols-[1fr_360px]">
+      <div className="mt-14 grid gap-14 md:grid-cols-[1fr_370px]">
         <div>
-          <h1 className="font-display text-4xl md:text-5xl">{room.name}</h1>
-          <p className="mt-2 font-data text-sm text-ink/60">{metaParts.join(" · ")}</p>
+          <Ornament variant="knot" />
+          <h1 className="display-xl mt-4">{room.name}</h1>
+          <p className="mt-3 font-data text-sm text-ink-soft">{metaParts.join(" · ")}</p>
 
-          <div className="mt-6 flex flex-wrap gap-1.5">
-            <span className="rounded-[var(--radius-kora)] bg-deodar/10 px-2 py-1 text-xs text-deodar">
+          <div className="mt-7 flex flex-wrap gap-2">
+            <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar">
               {room.hasKitchen ? "Self-catering kitchen" : "No kitchen"}
             </span>
             {room.noStairsFromEntrance && (
-              <span className="rounded-[var(--radius-kora)] bg-maroon/10 px-2 py-1 text-xs text-maroon">
+              <span className="rounded-[var(--radius-kora)] bg-maroon/12 px-3 py-1.5 text-xs text-maroon">
                 No stairs from entrance
               </span>
             )}
           </div>
 
-          {room.notes && <p className="mt-6 text-ink/70">{room.notes}</p>}
+          {room.notes && <p className="lede mt-8">{room.notes}</p>}
 
-          <p className="mt-6 text-sm text-ink/50">
-            Exact occupancy, bed configuration and room size are being
-            confirmed with the hosts — get in touch for the current detail.
+          <p className="mt-6 border-l-2 border-butter/50 pl-4 text-sm text-ink-soft/80">
+            Exact occupancy, bed configuration and room size are still being
+            confirmed with the hosts — message the house for the current detail.
           </p>
 
-          <div className="hairline-t mt-10 pt-8">
-            <p className="eyebrow text-ink/50">Good to know</p>
-            <ul className="mt-3 space-y-2 text-sm text-ink/70">
-              <li>{site.caveats.stairs}</li>
-              <li>{site.caveats.market}</li>
-              <li>{site.caveats.housekeeping}</li>
+          <div className="mt-14 border-t border-ink/10 pt-10">
+            <p className="eyebrow text-ink/45">Good to know</p>
+            <ul className="mt-5 space-y-4">
+              {[site.caveats.stairs, site.caveats.market, site.caveats.housekeeping].map((c) => (
+                <li key={c} className="flex gap-3 text-sm leading-relaxed text-ink-soft">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-butter" aria-hidden />
+                  {c}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <aside className="hairline h-fit rounded-[var(--radius-card)] bg-paper p-6">
-          <p className="font-data text-sm text-ink/50">Nightly rate</p>
-          <p className="mt-1 font-display text-2xl">
+        <aside className="h-fit rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-7 md:sticky md:top-28">
+          <p className="eyebrow text-ink/45">Nightly rate</p>
+          <p className="display-lg mt-2">
             {room.nightlyRate ? `₹${room.nightlyRate}` : "On request"}
           </p>
-          <PrimaryButton href="/rooms" className="mt-6 block">
+          <div className="my-6 h-px w-full bg-ink/10" />
+          <PrimaryButton href="/rooms" className="block w-full">
             Check availability
           </PrimaryButton>
-          <p className="mt-3 text-center text-xs text-ink/40">
-            Booking opens soon — message the house on WhatsApp for now.
+          <p className="mt-4 text-center text-xs leading-relaxed text-ink/45">
+            Online booking opens soon. For now, message the house on WhatsApp
+            and the hosts will confirm.
           </p>
         </aside>
       </div>

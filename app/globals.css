@@ -1,48 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm, rustic-premium palette. Ink shifted from cool slate to a warm
-     espresso brown-black; Mist and Paper shifted from cool bone to warm
-     parchment/ivory. Maroon, Butter Lamp and Deodar are unchanged — they're
-     the Tibetan monastic colours (maroon robes, gold gilding, forest green)
-     and already did the job. Sky is new, for the five-colour prayer-flag
-     accent set (blue/white/red/green/yellow -> sky/paper/maroon/deodar/butter). */
-  --color-ink: #2a2119;
-  --color-maroon: #6e2230;
-  --color-butter: #e8b04b;
-  --color-deodar: #3e5648;
-  --color-sky: #2f4a6b;
-  --color-mist: #f3ead8;
-  --color-paper: #faf4e8;
+  /* Deeper, warmer, older. The previous pass was warm but thin — this
+     pushes toward hand-made Lokta paper, rough plaster and monastery wood.
+     Ink is a warm near-black brown, never grey. Maroon deepened toward the
+     colour of monks' robes; gold aged rather than bright. */
+  --color-ink: #241c15;
+  --color-ink-soft: #4a3d31;
+  --color-maroon: #6b2436;
+  --color-maroon-deep: #4a1724;
+  --color-butter: #d99f3c;
+  --color-butter-pale: #e8c98a;
+  --color-deodar: #3d5244;
+  --color-sky: #35536f;
 
-  --hairline: color-mix(in srgb, var(--color-ink) 14%, transparent);
-  --hairline-strong: color-mix(in srgb, var(--color-ink) 24%, transparent);
+  /* Paper: warm, slightly uneven parchment. Paper-raised is for cards that
+     need to lift off the page without a shadow. */
+  --color-mist: #efe4cd;
+  --color-paper: #f7efdd;
+  --color-paper-raised: #fbf6ea;
+
+  --hairline: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --hairline-strong: color-mix(in srgb, var(--color-ink) 28%, transparent);
 }
 
 @theme inline {
   --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
   --color-maroon: var(--color-maroon);
+  --color-maroon-deep: var(--color-maroon-deep);
   --color-butter: var(--color-butter);
+  --color-butter-pale: var(--color-butter-pale);
   --color-deodar: var(--color-deodar);
   --color-sky: var(--color-sky);
   --color-mist: var(--color-mist);
   --color-paper: var(--color-paper);
+  --color-paper-raised: var(--color-paper-raised);
 
   --font-display: var(--font-marcellus), Georgia, serif;
   --font-body: var(--font-karla), system-ui, sans-serif;
   --font-data: var(--font-plex-mono), ui-monospace, monospace;
 
-  /* Small UI (buttons, pills, inputs) stays crisp; photos and cards get a
-     softer, more lived-in radius — the "rustic premium resort" split. */
-  --radius-kora: 4px;
-  --radius-card: 16px;
+  /* Small UI stays crisp and architectural; photos and cards get a softer,
+     more lived-in radius. */
+  --radius-kora: 3px;
+  --radius-card: 14px;
 
-  --tracking-eyebrow: 0.18em;
-}
-
-@media (prefers-color-scheme: dark) {
-  /* This site does not ship a dark theme — the Mist background and Ink Slate
-     text are the brand, in both light and dark OS modes. */
+  --tracking-eyebrow: 0.2em;
 }
 
 * {
@@ -54,10 +58,33 @@ html {
 }
 
 body {
-  background: var(--color-mist);
+  background-color: var(--color-mist);
   color: var(--color-ink);
   font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  /* Uneven dye across the page, the way a sheet of hand-made paper is never
+     one flat tone. Very low contrast — you should only notice it's missing. */
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 15% 0%,
+      color-mix(in srgb, var(--color-butter) 9%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 85% 25%,
+      color-mix(in srgb, var(--color-maroon) 5%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 90% 70% at 50% 100%,
+      color-mix(in srgb, var(--color-deodar) 7%, transparent),
+      transparent 70%
+    );
+  background-attachment: fixed;
 }
+
+/* ---------- Type ---------- */
 
 .font-display {
   font-family: var(--font-display);
@@ -67,6 +94,28 @@ body {
   font-family: var(--font-data);
 }
 
+/* Display sizes scale with the viewport so the type feels confident on a
+   laptop without breaking on a phone. */
+.display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.display-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.2;
+}
+
 .eyebrow {
   font-family: var(--font-data);
   font-size: 11px;
@@ -74,6 +123,15 @@ body {
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
 }
+
+/* Letterpress-ish lead paragraph — larger, looser, for section openers. */
+.lede {
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  line-height: 1.75;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- Rules & edges ---------- */
 
 .hairline {
   border: 1px solid var(--hairline);
@@ -95,45 +153,41 @@ body {
   color: var(--hairline-strong);
 }
 
-/* Five-colour prayer-flag accent strip: blue/white/red/green/yellow, the
-   traditional order (sky, air, fire, water, earth). Used sparingly as a
-   literal, visible marker of Tibetan material culture. */
-.prayer-flag-strip {
-  display: flex;
-  height: 4px;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 999px;
-}
-.prayer-flag-strip > span {
-  flex: 1 1 0;
-}
-.prayer-flag-strip > span:nth-child(1) {
-  background: var(--color-sky);
-}
-.prayer-flag-strip > span:nth-child(2) {
-  background: var(--color-paper);
-}
-.prayer-flag-strip > span:nth-child(3) {
-  background: var(--color-maroon);
-}
-.prayer-flag-strip > span:nth-child(4) {
-  background: var(--color-deodar);
-}
-.prayer-flag-strip > span:nth-child(5) {
-  background: var(--color-butter);
-}
-
-/* Warm scrim for legible type over real photography — ink-tinted rather
-   than flat black, so it stays inside the palette. */
+/* Warm scrim for legible type over photography — ink-tinted, never flat
+   black, so photos stay inside the palette. */
 .photo-scrim {
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-ink) 78%, transparent) 0%,
-    color-mix(in srgb, var(--color-ink) 32%, transparent) 45%,
-    transparent 75%
+    color-mix(in srgb, var(--color-ink) 88%, transparent) 0%,
+    color-mix(in srgb, var(--color-ink) 55%, transparent) 38%,
+    color-mix(in srgb, var(--color-ink) 18%, transparent) 68%,
+    transparent 100%
   );
 }
+
+/* Warms and slightly ages photography so nine sources from nine cameras
+   read as one commissioned set. */
+.photo-warm {
+  filter: sepia(0.16) saturate(0.94) contrast(1.03) brightness(0.99);
+}
+
+/* Immersive dark bands: monastery-wall depth rather than flat charcoal. */
+.band-dark {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(
+      ellipse 70% 80% at 20% 10%,
+      color-mix(in srgb, var(--color-maroon) 34%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 60% 70% at 90% 90%,
+      color-mix(in srgb, var(--color-butter) 12%, transparent),
+      transparent 65%
+    );
+}
+
+/* ---------- Motion ---------- */
 
 /* Mala bead settle: a weighted overshoot, not a linear scale-in. */
 @keyframes mala-settle {
@@ -201,32 +255,32 @@ body {
   animation: lamp-flicker 1.8s ease-in-out infinite;
 }
 
-/* Prayer flag sway: staggered, slightly desynced periods per segment. */
-@keyframes flag-sway-a {
+/* Prayer flag sway: cloth pivots from the string it's tied to. Amplitude is
+   small and the periods are deliberately coprime-ish so the flags never fall
+   into visible sync. */
+@keyframes cloth-sway-a {
   0%,
   100% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) skewX(0deg);
   }
   50% {
-    transform: rotate(3deg);
+    transform: rotate(1.8deg) skewX(-2deg);
   }
 }
-@keyframes flag-sway-b {
+@keyframes cloth-sway-b {
   0%,
   100% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) skewX(0deg);
   }
   50% {
-    transform: rotate(-2.4deg);
+    transform: rotate(-1.4deg) skewX(1.6deg);
   }
 }
-.flag-sway-a {
-  animation: flag-sway-a 3.6s ease-in-out infinite;
-  transform-origin: top center;
+.cloth-sway-a {
+  animation: cloth-sway-a 4.1s ease-in-out infinite;
 }
-.flag-sway-b {
-  animation: flag-sway-b 4.3s ease-in-out infinite;
-  transform-origin: top center;
+.cloth-sway-b {
+  animation: cloth-sway-b 5.3s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

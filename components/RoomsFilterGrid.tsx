@@ -28,7 +28,7 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
           not buried amenity icons. */}
       <div className="flex flex-wrap gap-6">
         <fieldset>
-          <legend className="eyebrow text-ink/50">Kitchen</legend>
+          <legend className="eyebrow text-ink/45">Kitchen</legend>
           <div className="mt-2 flex gap-2">
             {(
               [
@@ -42,10 +42,10 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
                 type="button"
                 onClick={() => setKitchen(value)}
                 aria-pressed={kitchen === value}
-                className={`rounded-[var(--radius-kora)] border px-3 py-1.5 text-sm transition-colors ${
+                className={`rounded-[var(--radius-kora)] border px-4 py-2 text-sm transition-colors ${
                   kitchen === value
-                    ? "border-maroon bg-maroon text-mist"
-                    : "border-ink/15 text-ink/70 hover:border-ink/30"
+                    ? "border-maroon bg-maroon text-paper"
+                    : "border-ink/20 text-ink-soft hover:border-ink/40"
                 }`}
               >
                 {label}
@@ -55,7 +55,7 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
         </fieldset>
 
         <fieldset>
-          <legend className="eyebrow text-ink/50">Floor</legend>
+          <legend className="eyebrow text-ink/45">Floor</legend>
           <div className="mt-2 flex gap-2">
             {(
               [
@@ -69,10 +69,10 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
                 type="button"
                 onClick={() => setFloor(value)}
                 aria-pressed={floor === value}
-                className={`rounded-[var(--radius-kora)] border px-3 py-1.5 text-sm transition-colors ${
+                className={`rounded-[var(--radius-kora)] border px-4 py-2 text-sm transition-colors ${
                   floor === value
-                    ? "border-maroon bg-maroon text-mist"
-                    : "border-ink/15 text-ink/70 hover:border-ink/30"
+                    ? "border-maroon bg-maroon text-paper"
+                    : "border-ink/20 text-ink-soft hover:border-ink/40"
                 }`}
               >
                 {label}
@@ -82,16 +82,16 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
         </fieldset>
       </div>
 
-      <p className="mt-4 font-data text-xs text-ink/50" role="status">
+      <p className="mt-6 font-data text-xs text-ink/45" role="status">
         {filtered.length} of {rooms.length} rooms
       </p>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-3">
+      <div className="mt-7 grid gap-7 md:grid-cols-3">
         {filtered.map((room) => (
           <RoomCard key={room.slug} room={room} />
         ))}
         {filtered.length === 0 && (
-          <p className="col-span-full text-sm text-ink/60">
+          <p className="col-span-full text-sm text-ink-soft">
             No rooms match those filters.
           </p>
         )}

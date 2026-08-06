@@ -98,7 +98,48 @@ via the global CSS reduced-motion rule in `app/globals.css` and via explicit
 `PrayerFlags`, `KoraPathDraw`). None of it runs past booking step one or in
 admin, because neither exists yet.
 
-## Redesign notes
+## Overhaul notes (third pass)
+
+The client asked for a full overhaul: more genuinely Tibetan, more rustic,
+still premium. Three concrete defects were called out and fixed:
+
+- **Overlapping labels on the Experiences circle.** The diagram carried
+  markers at t=0.04 and t=0.97 — 7% apart on a *closed* loop, so "Kora House"
+  and "Back to the house" printed on top of each other — and every label used
+  the default start-anchor, so left-side labels ran back across the ring.
+  `KoraPathDraw` now pushes each label radially outward and anchors it by
+  side (`end` on the left, `start` on the right, `middle` at top/bottom), and
+  the redundant return marker is gone. Verified in-browser: 0 pairwise
+  bounding-box intersections.
+- **Cartoonish prayer flags.** Ten flat, fully-saturated rectangles in a
+  straight row. `PrayerFlags` now hangs 16 flags from a sagging quadratic
+  bezier (~58px of sag), each rotated to the local tangent (75°–106° spread),
+  with irregular widths, drooping hems, a fold shadow, and sun-bleached
+  translucency (opacity 0.53–0.77). Traditional blue/white/red/green/yellow
+  order is preserved — that order is meaningful, not a palette choice.
+- **Too flat / not rustic.** Deeper warm palette, real two-layer hand-made
+  paper texture (`PaperTexture`: fine fibre + broad mottle + vignette),
+  `.band-dark` for monastery-wall depth, `.photo-warm` to unify nine photos
+  from nine cameras into one set, and a proper ornament vocabulary
+  (`Ornament`: cloud scroll, lotus band, interlace) replacing the single
+  generic squiggle.
+
+> **On ornament choice:** the motifs are the *decorative* vocabulary from
+> textile borders and painted woodwork — deliberately **not** the Eight
+> Auspicious Symbols or the dharmachakra. A badly drawn sacred symbol is
+> worse than no symbol, and these carry the same identity without that risk.
+
+### SSR determinism warning
+
+`PrayerFlags` generates geometry at module scope, which is server-rendered.
+`Math.sin`, `Math.atan2` and friends are **implementation-defined to the last
+ULP** — Node and browser V8 can disagree, which produced a real hydration
+mismatch during this pass (`37.11221408841084` vs `37.11221408849815`). The
+fix, and the rule for anything similar here: use an integer-only hash
+(`Math.imul`/xor/shift) for jitter, and round every number that reaches the
+DOM (`round3`). Avoiding `Math.random()` alone is *not* sufficient.
+
+## Redesign notes (second pass)
 
 The first pass (cool-bone "quiet monastery" palette, 2px architectural radii,
 no real photography) was rejected by the client: not enough visible Tibetan

@@ -1,18 +1,20 @@
-// Warm, intentional-looking stand-in for photography we don't have rights
-// to fake — property/room photos that are genuinely pending from the hosts.
-// Never a flat grey box: it should read as "coming soon", not "broken".
+// Warm, intentional stand-in for photography we don't have rights to fake —
+// the property's own rooms, balcony and hosts, which are genuinely pending
+// from the hosts. Never a flat grey box: it should read as "commissioned,
+// not yet delivered", not as a broken image.
 export function PhotoPending({ label, className }: { label?: string; className?: string }) {
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-ink)_7%,var(--color-paper)),color-mix(in_srgb,var(--color-ink)_14%,var(--color-paper)))] ${className ?? ""}`}
+      className={`relative flex items-center justify-center overflow-hidden bg-[linear-gradient(150deg,color-mix(in_srgb,var(--color-butter)_10%,var(--color-paper-raised)),color-mix(in_srgb,var(--color-ink)_13%,var(--color-paper)))] ${className ?? ""}`}
     >
-      <svg viewBox="0 0 64 64" className="h-10 w-10 text-ink/20">
-        <circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" strokeWidth="1" />
-        <circle cx="32" cy="32" r="3" fill="currentColor" />
+      {/* Concentric kora rings, drawn faintly — the house mark, standing in
+          for the photograph. */}
+      <svg viewBox="0 0 120 120" className="h-20 w-20 text-ink/15" fill="none" aria-hidden>
+        <circle cx="60" cy="60" r="34" stroke="currentColor" strokeWidth="1" />
+        <circle cx="60" cy="60" r="22" stroke="currentColor" strokeWidth="1" opacity="0.7" />
+        <circle cx="60" cy="60" r="3.5" fill="currentColor" />
       </svg>
-      {label && (
-        <span className="eyebrow absolute bottom-3 left-3 text-ink/35">{label}</span>
-      )}
+      {label && <span className="eyebrow absolute bottom-3 left-4 text-ink/30">{label}</span>}
     </div>
   );
 }
