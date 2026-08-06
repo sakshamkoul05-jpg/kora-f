@@ -49,40 +49,58 @@
   --tracking-eyebrow: 0.2em;
 }
 
-* {
-  border-color: var(--hairline);
+/* Everything below lives in a cascade layer on purpose.
+ *
+ * `@import "tailwindcss"` registers the layers theme/base/components/utilities.
+ * UNLAYERED css beats every layer for normal declarations, so a bare
+ * `.lede { color: ... }` here would silently override `text-paper/80` on the
+ * same element no matter the source order — which is exactly how the hero
+ * copy ended up dark-on-dark. Declaring these in `components` puts them
+ * *below* `utilities`, so a colour utility can always override a component
+ * class. Keep it that way when adding classes here.
+ *
+ * @keyframes and the reduced-motion block stay unlayered deliberately: keyframes
+ * don't participate in the cascade, and unlayered `!important` still beats every
+ * normal declaration. */
+
+@layer base {
+  * {
+    border-color: var(--hairline);
+  }
+
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-mist);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    /* Uneven dye across the page, the way a sheet of hand-made paper is never
+       one flat tone. Very low contrast — you should only notice it's missing. */
+    background-image:
+      radial-gradient(
+        ellipse 80% 60% at 15% 0%,
+        color-mix(in srgb, var(--color-butter) 9%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 85% 25%,
+        color-mix(in srgb, var(--color-maroon) 5%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 90% 70% at 50% 100%,
+        color-mix(in srgb, var(--color-deodar) 7%, transparent),
+        transparent 70%
+      );
+    background-attachment: fixed;
+  }
 }
 
-html {
-  scroll-padding-top: 5rem;
-}
-
-body {
-  background-color: var(--color-mist);
-  color: var(--color-ink);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.7;
-  /* Uneven dye across the page, the way a sheet of hand-made paper is never
-     one flat tone. Very low contrast — you should only notice it's missing. */
-  background-image:
-    radial-gradient(
-      ellipse 80% 60% at 15% 0%,
-      color-mix(in srgb, var(--color-butter) 9%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 70% 50% at 85% 25%,
-      color-mix(in srgb, var(--color-maroon) 5%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 90% 70% at 50% 100%,
-      color-mix(in srgb, var(--color-deodar) 7%, transparent),
-      transparent 70%
-    );
-  background-attachment: fixed;
-}
+@layer components {
 
 /* ---------- Type ---------- */
 
@@ -154,15 +172,30 @@ body {
 }
 
 /* Warm scrim for legible type over photography — ink-tinted, never flat
-   black, so photos stay inside the palette. */
+   black, so photos stay inside the palette.
+ *
+ * The stops are tuned to the hero's text column, not chosen by eye: the
+ * eyebrow sits ~72% up from the bottom, where the previous curve had faded to
+ * 13% ink and left it at 2.96:1 against the sky — under WCAG AA. It now holds
+ * ~66% there, and never drops below 35% even at the very top. */
 .photo-scrim {
   background: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-ink) 88%, transparent) 0%,
-    color-mix(in srgb, var(--color-ink) 55%, transparent) 38%,
-    color-mix(in srgb, var(--color-ink) 18%, transparent) 68%,
-    transparent 100%
+    color-mix(in srgb, var(--color-ink) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-ink) 78%, transparent) 50%,
+    color-mix(in srgb, var(--color-ink) 62%, transparent) 80%,
+    color-mix(in srgb, var(--color-ink) 35%, transparent) 100%
   );
+}
+
+/* Belt-and-braces for type over photography. The hosts will eventually swap
+   in their own hero image, and we can't know how bright it is — this keeps
+   the hero readable over anything without being visible when the scrim is
+   already doing its job. */
+.text-on-photo {
+  text-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-ink) 55%, transparent),
+    0 2px 14px color-mix(in srgb, var(--color-ink) 40%, transparent);
 }
 
 /* Warms and slightly ages photography so nine sources from nine cameras
@@ -187,7 +220,12 @@ body {
     );
 }
 
+}
+/* end @layer components */
+
 /* ---------- Motion ---------- */
+/* Animation classes stay unlayered: they set only `animation`, so no Tailwind
+   colour/spacing utility can conflict with them. */
 
 /* Mala bead settle: a weighted overshoot, not a linear scale-in. */
 @keyframes mala-settle {

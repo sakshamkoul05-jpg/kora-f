@@ -129,6 +129,30 @@ still premium. Three concrete defects were called out and fixed:
 > Auspicious Symbols or the dharmachakra. A badly drawn sacred symbol is
 > worse than no symbol, and these carry the same identity without that risk.
 
+### Cascade-layer rule for `globals.css`
+
+Custom classes in `app/globals.css` **must** be declared inside
+`@layer base` / `@layer components`. Unlayered CSS beats every Tailwind layer
+for normal declarations, regardless of source order — so a bare
+`.lede { color: … }` silently overrides `text-paper/80` on the same element.
+That is exactly how the hero copy shipped dark-brown-on-a-dark-photo
+(`rgb(74,61,49)` where `text-paper/80` was specified and ignored). Keeping
+these in `components` puts them below `utilities`, so a colour utility always
+wins, while the component default still applies where nothing overrides it.
+
+`@keyframes` and the `prefers-reduced-motion` block stay unlayered on purpose:
+keyframes don't participate in the cascade, and unlayered `!important` still
+beats every normal declaration.
+
+### Text over photography
+
+Hero contrast is tuned against the *measured* photo, not by eye. The scrim
+stops are set so the eyebrow — the highest and therefore least-covered line —
+clears WCAG AA. Measured against the current hero image it sits at **8.04:1**
+(AAA). `.text-on-photo` adds a soft ink shadow as insurance for when the hosts
+swap in their own hero, which may be brighter. If you change the hero image or
+move the text block, re-check contrast rather than assuming.
+
 ### SSR determinism warning
 
 `PrayerFlags` generates geometry at module scope, which is server-rendered.

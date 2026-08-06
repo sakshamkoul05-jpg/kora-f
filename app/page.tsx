@@ -45,7 +45,7 @@ export default function HomePage() {
         <div className="photo-scrim absolute inset-0 -z-10" aria-hidden />
         <PrayerFlags />
 
-        <div className="mx-auto w-full max-w-6xl px-5 pb-20 pt-40 md:px-8 md:pb-28">
+        <div className="text-on-photo mx-auto w-full max-w-6xl px-5 pb-20 pt-40 md:px-8 md:pb-28">
           <div className="max-w-2xl">
             <p className="eyebrow text-butter-pale">
               McLeodganj · Himachal Pradesh · 2082 m
@@ -55,7 +55,7 @@ export default function HomePage() {
               <br />
               not a hotel
             </h1>
-            <p className="lede mt-6 max-w-lg text-paper/80">
+            <p className="lede mt-6 max-w-lg text-paper/90">
               Six rooms above the temple road — quiet, secluded, and run by the
               family who live here. The common balcony is the reason most
               people come back.
