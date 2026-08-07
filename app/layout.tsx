@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Karla, Marcellus } from "next/font/google";
+import { IBM_Plex_Mono, Karla, Marcellus, Noto_Serif_Tibetan } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PaperTexture } from "@/components/PaperTexture";
@@ -24,6 +24,18 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+// Uchen script, for the mantra carved into the mani stones. `display: block`
+// rather than swap: Tibetan has no sane fallback on most systems, so it is
+// better for the carving to be briefly absent than to flash as tofu. The
+// stones also check at runtime that this actually loaded before carving —
+// see components/motion/ManiStone.tsx.
+const notoTibetan = Noto_Serif_Tibetan({
+  variable: "--font-tibetan",
+  subsets: ["tibetan"],
+  weight: ["400", "600"],
+  display: "block",
+});
+
 export const metadata: Metadata = {
   title: `${site.name} — ${site.tagline}`,
   description:
@@ -32,7 +44,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${marcellus.variable} ${karla.variable} ${plexMono.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${marcellus.variable} ${karla.variable} ${plexMono.variable} ${notoTibetan.variable} h-full`}
+    >
       <body className="flex min-h-full flex-col">
         <PaperTexture />
         <KhataTransition>

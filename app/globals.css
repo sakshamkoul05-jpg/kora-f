@@ -40,6 +40,8 @@
   --font-display: var(--font-marcellus), Georgia, serif;
   --font-body: var(--font-karla), system-ui, sans-serif;
   --font-data: var(--font-plex-mono), ui-monospace, monospace;
+  /* --font-tibetan is defined on <html> by next/font — do not redeclare it
+     here or it will clobber the loaded face. Used by .mani-mantra below. */
 
   /* Small UI stays crisp and architectural; photos and cards get a softer,
      more lived-in radius. */
@@ -226,6 +228,18 @@
 .group:hover .mala-label,
 .group:focus-visible .mala-label {
   opacity: 1;
+}
+
+/* The mantra carved into a mani stone. No generic fallback in the stack on
+   purpose: if Noto Serif Tibetan is missing we want nothing rather than a
+   substituted face producing broken stacks — and ManiStone gates on
+   isTibetanReady() before drawing this at all. */
+.mani-mantra {
+  font-family: var(--font-tibetan);
+  font-size: 21px;
+  font-weight: 400;
+  /* Tibetan stacks below the baseline; give the glyphs room to breathe. */
+  letter-spacing: 0.02em;
 }
 
 /* Immersive dark bands: monastery-wall depth rather than flat charcoal. */
