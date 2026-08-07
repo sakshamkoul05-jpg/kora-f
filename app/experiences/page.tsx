@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { KoraCircuit } from "@/components/motion/KoraCircuit";
 import { OrnamentDivider, SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages, type PlaceImage } from "@/lib/image-credits";
-import { koraNotes } from "@/lib/kora-route";
+import { KoraSection } from "./KoraSection";
 
 export const metadata: Metadata = { title: "Experiences — Kora House" };
 
@@ -50,21 +49,7 @@ export default function ExperiencesPage() {
       </p>
 
       <div className="mt-16">
-        <KoraCircuit />
-        <div className="mx-auto mt-8 flex max-w-2xl flex-wrap justify-center gap-x-3 gap-y-2">
-          {koraNotes.map((note) => (
-            <span
-              key={note}
-              className="rounded-[var(--radius-kora)] border border-ink/12 px-3 py-1 font-data text-[11px] text-ink-soft"
-            >
-              {note}
-            </span>
-          ))}
-        </div>
-        <p className="mx-auto mt-5 max-w-md text-center text-xs text-ink/40">
-          A stylised diagram of the circuit, not drawn to scale. Walking times
-          are approximate.
-        </p>
+        <KoraSection />
       </div>
 
       <div className="py-16">

@@ -307,6 +307,65 @@
   animation: mala-turn 600ms cubic-bezier(0.3, 0.8, 0.4, 1);
 }
 
+/* ---------- Prayer wheel ---------- */
+/* A real cylinder in 3D, so spinning it costs one transform on the parent
+   rather than a restyle of every face. */
+.prayer-wheel-scene {
+  perspective: 900px;
+}
+.prayer-wheel-drum {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.prayer-wheel-face {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin-left: -8.8px;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-maroon-deep) 92%, black),
+    var(--color-maroon) 45%,
+    color-mix(in srgb, var(--color-maroon-deep) 88%, black)
+  );
+  border-left: 1px solid color-mix(in srgb, var(--color-butter) 22%, transparent);
+  backface-visibility: hidden;
+}
+/* Fixed lighting. Does not rotate with the drum. */
+.prayer-wheel-shade {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 3px;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-ink) 72%, transparent) 0%,
+    transparent 26%,
+    color-mix(in srgb, var(--color-butter) 26%, transparent) 42%,
+    transparent 62%,
+    color-mix(in srgb, var(--color-ink) 78%, transparent) 100%
+  );
+}
+.prayer-wheel-cap {
+  position: absolute;
+  left: 50%;
+  height: 16px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  border-radius: 50%;
+  background: linear-gradient(
+    to bottom,
+    var(--color-butter),
+    color-mix(in srgb, var(--color-butter) 55%, var(--color-ink))
+  );
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+.prayer-wheel-stage:focus-visible {
+  outline: 2px solid var(--color-butter);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
 /* ---------- Kora circuit draw ---------- */
 /* Undrawn resting state. `pathLength="1"` on the element normalises the path,
    so the dash maths is 1 -> 0 and needs no JS measurement. */
@@ -400,60 +459,26 @@
   animation: khata-sweep 380ms ease-out;
 }
 
-/* Butter lamp hover: an irregular flicker driven by layered offset pulses
-   rather than a single smooth sine, kept to a very low amplitude. */
-@keyframes lamp-flicker {
-  0%,
-  100% {
-    box-shadow: 0 0 12px 1px color-mix(in srgb, var(--color-butter) 45%, transparent);
-  }
-  22% {
-    box-shadow: 0 0 15px 2px color-mix(in srgb, var(--color-butter) 55%, transparent);
-  }
-  41% {
-    box-shadow: 0 0 10px 1px color-mix(in srgb, var(--color-butter) 38%, transparent);
-  }
-  63% {
-    box-shadow: 0 0 16px 2px color-mix(in srgb, var(--color-butter) 60%, transparent);
-  }
-  78% {
-    box-shadow: 0 0 11px 1px color-mix(in srgb, var(--color-butter) 42%, transparent);
-  }
-}
-.lamp-hover {
-  transition: box-shadow 200ms ease-out;
-}
-.lamp-hover:hover,
-.lamp-hover:focus-visible {
-  animation: lamp-flicker 1.8s ease-in-out infinite;
+/* Butter lamp glow. The shadow itself is painted ONCE and never animated —
+   only the span's opacity changes, driven by noise in useButterLamp, so the
+   per-frame work stays on the compositor. Flame is not a sine wave. */
+.lamp-flame {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    0 0 14px 2px color-mix(in srgb, var(--color-butter) 60%, transparent),
+    0 0 30px 6px color-mix(in srgb, var(--color-butter) 26%, transparent);
+  transition: opacity 200ms ease-out;
 }
 
-/* Prayer flag sway: cloth pivots from the string it's tied to. Amplitude is
-   small and the periods are deliberately coprime-ish so the flags never fall
-   into visible sync. */
-@keyframes cloth-sway-a {
-  0%,
-  100% {
-    transform: rotate(0deg) skewX(0deg);
-  }
-  50% {
-    transform: rotate(1.8deg) skewX(-2deg);
-  }
-}
-@keyframes cloth-sway-b {
-  0%,
-  100% {
-    transform: rotate(0deg) skewX(0deg);
-  }
-  50% {
-    transform: rotate(-1.4deg) skewX(1.6deg);
-  }
-}
-.cloth-sway-a {
-  animation: cloth-sway-a 4.1s ease-in-out infinite;
-}
-.cloth-sway-b {
-  animation: cloth-sway-b 5.3s ease-in-out infinite;
+/* Prayer flag cloth pivots from the string it is tied to. The transform is
+   written per frame from a noise value (see components/motion/PrayerFlags),
+   not from a keyframe — wind is gusty, not periodic. */
+[data-cloth] {
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

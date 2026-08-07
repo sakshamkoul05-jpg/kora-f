@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { PrimaryButton } from "@/components/PrimaryButton";
 import { KoraCircuit } from "@/components/motion/KoraCircuit";
 import { MalaRail } from "@/components/motion/MalaRail";
+import { ManiStone } from "@/components/motion/ManiStone";
+import { NamchuWangden } from "@/components/motion/NamchuWangden";
+import { PrayerWheel } from "@/components/motion/PrayerWheel";
+import { koraWaypoints } from "@/lib/kora-route";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const demoSections = [
@@ -17,10 +22,11 @@ const demoSections = [
 const status = [
   { n: 1, name: "Mala rail", state: "built" },
   { n: 3, name: "Kora circuit", state: "built" },
-  { n: 2, name: "Prayer wheel", state: "pending" },
-  { n: 5, name: "Prayer flags", state: "in place, pending rework to brief" },
-  { n: 6, name: "Butter lamp", state: "in place, pending rework to brief" },
-  { n: 4, name: "Mani stones", state: "pending" },
+  { n: 2, name: "Prayer wheel", state: "built" },
+  { n: 5, name: "Prayer flags", state: "built · noise-driven" },
+  { n: 6, name: "Butter lamp", state: "built · noise-driven" },
+  { n: 4, name: "Mani stones", state: "built · uncarved by decision" },
+  { n: 0, name: "Namchu Wangden", state: "placeholder · never animated" },
 ];
 
 export function MotionLab() {
@@ -130,10 +136,98 @@ export function MotionLab() {
         </div>
       </section>
 
-      <p className="mt-20 border-t border-ink/10 pt-8 text-sm text-ink-soft">
-        Interactions 2, 5, 6 and 4 follow after review, per the brief&apos;s
-        instruction to stop after 1 and 3.
-      </p>
+      {/* ---- 2. Prayer wheel ---- */}
+      <section className="mt-20 border-t border-ink/10 pt-10">
+        <h2 className="display-md">2 · Prayer wheel</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          A drum with visible vertical faces, not a flat disc. Drag it and let
+          go: angular velocity decays under friction and it coasts for several
+          seconds. <strong>Clockwise only</strong> — pull it anticlockwise and
+          it resists, then springs back on release. The rAF loop stops dead at
+          rest; it never idle-spins. Keyboard: Enter or → to spin.
+        </p>
+        <div className="mt-10 flex justify-center rounded-[var(--radius-card)] border border-ink/10 bg-paper-raised py-12">
+          <PrayerWheel />
+        </div>
+      </section>
+
+      {/* ---- 5. Prayer flags ---- */}
+      <section className="mt-20 border-t border-ink/10 pt-10">
+        <h2 className="display-md">5 · Prayer flags</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          On the hero only — see the homepage. Gust amplitude comes from a
+          looping noise value per flag, not a fixed period, so they never fall
+          into visible sync. The wind decays to complete stillness after about
+          eight seconds and the loop stops entirely; scrolling wakes it briefly.
+          Colour order is fixed: blue, white, red, green, yellow.
+        </p>
+        <div className="mt-6 flex gap-2" aria-hidden>
+          {["#4a6b88", "#e6ddc9", "#8c3341", "#4e6553", "#d2a44f"].map((c) => (
+            <span key={c} className="h-8 w-12 rounded-[2px]" style={{ background: c }} />
+          ))}
+        </div>
+      </section>
+
+      {/* ---- 6. Butter lamp ---- */}
+      <section className="mt-20 border-t border-ink/10 pt-10">
+        <h2 className="display-md">6 · Butter lamp</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          Hover or focus the button. The glow is a static shadow whose{" "}
+          <em>opacity</em> is driven by noise — flame is not a sine wave. It is
+          meant to be barely perceptible; if you notice it at a glance it needs
+          halving.
+        </p>
+        <div className="mt-8">
+          <PrimaryButton href="/motion">Check availability</PrimaryButton>
+        </div>
+      </section>
+
+      {/* ---- 4. Mani stones ---- */}
+      <section className="mt-20 border-t border-ink/10 pt-10">
+        <h2 className="display-md">4 · Mani stones</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          Depth, not motion. On hover or focus the light source&apos;s azimuth
+          shifts twenty degrees — <strong>the stone itself never moves or
+          scales</strong>. Click one to open its note.
+        </p>
+        <p className="mt-3 max-w-2xl rounded-[var(--radius-kora)] border border-butter/40 bg-butter/[0.07] p-4 text-sm leading-relaxed text-ink-soft">
+          These are deliberately <strong>uncarved</strong>. The brief&apos;s
+          standard is correct Uchen or nothing, and the stacked subjoined
+          glyphs in <em>om mani padme hum</em> could not be visually verified
+          here — that failure is invisible to anyone who doesn&apos;t read
+          Tibetan. The correct codepoint sequence is recorded in
+          <code className="font-data"> ManiStone.tsx</code> for someone to enable
+          after checking it with a native reader present.
+        </p>
+        <div className="mt-10 grid gap-8 sm:grid-cols-3 lg:grid-cols-5">
+          {koraWaypoints.map((w, i) => (
+            <ManiStone
+              key={w.name}
+              index={i}
+              name={w.isHouse ? "Kora House" : w.name}
+              meta={w.minutes}
+              note={w.note}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ---- Kalachakra ---- */}
+      <section className="mt-20 border-t border-ink/10 pt-10">
+        <h2 className="display-md">Namchu Wangden</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          Placed once, static, as a threshold mark above the booking
+          confirmation card. <strong>Never animated</strong> — not a loader, not
+          a spinner, not a background pattern, not a hover effect. The artwork
+          is to be commissioned from a Tibetan artist or sourced from
+          Norbulingka Institute, so this is a marked placeholder at the correct
+          aspect ratio rather than a traced approximation. It is not mounted
+          anywhere yet: the booking confirmation screen does not exist.
+        </p>
+        <div className="mt-10">
+          <NamchuWangden />
+        </div>
+      </section>
     </div>
   );
 }

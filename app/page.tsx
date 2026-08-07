@@ -4,7 +4,7 @@ import { DeckledEdge } from "@/components/DeckledEdge";
 import { MalaRail } from "@/components/motion/MalaRail";
 import { Ornament, OrnamentDivider, SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
-import { PrayerFlags } from "@/components/PrayerFlags";
+import { PrayerFlags } from "@/components/motion/PrayerFlags";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { RoomCard } from "@/components/RoomCard";
 import { placeImages } from "@/lib/image-credits";

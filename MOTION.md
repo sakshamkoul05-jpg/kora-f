@@ -117,41 +117,109 @@ as a spiritual amenity. The restraint is the point.
 
 ---
 
-## 2. Prayer wheel — not yet built
+## 2. Prayer wheel — entry point to the route
 
-Real angular momentum: velocity integrated in `requestAnimationFrame` with a
-friction coefficient, drag imparting velocity proportional to gesture speed,
-coasting several seconds from a firm spin. Rendered as a **drum with visible
-vertical faces**, not a flat disc. **Clockwise only** — anticlockwise drag
-resists and returns. The rAF loop must stop entirely at rest; no idle spin.
-Spinning it reveals the kora section, so it earns its place.
+`components/motion/PrayerWheel.tsx` · physics in `lib/wheel-physics.ts`
 
-## 5. Prayer flags — in place, pending rework to this brief
+**Derived from:** the mani chos 'khor, the hand-turned prayer drum.
 
-`components/PrayerFlags.tsx` currently hangs 16 flags from a sagging bezier,
-each rotated to the local tangent, sun-bleached and irregular. Still to do
-against this brief: drive gust amplitude from a **looping noise value** rather
-than fixed periods, and decay to complete stillness after ~8s, resuming briefly
-on scroll.
+**Interface job:** it is the way into the kora route. Spinning it reveals the
+circuit.
 
-Colour order is fixed: **blue, white, red, green, yellow**. Do not reshuffle.
+**Rendered as a drum, not a disc.** 24 vertical faces on a
+`transform-style: preserve-3d` cylinder. A flat spinning circle is the tell of
+a wheel nobody looked at. Because it is a real cylinder the physics loop writes
+exactly **one** transform per frame — on the parent — instead of restyling
+every face, so it composites cheaply. The lighting is a static overlay that
+does *not* rotate: the light stays in the room and the faces turn through it.
 
-## 6. Butter lamp — in place, pending rework to this brief
+**Physics.** Angular velocity integrated in `requestAnimationFrame` under
+exponential friction. Drag imparts velocity proportional to gesture speed,
+sampled over the last ~90ms. Tested: a firm spin (900°/s) coasts **4.7s**, and
+the drum genuinely reaches rest from maximum velocity rather than decaying
+asymptotically forever — which is what lets the loop stop.
 
-Warm irregular glow on primary maroon CTAs, currently layered offset pulses
-rather than a smooth sine. Still to do: drive it from the shared noise value.
-If it is noticeable at a glance, halve it.
+**The loop stops dead at rest.** No idle spin, ever.
 
-## 4. Mani stones — not yet built
+**CLOCKWISE ONLY.** `clampSpin` never returns a negative velocity, so no
+gesture can make the drum turn backwards. Dragging anticlockwise of where the
+gesture began is damped to 22% and springs back on release — sprung, not stuck.
+Unit tested.
 
-Section markers along the kora rendered as carved stones. On hover/focus the
-carving catches light: **move an SVG lighting filter's light source a few
-degrees — the stone itself does not move or scale.**
+**Keyboard:** Enter, Space, → or ↑ spin it. ← and ↓ are deliberately inert.
 
-If the mantra is inscribed it must be correct Tibetan Uchen script in Noto
-Serif Tibetan, legibly sized and correctly spelled. **If that cannot be done
-properly, leave the stones uncarved.** A plain stone is honest; a garbled one
-is not.
+**Reduced motion:** the drum does not spin, and the route is revealed from the
+start rather than gated.
+
+> The route is **never trapped behind the gesture**. The content is always in
+> the DOM, the reveal is opacity and transform only, there is a plain "Or show
+> the route" control, and reduced motion opens it immediately. Gating content
+> behind a drag with no way past it would be a trap, not an interaction.
+
+## 5. Prayer flags — wind that dies down
+
+`components/motion/PrayerFlags.tsx`
+
+**Derived from:** lungta strung between rooftops.
+
+Sixteen flags hang from a **sagging** quadratic bezier — the line is never
+horizontal — each rotated to the local tangent, with irregular widths, drooping
+hems and sun-bleached translucency.
+
+**Gusts come from a looping noise value**, one generator per flag with its own
+seed and period, so they never fall into visible sync. Wind is gusty, not
+periodic: a sine reads as machinery because the eye catches the period.
+
+**It dies down.** An eased envelope decays the amplitude to zero over ~8s
+without interaction, and then the rAF loop **stops entirely** — a still page
+costs nothing. Scrolling wakes it briefly. A permanently fluttering page reads
+as a screensaver.
+
+**COLOUR ORDER IS FIXED: blue, white, red, green, yellow** — sky, air, fire,
+water, earth. Never reshuffled for visual balance.
+
+## 6. Butter lamp — CTA hover
+
+`components/motion/useButterLamp.ts`
+
+Warm irregular glow on primary maroon CTAs, driven by **noise, not a smooth
+pulse** — flame flicker is not a sine wave.
+
+Only **opacity** is animated. The glow itself is a static `box-shadow` painted
+once on a child span, so the per-frame work stays on the compositor and the
+button is never repainted. Amplitude is 0.26–0.46 opacity. It is meant to be
+barely perceptible: **if you notice it at a glance, halve it.**
+
+The loop runs only while hovered or focused. Reduced motion gets a constant
+value — an instant state change, no flicker.
+
+## 4. Mani stones — depth, not motion
+
+`components/motion/ManiStone.tsx`
+
+Waypoint markers on the kora, rendered as stones with a deterministic irregular
+outline — no two off the same hillside match.
+
+**On hover or focus the light moves, not the stone.** The azimuth of the
+lighting filter's `feDistantLight` shifts twenty degrees over 280ms. Verified:
+the stone's own computed transform is `none` in every state. Moving or scaling
+it would read as a UI card; moving the light reads as stone.
+
+Each stone is a real `<button>` — clicking opens its note — and each gets a
+unique filter id via `useId`.
+
+### The stones are deliberately UNCARVED
+
+The standard is correct Uchen or nothing. *Om mani padme hum* requires stacked
+subjoined consonants (the ྨ of པདྨེ, the vowel-plus-nasal cluster of ཧཱུྃ) —
+exactly the sequences that render as tofu or mis-stacked glyphs when font
+loading or shaping fails. **That failure is invisible to anyone who does not
+read Tibetan**, and it could not be visually verified in the build environment,
+so it is not shipped. The incisions on the stones are plain tool marks,
+deliberately not letterforms, so nothing can be mistaken for badly-set script.
+
+The correct sequence is recorded in the component's header comment for whoever
+enables this **after checking it renders with a native reader present**.
 
 ---
 
@@ -184,31 +252,60 @@ correct aspect ratio until real artwork exists.
 
 ## Budget
 
-Target 20KB gzipped for added JS. Interactions 1 and 3, measured with esbuild
-(minified, gzipped, React/Next external, shared modules deduped):
+Target 20KB gzipped for added JS. Measured with esbuild (minified, gzipped,
+React/Next external, shared modules deduped):
 
 | module | min (B) | min+gzip (B) |
 |---|---:|---:|
-| MalaRail (interaction 1) | 3298 | 1599 |
-| KoraCircuit (interaction 3) | 3261 | 1528 |
-| useReducedMotion (shared hook) | 324 | 225 |
-| mala-state (tested state machine) | 424 | 238 |
-| deterministic (shared helpers) | 351 | 234 |
-| kora-route (data + copy) | 811 | 492 |
-| **combined, deduped, as shipped** | **6532** | **2908** |
+| 1 · MalaRail | 3298 | 1599 |
+| 2 · PrayerWheel | 3762 | 1715 |
+| 3 · KoraCircuit | 3261 | 1528 |
+| 4 · ManiStone | 3226 | 1668 |
+| 5 · PrayerFlags | 3108 | 1670 |
+| 6 · useButterLamp | 1371 | 775 |
+| — NamchuWangden (static) | 667 | 451 |
+| shared · useReducedMotion | 324 | 225 |
+| shared · noise | 440 | 307 |
+| shared · deterministic | 351 | 234 |
+| shared · mala-state | 424 | 238 |
+| shared · wheel-physics | 346 | 261 |
+| data · kora-route | 811 | 492 |
+| **all six, deduped, as shipped** | **17189** | **7187** |
 
-**2908 B of 20480 B — 14.2% used, 17572 B headroom** for interactions 2, 5, 6
-and 4. Re-run the measurement as each lands.
+**7187 B of 20480 B — 35.1% used, 13293 B headroom.** No GSAP, no Three.js, no
+Lottie; the only added dependency is nothing at all.
 
 ## Testing
 
 ```bash
-npm test          # the guru bead invariant and the rail traversal rules
+npm test          # 16 tests: guru bead invariant, wheel physics, noise
 npm run lint
 npm run build
 ```
 
-Performance target is 60fps on a mid-range Android over 4G; profile with CPU
-throttling at 4x. The kora draw runs on the compositor where
-`animation-timeline: view()` is supported, and the mala animates `transform`
-only, so both should hold — but this has **not** yet been measured on device.
+Behavioural rules are extracted into pure modules (`mala-state`,
+`wheel-physics`, `noise`) specifically so they can be tested rather than
+eyeballed. Among the assertions:
+
+- the mala strand never steps last→first in either direction (the guru bead)
+- `clampSpin` never returns a negative velocity (clockwise only)
+- a firm spin coasts 4.7s, and the drum truly reaches rest so the loop can stop
+- the noise loops, stays continuous frame to frame, and has irregular peak
+  heights — i.e. it is demonstrably not a sine
+
+### What has NOT been verified
+
+Be honest about this when reviewing:
+
+- **Runtime motion has not been observed.** The build environment's browser
+  pane reports `document.visibilityState === "hidden"`, so
+  `requestAnimationFrame` never fires and IntersectionObserver never delivers
+  (measured: 0 frames in 500ms). Events *are* delivered, so the wiring is
+  sound, but no animation has actually been watched. Everything above is
+  verified by unit test, computed style, or DOM structure — not by eye.
+  **Open `/motion` and look at it.**
+- **The 60fps target on a mid-range Android over 4G has not been measured.**
+  Profile with CPU throttling at 4x. The likely hot spot is interaction 4: the
+  `feTurbulence` + `feDiffuseLighting` filter re-renders while the azimuth
+  tweens. It is bounded to 280ms on one stone at a time, but it is the first
+  thing to check on device, and the first thing to cut if it does not hold.

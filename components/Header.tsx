@@ -48,7 +48,7 @@ export function Header() {
           })}
           <Link
             href="/rooms"
-            className="lamp-hover rounded-[var(--radius-kora)] bg-maroon px-6 py-2.5 font-display text-sm tracking-wide text-paper transition-colors hover:bg-maroon-deep"
+            className="rounded-[var(--radius-kora)] bg-maroon px-6 py-2.5 font-display text-sm tracking-wide text-paper transition-colors hover:bg-maroon-deep"
           >
             Book a room
           </Link>
