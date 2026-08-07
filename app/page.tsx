@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DeckledEdge } from "@/components/DeckledEdge";
-import { MalaIndicator } from "@/components/MalaIndicator";
+import { MalaRail } from "@/components/motion/MalaRail";
 import { Ornament, OrnamentDivider, SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { PrayerFlags } from "@/components/PrayerFlags";
@@ -30,7 +30,7 @@ const valleyPhotos = [
 export default function HomePage() {
   return (
     <>
-      <MalaIndicator sections={[...sections]} />
+      <MalaRail sections={[...sections]} />
 
       {/* ---------- Hero ---------- */}
       <section id="hero" className="relative isolate flex min-h-[86vh] flex-col justify-end overflow-hidden">
