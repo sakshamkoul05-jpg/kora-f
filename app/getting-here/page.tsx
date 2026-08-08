@@ -3,7 +3,7 @@ import Image from "next/image";
 import { SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages } from "@/lib/image-credits";
-import { site, whatsappUrl } from "@/lib/site";
+import { distances, site, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Getting to Kora House, McLeodganj",
@@ -11,12 +11,16 @@ export const metadata: Metadata = {
     "Directions to Kora House on Buddha House Road, McLeodganj — near the Dalai Lama temple complex and the Lingkhor walk.",
 };
 
-// TODO_CONFIRM: every figure in this block. Left deliberately unstated rather
-// than guessed — a wrong walking time at 11pm with a bag is worse than none.
+// Distances the hosts' guidebook actually states are given as facts. The rest
+// stay visibly unconfirmed rather than estimated — a wrong walking time at
+// 11pm with a bag is worse than no number.
 const practical = [
-  { label: "From McLeodganj bus stand", value: "TODO_CONFIRM — minutes on foot / short taxi" },
-  { label: "From Kangra (Gaggal) airport", value: "TODO_CONFIRM — distance by road" },
-  { label: "Parking", value: "TODO_CONFIRM — on-site or street" },
+  { label: "To the Dalai Lama temple entrance", value: distances.templeEntrance, known: true },
+  { label: "To Bhagsu", value: distances.bhagsu, known: true },
+  { label: "To Tushita, Dharamkot", value: distances.tushita, known: true },
+  { label: "From McLeodganj bus stand", value: "TODO_CONFIRM", known: false },
+  { label: "From Kangra (Gaggal) airport", value: "TODO_CONFIRM", known: false },
+  { label: "Parking", value: "TODO_CONFIRM", known: false },
 ];
 
 export default function GettingHerePage() {
@@ -87,7 +91,11 @@ export default function GettingHerePage() {
               {practical.map((row) => (
                 <div key={row.label} className="flex flex-wrap justify-between gap-2 text-sm">
                   <dt className="text-ink-soft">{row.label}</dt>
-                  <dd className="font-data text-xs text-ink/40">{row.value}</dd>
+                  <dd
+                    className={`font-data text-xs ${row.known ? "text-ink/70" : "text-ink/35"}`}
+                  >
+                    {row.value}
+                  </dd>
                 </div>
               ))}
             </dl>

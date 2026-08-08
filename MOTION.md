@@ -17,11 +17,46 @@ real object does, or does not do.
 | # | Rule | Why |
 |---|------|-----|
 | 1 | **The guru bead is never crossed.** The mala rail must never wrap from the last section to the first. On reaching the end it pauses, then *reverses*. | A mala is counted up to the guru bead and the strand is then turned around. Wrapping is the one thing the object specifically does not do. Enforced by `lib/mala-state.ts` and asserted in `lib/mala-state.test.ts`. |
-| 2 | **The kora is walked clockwise.** The circuit draws clockwise; the prayer wheel spins clockwise only and resists anticlockwise drag. | Doctrinal direction. Getting it backwards is an error, not a style choice. |
+| 2 | **The kora is walked clockwise** — currently. The circuit draws clockwise and the wheels turn clockwise only. **See the open question below before changing anything.** | Doctrinal direction. Getting it backwards is an error, not a style choice — which is exactly why the contradiction below has to be settled by a person. |
 | 3 | **Prayer flag colour order is blue, white, red, green, yellow.** Never reshuffled for visual balance. | Fixed traditional order (sky, air, fire, water, earth). |
 | 4 | **The Namchu Wangden monogram is never animated.** Not a loader, spinner, background pattern or hover effect. Placed once, static, on booking confirmation. | See "Kalachakra" below. |
 | 5 | **No motion in the booking flow past step one, and none in the admin.** | Someone entering payment details wants stillness. |
 | 6 | **Everything degrades completely under `prefers-reduced-motion: reduce`** — static, functional, no movement. | The mala still shows position; it just doesn't travel. |
+
+---
+
+## ⚠ Open question: which way does the kora go?
+
+**The two client documents contradict each other.**
+
+| source | says |
+|---|---|
+| `kora-house-build-spec.md` | **clockwise** — "this is the direction of the kora and getting it backwards is a real error, not a stylistic one" |
+| The hosts' own local guidebook | "circumambulating (walking in a **counter-clockwise** direction) around the temple" |
+
+The code currently implements **clockwise**, on three grounds: it is what the
+build spec instructs, it is the near-universal documented direction for
+Tibetan Buddhist kora (counter-clockwise circumambulation is characteristic of
+Bön rather than Buddhist practice), and it is the safer default to sit on while
+the question is open.
+
+**But the guidebook is the hosts' own writing about their own doorstep, and
+they may simply be describing what they see every morning.** That is not a
+thing to overrule from a desk.
+
+This is not cosmetic. It affects:
+
+- the direction the kora circuit draws (`lib/kora-route.ts`, `KoraCircuit`)
+- the direction the prayer wheels turn, and the anticlockwise resistance
+  (`lib/wheel-physics.ts` — `clampSpin` is unit tested to never allow reverse)
+- the "CLOCKWISE" label rendered in the centre of the circuit diagram
+- copy on the Story page and the guidebook
+
+**Do not flip half of it.** If the answer is counter-clockwise, invert the path
+direction, the physics sign convention, the label, and the copy together, and
+update the tests — they currently assert clockwise as an invariant.
+
+Ask a host, or anyone who walks it.
 
 ---
 

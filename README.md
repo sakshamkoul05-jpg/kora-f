@@ -33,6 +33,33 @@ admin CRM (spec steps 6–7). "Check availability" / "Book" buttons currently
 link to `/rooms` and the room detail page says booking is coming soon — there
 is no live booking path yet, by design.
 
+## ⚠ Unresolved: the direction of the kora
+
+The build spec says the kora is walked **clockwise** and calls getting it
+backwards "a real error". The hosts' own local guidebook says
+**counter-clockwise**. Both are client documents; they contradict each other.
+
+The site currently says and animates clockwise. **Settle this with a host
+before launch** — it affects the circuit animation, the prayer wheel physics
+and its unit tests, the label on the diagram, and copy on two pages. Full
+detail and the list of things to change together is in `MOTION.md`.
+
+## Content sources, in order of authority
+
+1. **The hosts' local guidebook** (`Kora house local guidebook_07-May-15.docx`)
+   — their own writing about their own town. Where it conflicts with anything
+   invented earlier, it wins. It resolved the host story, several distances,
+   and supplied the whole `/guidebook` section.
+2. **`kora-house-build-spec.md`** — the verified property facts and the honest
+   caveats, which remain binding.
+3. The content plan — strategy and voice, but explicitly written without sight
+   of the built site.
+
+Three things in the guidebook are deliberately **not** on the site: an internal
+working note from Ashish, a reference to a map photocopied from a Lonely Planet
+book (reproducing it would be a copyright problem), and a passage quoted from
+Wikivoyage, which is paraphrased instead. See `lib/guidebook.ts`.
+
 ## TODO_CONFIRM — facts pending confirmation from the hosts
 
 All of these live as `null` values or comments in `lib/site.ts` and
@@ -42,11 +69,19 @@ guessed at; get these from Rohitash and Ashish before shipping:
 - **Phone / WhatsApp number** (`lib/site.ts`) — currently carries the number
   from the brief, unconfirmed. Every CTA on the site now routes to it, so this
   is the highest-priority item on the list.
-- **Host identity** — the content plan flags that existing guest reviews name
-  *previous* hosts and a caretaker. If this is a relaunch under new ownership,
-  the Story page bios are wrong, not just unconfirmed. Settle this before
-  launch.
-- **Host and caretaker name spellings**, and how each wants to be named.
+- ~~Host identity~~ — **resolved by the guidebook.** Rohitash and Ashish are
+  brothers and the current hosts. Their father bought the land and died before
+  the building was finished; they completed it between them, Rohitash on
+  construction and the house day to day, Ashish on bookings and everything
+  online. Still open: **how many years ago their father bought the land** — the
+  guidebook itself leaves that as an unanswered note.
+- **Caretaker** — Suraj is on the site but is *not* mentioned anywhere in the
+  guidebook. Confirm he is still with the house before publishing him.
+- **Taxi drivers' consent.** `lib/guidebook.ts` holds Hari's, Rahul's and
+  Vikas's mobile numbers but renders "ask at the house" instead. Personal
+  numbers in a printed in-room guidebook are one thing; on a public,
+  search-indexed page they are another. Ask each of them, then flip
+  `TAXIS.consentToPublish`.
 - **Google review listing URL** (`site.googleReviewUrl`) — placeholder only,
   needed to link out to the real 4.7★ / 69-review listing.
 - **Room name → room mapping** (`lib/rooms.ts`). The six names (Mani,

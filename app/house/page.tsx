@@ -22,29 +22,26 @@ export default function HousePage() {
 
         <div className="mt-10 max-w-2xl space-y-6">
           <p className="lede">
-            <em>Kora</em> is the Tibetan word for circumambulation — walking
-            clockwise around a sacred site as an act of devotion, of settling
-            the mind, of simply arriving somewhere on foot instead of by
-            vehicle. In McLeodganj that circuit runs around the Tsuglagkhang
-            complex, the residence and temple of His Holiness the Dalai Lama,
-            and it is known locally as the Lingkhor — lined with prayer wheels,
-            mani stones, and strings of flags that fade a little more with
-            every monsoon.
+            <em>Kora</em> means circumambulation — walking a circuit around a
+            sacred site, as an act of devotion, of settling the mind, of simply
+            arriving somewhere on foot. In McLeodganj that circuit runs around
+            the Tsuglagkhang complex, the temple and residence of His Holiness
+            the Dalai Lama, and the house stands on it. You are, more or less,
+            neighbours of the Dalai Lama while you are here.
           </p>
           <p className="text-ink-soft">
-            Kora House takes its name from this path because it sits directly
-            on it, on Buddha House Road, a short walk from the temple itself.
-            Guests who stay here aren&apos;t visiting the kora as a stop between
-            breakfast and lunch. It is the road outside the front door.
+            From the balcony you can watch Tibetans and other practitioners
+            making their way round the temple. They are performing a kora. Most
+            carry a <em>mala</em> — prayer beads, used to count recitations of a
+            mantra. The one you will hear most often is{" "}
+            <em>om mani padme hum</em>, which stands for compassion.
           </p>
           <p className="text-ink-soft">
-            The house holds six rooms, a shared balcony that catches the valley
-            at the end of the day, and views that shift constantly with the
-            weather coming off the Dhauladhar range. It is built for people who
-            want to be close to McLeodganj&apos;s centre without living inside
-            the noise of the main market — near enough to walk to Jogiwara Road
-            for dinner, far enough to hear almost nothing but wind and prayer
-            flags at night.
+            Behind the house is the police and security post for His Holiness,
+            so the lane is well watched. On the hill there is a brightly painted
+            Shiva temple, and at some point in the day you will hear its bell —
+            rung both to call the deity and to wake up whoever is about to
+            worship.
           </p>
         </div>
 
@@ -68,30 +65,63 @@ export default function HousePage() {
         <OrnamentDivider variant="cloud" />
       </div>
 
-      {/* ---------- The walk itself ---------- */}
+      {/* ---------- Why the house exists ---------- */}
       <section className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="grid gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
           <div>
-            <SectionMark eyebrow="A short history of the walk" variant="knot" />
-            <h2 className="display-lg mt-5">It isn&apos;t curated for visitors</h2>
+            <SectionMark eyebrow="Why the house exists" variant="knot" />
+            <h2 className="display-lg mt-5">Built to finish someone&apos;s wish</h2>
           </div>
           <div className="space-y-5">
             <p className="text-ink-soft">
-              The Lingkhor has been walked daily for decades by residents of
-              McLeodganj — Tibetan elders turning hand-held prayer wheels, monks
-              on their way to morning prayers, locals fitting in a lap before
-              opening their shops.
+              Rohitash and Ashish&apos;s father bought this land. He died before
+              the building was finished.
             </p>
             <p className="text-ink-soft">
-              It is simply what the town does every morning, and Kora House
-              happens to be one of the houses it passes.
+              His sons completed it between them — Rohitash took on the
+              construction and runs the house day to day; Ashish handles the
+              bookings and everything online. What they wanted was to
+              commemorate their father, and the thing he had wanted: somewhere
+              people could come together and learn from each other.
             </p>
-            <Link
-              href="/experiences"
-              className="inline-block border-b border-maroon/40 pb-1 text-sm text-maroon transition-colors hover:border-maroon"
-            >
-              What the walk actually involves
-            </Link>
+            <p className="text-ink-soft">
+              What comes next is sustainable power and water, and a communal
+              space for gatherings and events.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- The town ---------- */}
+      <section className="mx-auto mt-24 max-w-6xl px-5 md:px-8">
+        <div className="border-t border-ink/10 pt-14">
+          <div className="grid gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+            <div>
+              <SectionMark eyebrow="The town it sits in" variant="lotus" />
+              <h2 className="display-lg mt-5">Two cultures, one hillside</h2>
+            </div>
+            <div className="space-y-5">
+              <p className="text-ink-soft">
+                Tibetans in exile settled here in 1960, after their land and
+                culture were taken by the invading Chinese, and they were able
+                to because India made room for them. Religious difference has
+                long been ordinary in this country, and it is worth noticing how
+                peaceably these particular traditions sit side by side on one
+                hillside.
+              </p>
+              <p className="text-ink-soft">
+                Guests here have ranged from Gaddi shepherds&apos; neighbours in
+                the villages below to people who came for a teaching and stayed
+                a month. The point of the house is that they end up on the same
+                balcony.
+              </p>
+              <Link
+                href="/guidebook"
+                className="inline-block border-b border-maroon/40 pb-1 text-sm text-maroon transition-colors hover:border-maroon"
+              >
+                The guidebook the hosts keep
+              </Link>
+            </div>
           </div>
         </div>
       </section>

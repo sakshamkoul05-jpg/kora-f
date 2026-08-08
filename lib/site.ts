@@ -17,12 +17,11 @@ export const site = {
   whatsapp: "+91 94180 66891",
   googleReviewUrl: "https://www.google.com/maps/place/?q=place_id:TODO_CONFIRM",
   rating: { value: 4.7, count: 69 },
+  // Confirmed by the hosts' own guidebook: Rohitash and Ashish are brothers,
+  // and these are their actual roles rather than a generic "Host" label.
   hosts: [
-    // TODO_CONFIRM: confirm spelling, and whether these are the current hosts.
-    // The content plan flags that existing guest reviews name previous hosts —
-    // if this is a relaunch under new ownership the bios must be rewritten.
-    { name: "Rohitash", role: "Host" },
-    { name: "Ashish", role: "Host" },
+    { name: "Rohitash", role: "Construction and the house day to day" },
+    { name: "Ashish", role: "Bookings and everything online" },
   ],
   caretaker: {
     // TODO_CONFIRM: confirm spelling.
@@ -59,6 +58,21 @@ export const nav = [
   { label: "The Story", href: "/house" },
   { label: "Rooms", href: "/rooms" },
   { label: "The Walk", href: "/experiences" },
+  { label: "Guidebook", href: "/guidebook" },
   { label: "Getting Here", href: "/getting-here" },
   { label: "Book", href: "/book" },
 ] as const;
+
+/**
+ * Distances confirmed by the hosts' guidebook. Anything not listed here is
+ * still unknown — do not estimate it.
+ */
+export const distances = {
+  templeEntrance: "550 m",
+  theOtherSpace: "800 m",
+  tushita: "40 minutes to an hour on foot",
+  bhagsu: "About 2 km from McLeodganj",
+  library: "About 30 minutes on foot down Jogiwara Road",
+  sidhbari: "About 20 minutes by taxi",
+  triund: "9 km · 1,105 m ascent · about 3 hours up",
+} as const;

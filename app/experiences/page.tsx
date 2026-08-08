@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { OrnamentDivider, SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages, type PlaceImage } from "@/lib/image-credits";
+import { distances } from "@/lib/site";
 import { KoraSection } from "./KoraSection";
 
 export const metadata: Metadata = {
@@ -29,26 +31,26 @@ const stops: Stop[] = [
   },
   {
     name: "McLeodganj main market",
-    distance: "About fifteen minutes on foot",
+    distance: "A walk down the hill",
     body: "Tibetan and Indian street food, prayer-flag and singing-bowl shops, and most of the town's cafés. Far enough that you won't hear it at night; close enough that dinner is never a production.",
     photo: placeImages.mcleodganjStreet,
   },
   {
     name: "Bhagsu falls & Bhagsunath temple",
-    distance: "A short taxi, or a longer walk beyond the market",
-    body: "A modest waterfall beside an old Shiva temple. An easy half-day, and one of the better places nearby for a quiet swim in the warmer months.",
+    distance: distances.bhagsu,
+    body: "A walk through a peaceful town, then steps to the top of the waterfall, with cafés along the way. The Shiva temple has a pool beside it where locals swim, and some shops sell Bhagsu cake.",
     photo: placeImages.prayerFlagsBhagsu,
   },
   {
     name: "Dharamkot",
-    distance: "About twenty minutes",
-    body: "A quieter hillside settlement up through the deodar, and the way to the Triund trailhead.",
+    distance: distances.tushita,
+    body: "A quieter hillside settlement up through the deodar, home to both Tushita and the Vipassana centre, and the way to the Triund trailhead.",
     photo: placeImages.dharamkotHouses,
   },
   {
     name: "Triund",
-    distance: "A day, or a night on the ridge",
-    body: "A moderate climb to a ridge with the Dhauladhar close up in front of you. Best attempted early; the return can be done the same day or with an overnight camp.",
+    distance: distances.triund,
+    body: "The most popular trek here, climbing to base camp for the whole Dhauladhar range and the Kangra valley. Average difficulty, two stops for snacks on the way, and wildflowers in spring and summer. Some people camp on the ridge; a guide isn't necessary unless you need help carrying gear.",
     photo: placeImages.triundTrek,
   },
 ];
@@ -121,9 +123,22 @@ export default function ExperiencesPage() {
         of shoes and a morning free.
       </p>
 
+      <p className="mt-10 max-w-lg">
+        <Link
+          href="/guidebook"
+          className="border-b border-maroon/40 pb-1 text-maroon transition-colors hover:border-maroon"
+        >
+          The rest of it is in the guidebook
+        </Link>{" "}
+        <span className="text-ink-soft">
+          — where to eat, where to volunteer, and how to register for a
+          teaching.
+        </span>
+      </p>
+
       <p className="mt-8 max-w-lg border-l-2 border-butter/50 pl-4 text-sm text-ink-soft/80">
-        Walking times and temple opening hours are approximate and change with
-        the season — ask at the house before you set out.
+        Walking times and temple opening hours shift with the season — ask at
+        the house before you set out.
       </p>
     </div>
   );
