@@ -1,38 +1,34 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { OM_MANI_PADME_HUM, ensureTibetan } from "@/lib/mantra";
 import { useReducedMotion } from "@/lib/useReducedMotion";
-import { REST_OMEGA, clampSpin, decayOmega, resolveDrag } from "@/lib/wheel-physics";
+import { REST_OMEGA, clampSpin, decayOmega } from "@/lib/wheel-physics";
 
-const FACES = 20;
-const RADIUS = 40;
-const FACE_W = 13.2; // 2·R·tan(π/N), a shade over so the seams close
-const DRUM_H = 104;
 const WHEELS = 5;
-const DEG_PER_PX = 0.7;
+const HOVER_OMEGA = 300; // deg/s the drum settles to while hovered
+const SPIN_UP = 5.5; // how quickly it reaches that, per second
 
 /**
- * A wall of mani wheels — five brass drums in a row, as they are set along the
- * kora wall below the house.
+ * A wall of mani wheels — five copper drums in a row, as they are set along
+ * the kora wall below the house.
  *
- * Each drum is a real cylinder (`preserve-3d`, 20 vertical faces), so spinning
- * one costs a single transform on its parent rather than a restyle of every
- * face. The lighting is a static overlay that does NOT rotate: the light stays
- * in the room and the brass turns through it, which is what makes it read as
- * metal rather than as a spinning graphic.
+ * ── Why this is a scrolling skin and not a faceted cylinder ────────────────
+ * The first version built each drum from 20 flat faces in `preserve-3d`. That
+ * cannot carry continuous ornament: the Greek key rings, the scrollwork and
+ * the mantra all break at every face seam, and no face is wide enough to hold
+ * a legible character. Real wheels are chased with unbroken bands.
  *
- * CLOCKWISE ONLY, enforced in lib/wheel-physics.ts and unit tested. Dragging a
- * drum anticlockwise is damped and springs back.
+ * So the drum is a clipped window onto a skin that carries the full register
+ * stack twice over, translated horizontally. One rotation = one tile width, so
+ * it loops seamlessly. Rotation is still `transform` only, so it stays on the
+ * compositor, and the ornament is continuous.
  *
- * Two gestures, because both are real:
- *   - drag a single drum, or
- *   - sweep the pointer along the row with the button down, which sets each
- *     drum turning as you pass it — the way you actually walk a wall of wheels,
- *     brushing them with one hand.
+ * The cylinder comes from a FIXED shading overlay — dark at both edges, a
+ * specular band off-centre. The light stays in the room and the metal turns
+ * through it. That, more than the colour, is what makes it read as metal.
  *
- * Spinning a drum releases the mantra: the syllables rise off it and fade. That
- * is what the object is for — the wheel turns so the mantra goes out.
+ * CLOCKWISE ONLY, enforced in lib/wheel-physics.ts and unit tested.
  */
 export function PrayerWheelRow({ onSpin }: { onSpin?: () => void }) {
   const reduced = useReducedMotion();
@@ -56,18 +52,18 @@ export function PrayerWheelRow({ onSpin }: { onSpin?: () => void }) {
   }, [onSpin]);
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-6">
       <div
-        className="flex items-end justify-center gap-3 sm:gap-5"
+        className="flex items-end justify-center gap-2 sm:gap-4"
         role="group"
-        aria-label="A row of five prayer wheels. Drag one clockwise, or sweep across them, to spin."
+        aria-label="A row of five prayer wheels. Hover or focus one to turn it."
       >
         {Array.from({ length: WHEELS }, (_, i) => (
           <Wheel key={i} index={i} carved={carved} reduced={reduced} onSpin={handleSpin} />
         ))}
       </div>
       <p className="font-data text-[11px] tracking-[0.14em] text-ink/40">
-        {reduced ? "SPIN DISABLED — REDUCED MOTION" : "DRAG OR SWEEP ACROSS · CLOCKWISE"}
+        {reduced ? "TURNING DISABLED — REDUCED MOTION" : "HOVER TO TURN · CLOCKWISE"}
       </p>
     </div>
   );
@@ -86,43 +82,29 @@ function Wheel({
   reduced: boolean;
   onSpin: () => void;
 }) {
-  const uid = useId().replace(/:/g, "");
-  const drumRef = useRef<HTMLDivElement>(null);
+  const skinRef = useRef<HTMLDivElement>(null);
   const angle = useRef(0);
   const omega = useRef(0);
   const raf = useRef<number | null>(null);
   const lastT = useRef(0);
+  const hovering = useRef(false);
   const sinceEmit = useRef(0);
   const emitKey = useRef(0);
-
-  const dragging = useRef(false);
-  const dragStartAngle = useRef(0);
-  const lastX = useRef(0);
-  const samples = useRef<{ t: number; a: number }[]>([]);
-  const returning = useRef(false);
-  const returnFrom = useRef(0);
-  const returnStart = useRef(0);
 
   const [emissions, setEmissions] = useState<Emission[]>([]);
 
   const paint = useCallback(() => {
-    const el = drumRef.current;
-    if (el) el.style.transform = `rotateY(${angle.current}deg)`;
+    const el = skinRef.current;
+    if (!el) return;
+    // One full turn consumes exactly one tile, i.e. half the doubled skin.
+    const progress = (((angle.current % 360) + 360) % 360) / 360;
+    el.style.transform = `translate3d(${(-progress * 50).toFixed(3)}%,0,0)`;
   }, []);
 
-  const stop = useCallback(() => {
-    if (raf.current !== null) {
-      cancelAnimationFrame(raf.current);
-      raf.current = null;
-    }
-    omega.current = 0;
-  }, []);
-
-  /** Release a syllable. Capped, and never under reduced motion. */
   const emit = useCallback(() => {
     if (reduced) return;
     const key = emitKey.current++;
-    const drift = ((key * 37) % 40) - 20; // deterministic spread, no Math.random
+    const drift = ((key * 37) % 40) - 20; // deterministic spread, never Math.random
     setEmissions((list) => [...list.slice(-4), { key, drift }]);
   }, [reduced]);
 
@@ -134,119 +116,70 @@ function Wheel({
       const dt = Math.min((now - lastT.current) / 1000, 0.05);
       lastT.current = now;
 
-      if (returning.current) {
-        const p = Math.min((now - returnStart.current) / 320, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        angle.current = returnFrom.current + (dragStartAngle.current - returnFrom.current) * eased;
-        paint();
-        if (p >= 1) {
-          returning.current = false;
-          raf.current = null;
-          return;
-        }
-        raf.current = requestAnimationFrame(step);
-        return;
+      if (hovering.current) {
+        // Ease up to speed rather than snapping — a drum has mass.
+        omega.current += (HOVER_OMEGA - omega.current) * Math.min(SPIN_UP * dt, 1);
+        omega.current = clampSpin(omega.current); // clockwise only
+      } else {
+        omega.current = decayOmega(omega.current, dt);
       }
 
-      omega.current = decayOmega(omega.current, dt);
       angle.current += omega.current * dt;
       paint();
 
-      // A syllable goes out roughly every half turn, while it is turning.
+      // A syllable goes out roughly every half turn.
       sinceEmit.current += omega.current * dt;
       if (sinceEmit.current > 180) {
         sinceEmit.current = 0;
         emit();
       }
 
-      if (omega.current < REST_OMEGA) {
-        stop(); // at rest — shut the loop down completely, no idle spin
+      if (!hovering.current && omega.current < REST_OMEGA) {
+        omega.current = 0;
+        raf.current = null; // at rest — shut the loop down completely
         return;
       }
       raf.current = requestAnimationFrame(step);
     };
 
     raf.current = requestAnimationFrame(step);
-  }, [paint, stop, emit]);
+  }, [paint, emit]);
 
-  const spin = useCallback(
-    (velocity: number) => {
-      if (reduced) return;
-      const v = clampSpin(velocity); // clockwise only
-      if (v <= REST_OMEGA) return;
-      omega.current = Math.max(omega.current, v);
-      onSpin();
-      start();
-    },
-    [reduced, start, onSpin]
-  );
-
-  const onPointerDown = (e: React.PointerEvent) => {
+  const engage = useCallback(() => {
     if (reduced) return;
-    (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
-    stop();
-    returning.current = false;
-    dragging.current = true;
-    dragStartAngle.current = angle.current;
-    lastX.current = e.clientX;
-    samples.current = [{ t: performance.now(), a: angle.current }];
-  };
+    hovering.current = true;
+    onSpin();
+    start();
+  }, [reduced, onSpin, start]);
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    const dx = e.clientX - lastX.current;
-    lastX.current = e.clientX;
-    const delta = resolveDrag(dx * DEG_PER_PX, angle.current, dragStartAngle.current);
-    angle.current += delta;
-    paint();
-    const now = performance.now();
-    samples.current.push({ t: now, a: angle.current });
-    while (samples.current.length > 2 && now - samples.current[0].t > 90) samples.current.shift();
-  };
-
-  const onPointerUp = () => {
-    if (!dragging.current) return;
-    dragging.current = false;
-    const s = samples.current;
-    let v = 0;
-    if (s.length >= 2) {
-      const dtms = s[s.length - 1].t - s[0].t;
-      if (dtms > 0) v = ((s[s.length - 1].a - s[0].a) / dtms) * 1000;
-    }
-    if (angle.current < dragStartAngle.current || v < 0) {
-      returning.current = true;
-      returnFrom.current = angle.current;
-      returnStart.current = performance.now();
-      start();
-      return;
-    }
-    spin(v);
-  };
-
-  /** Sweeping along the row with the button held sets each drum going. */
-  const onPointerEnter = (e: React.PointerEvent) => {
-    if (reduced || dragging.current) return;
-    if (e.buttons === 1) spin(520);
-  };
+  const release = useCallback(() => {
+    hovering.current = false; // the loop coasts it down and then stops itself
+  }, []);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight" || e.key === "ArrowUp") {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (reduced) {
         onSpin();
         return;
       }
-      spin(Math.max(omega.current, 0) + 600);
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-      e.preventDefault(); // clockwise only — deliberately inert
+      // A push, on top of whatever it is already doing.
+      omega.current = clampSpin(omega.current + 420);
+      onSpin();
+      start();
     }
   };
 
-  useEffect(() => () => stop(), [stop]);
+  useEffect(
+    () => () => {
+      if (raf.current !== null) cancelAnimationFrame(raf.current);
+    },
+    []
+  );
 
   return (
     <div className="relative flex flex-col items-center">
-      {/* Mantra released by the turning drum */}
+      {/* The mantra, released by the turning drum */}
       <div className="pointer-events-none absolute inset-x-0 bottom-full h-24" aria-hidden>
         {carved &&
           emissions.map((em) => (
@@ -254,9 +187,7 @@ function Wheel({
               key={em.key}
               className="mantra-emit mani-mantra"
               style={{ ["--drift" as string]: `${em.drift}px` }}
-              onAnimationEnd={() =>
-                setEmissions((list) => list.filter((x) => x.key !== em.key))
-              }
+              onAnimationEnd={() => setEmissions((l) => l.filter((x) => x.key !== em.key))}
             >
               {OM_MANI_PADME_HUM}
             </span>
@@ -266,46 +197,67 @@ function Wheel({
       <div
         role="button"
         tabIndex={0}
-        aria-label={`Prayer wheel ${index + 1} of ${WHEELS}. Drag clockwise or press Enter to spin.`}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onPointerEnter={onPointerEnter}
+        aria-label={`Prayer wheel ${index + 1} of ${WHEELS}. Hover or press Enter to turn it clockwise.`}
+        onPointerEnter={engage}
+        onPointerLeave={release}
+        onFocus={engage}
+        onBlur={release}
         onKeyDown={onKeyDown}
-        className="prayer-wheel-stage relative cursor-grab touch-none select-none active:cursor-grabbing"
-        style={{ width: RADIUS * 2 + 16, height: DRUM_H + 34 }}
+        className="mani-wheel"
       >
-        {/* Spindle, above and below the drum */}
-        <span aria-hidden className="wheel-spindle" />
+        {/* Ornate domed lid */}
+        <span aria-hidden className="mani-wheel-lid">
+          <span className="mani-wheel-finial" />
+        </span>
 
-        <div className="prayer-wheel-scene absolute inset-0 flex items-center justify-center">
-          <div ref={drumRef} className="prayer-wheel-drum" style={{ height: DRUM_H }}>
-            {Array.from({ length: FACES }, (_, i) => (
-              <span
-                key={i}
-                aria-hidden
-                className="prayer-wheel-face"
-                style={{
-                  width: FACE_W,
-                  height: DRUM_H,
-                  marginLeft: -FACE_W / 2,
-                  transform: `rotateY(${(360 / FACES) * i}deg) translateZ(${RADIUS}px)`,
-                }}
-              />
-            ))}
-          </div>
+        {/* The drum: a clipped window onto the turning skin */}
+        <span aria-hidden className="mani-wheel-drum">
+          <span ref={skinRef} className="mani-wheel-skin">
+            <WheelTile carved={carved} />
+            <WheelTile carved={carved} />
+          </span>
+          {/* Fixed lighting — does not turn with the metal */}
+          <span className="mani-wheel-sheen" />
+        </span>
 
-          {/* Fixed lighting and hardware. None of this rotates. */}
-          <span aria-hidden className="wheel-sheen" style={{ width: RADIUS * 2, height: DRUM_H }} />
-          <span aria-hidden className="wheel-band" style={{ width: RADIUS * 2, top: 30 }} />
-          <span aria-hidden className="wheel-band" style={{ width: RADIUS * 2, bottom: 30 }} />
-          <span aria-hidden className="wheel-cap wheel-cap-top" style={{ width: RADIUS * 2 + 8 }} />
-          <span aria-hidden className="wheel-cap wheel-cap-bottom" style={{ width: RADIUS * 2 + 8 }} />
-        </div>
-        <span className="sr-only">{`Wheel ${index + 1}`}</span>
-        <span aria-hidden className="sr-only">{uid}</span>
+        {/* Hanging ring and the pin it turns on */}
+        <span aria-hidden className="mani-wheel-ring" />
+        <span aria-hidden className="mani-wheel-foot" />
       </div>
     </div>
+  );
+}
+
+/**
+ * One repeat of the chased surface. Two of these sit side by side inside the
+ * skin so the translate can loop without a seam.
+ *
+ * The register stack follows the object: brass meander band, copper
+ * scrollwork, a raised mantra course, scrollwork, meander band.
+ */
+function WheelTile({ carved }: { carved: boolean }) {
+  return (
+    <span className="mani-wheel-tile">
+      <span className="mwt-key mwt-key-top" />
+      <span className="mwt-rule" />
+      <span className="mwt-scroll" />
+      <span className="mwt-bead" />
+      <span className="mwt-mantra">
+        {carved && (
+          <>
+            {/* Repoussé: the character is raised, so the light catches its top
+                edge and it casts downward. Three passes — highlight, shadow,
+                then the face of the metal. */}
+            <span className="mwt-mantra-hi">{OM_MANI_PADME_HUM}</span>
+            <span className="mwt-mantra-lo">{OM_MANI_PADME_HUM}</span>
+            <span className="mwt-mantra-face">{OM_MANI_PADME_HUM}</span>
+          </>
+        )}
+      </span>
+      <span className="mwt-bead" />
+      <span className="mwt-scroll" />
+      <span className="mwt-rule" />
+      <span className="mwt-key mwt-key-bottom" />
+    </span>
   );
 }

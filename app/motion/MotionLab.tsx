@@ -139,18 +139,18 @@ export function MotionLab() {
       <section className="mt-20 border-t border-ink/10 pt-10">
         <h2 className="display-md">2 · Prayer wheels</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
-          Five brass drums in a row, as they are set along the kora wall. Each
-          is a real cylinder with 20 vertical faces, turning under a fixed
-          light — the sheen stays put and the metal moves through it.
+          Five copper drums in a row, built from the photograph of the actual
+          object: patinated copper body, olive-brass meander bands top and
+          bottom, scrollwork courses, a raised mantra register, and a domed
+          lid. The specular sheen is fixed and does <em>not</em> turn — the
+          light stays in the room and the metal moves through it.
         </p>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
-          Drag one and let go: velocity decays under friction and it coasts for
-          several seconds. Or <strong>sweep across the row with the button
-          held</strong> and each drum starts as you pass it, the way you brush a
-          wall of wheels walking by. Spinning releases the mantra, which rises
-          off the drum and fades. <strong>Clockwise only</strong> — pull one
-          backwards and it resists, then springs back. Each loop stops dead at
-          rest; none of them idle-spin. Keyboard: Enter or → to spin.
+          <strong>Hover a wheel to turn it.</strong> It eases up to speed, and
+          coasts down under friction when you leave. Turning releases the
+          mantra, which rises off the drum and fades. <strong>Clockwise
+          only.</strong> Each loop stops dead once the drum is at rest; none of
+          them idle-spin. Keyboard: Tab to a wheel to turn it, Enter for a push.
         </p>
         <div className="mt-10 flex justify-center rounded-[var(--radius-card)] border border-ink/10 bg-paper-raised py-12">
           <PrayerWheelRow />

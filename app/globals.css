@@ -321,112 +321,221 @@
   animation: mala-turn 600ms cubic-bezier(0.3, 0.8, 0.4, 1);
 }
 
-/* ---------- Prayer wheel ---------- */
-/* A real cylinder in 3D, so spinning it costs one transform on the parent
-   rather than a restyle of every face. */
-.prayer-wheel-scene {
-  perspective: 900px;
-}
-.prayer-wheel-drum {
+/* ---------- Prayer wheels ---------- */
+/* Built from the photograph of the actual object: patinated copper body,
+   olive-brass meander bands top and bottom, scrollwork courses, a raised
+   mantra register, and an ornate domed lid.
+ *
+ * The drum is a clipped window onto a skin carrying the register stack twice
+ * over. Turning it translates that skin, so the ornament runs unbroken all the
+ * way round — a faceted cylinder cannot do that, because the bands and the
+ * characters break at every seam. Rotation stays `transform` only.
+ *
+ * The specular sheen is a FIXED overlay that does not turn: the light stays in
+ * the room and the metal moves through it. That is what reads as metal. */
+
+.mani-wheel {
   position: relative;
-  transform-style: preserve-3d;
-  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 92px;
+  cursor: pointer;
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
 }
-/* Brass. Metal reads as metal because of the sharp value jumps between light
-   and dark bands, not because of the hue — hence the hard stops rather than a
-   smooth ramp. Each face carries the same repeating engraved lines, so the
-   turning drum shows chased metalwork passing under a fixed light. */
-.prayer-wheel-face {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  backface-visibility: hidden;
-  background-image:
-    /* engraved horizontal chasing */
-    repeating-linear-gradient(
-      to bottom,
-      rgba(60, 40, 12, 0.34) 0px,
-      rgba(60, 40, 12, 0.34) 1px,
-      transparent 1px,
-      transparent 7px
-    ),
-    /* the metal itself */
-    linear-gradient(
-      to right,
-      #4a3410 0%,
-      #7d5a1c 18%,
-      #c79a3c 42%,
-      #f2dfa4 52%,
-      #c79a3c 62%,
-      #7d5a1c 84%,
-      #4a3410 100%
-    );
-  border-left: 1px solid rgba(20, 12, 4, 0.45);
+.mani-wheel:focus-visible {
+  outline: 2px solid var(--color-butter);
+  outline-offset: 5px;
 }
 
-/* Fixed lighting: a specular streak that stays put while the brass turns
-   through it. This is what sells the material. */
-.wheel-sheen {
+/* --- domed lid --- */
+.mani-wheel-lid {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 74px;
+  height: 26px;
+  margin-bottom: -4px;
+  border-radius: 50% 50% 34% 34% / 78% 78% 22% 22%;
+  background:
+    radial-gradient(ellipse at 34% 22%, #c98a5e 0%, #9c5636 34%, #6a3320 66%, #3a1a0e 100%);
+  box-shadow:
+    inset 0 -3px 5px rgba(28, 10, 4, 0.6),
+    inset 0 2px 3px rgba(238, 178, 132, 0.35),
+    0 2px 4px rgba(20, 10, 4, 0.4);
+}
+/* Cast detailing around the dome. */
+.mani-wheel-lid::after {
+  content: "";
   position: absolute;
+  inset: 6px 5px 2px;
+  border-radius: 50% 50% 30% 30% / 74% 74% 26% 26%;
+  background-image: repeating-conic-gradient(
+    from 0deg at 50% 100%,
+    rgba(44, 18, 8, 0.42) 0deg 7deg,
+    rgba(214, 154, 110, 0.24) 7deg 14deg
+  );
+  opacity: 0.55;
+}
+.mani-wheel-finial {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 8px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 40% 40%;
+  background: linear-gradient(to bottom, #e0b184, #8d4f2f 60%, #43200f);
+}
+
+/* --- the drum --- */
+.mani-wheel-drum {
+  position: relative;
+  display: block;
+  width: 92px;
+  height: 116px;
+  overflow: hidden;
+  border-radius: 4px / 8px;
+  background: #40200f;
+  box-shadow:
+    inset 0 3px 6px rgba(20, 8, 2, 0.7),
+    inset 0 -3px 6px rgba(20, 8, 2, 0.7);
+}
+.mani-wheel-skin {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 200%;
+  will-change: transform;
+}
+.mani-wheel-tile {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+
+/* Fixed lighting. Two dark cheeks and an off-centre specular band, which is
+   what gives a flat rectangle its roundness. */
+.mani-wheel-sheen {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
   background: linear-gradient(
     to right,
-    rgba(18, 12, 4, 0.72) 0%,
-    rgba(18, 12, 4, 0.28) 14%,
-    rgba(255, 246, 214, 0.42) 40%,
-    rgba(255, 252, 238, 0.62) 49%,
-    rgba(255, 246, 214, 0.34) 58%,
-    rgba(18, 12, 4, 0.3) 86%,
-    rgba(18, 12, 4, 0.78) 100%
+    rgba(14, 6, 2, 0.88) 0%,
+    rgba(14, 6, 2, 0.5) 9%,
+    rgba(255, 214, 170, 0.13) 30%,
+    rgba(255, 236, 208, 0.28) 41%,
+    rgba(255, 214, 170, 0.1) 52%,
+    rgba(14, 6, 2, 0.42) 82%,
+    rgba(20, 9, 3, 0.9) 100%
   );
 }
 
-/* Raised rims that divide the drum, as on a cast wheel. */
-.wheel-band {
-  position: absolute;
-  left: 50%;
-  height: 5px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(to bottom, #f0d99a, #8a6520 60%, #33220a);
-  box-shadow: 0 1px 0 rgba(255, 240, 200, 0.25);
+/* --- register stack --- */
+
+/* Olive-brass meander band. The Greek key is the most recognisable thing on
+   the object, so it is a real tile rather than an approximation. */
+.mwt-key {
+  flex: 0 0 15px;
+  background-color: #8c8752;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Cpath d='M1 12V3h10v7H5V6h4' fill='none' stroke='%233f3c1d' stroke-width='2'/%3E%3C/svg%3E"),
+    linear-gradient(to bottom, #b3ad72, #8c8752 45%, #5c5830);
+  background-repeat: repeat-x;
+  background-position: center;
+  box-shadow: inset 0 0 6px rgba(30, 28, 12, 0.5);
+}
+.mwt-key-top {
+  border-bottom: 1px solid #2c1a0c;
+}
+.mwt-key-bottom {
+  border-top: 1px solid #2c1a0c;
 }
 
-/* Cast top and bottom collars. */
-.wheel-cap {
+/* Dark recessed rule between courses. */
+.mwt-rule {
+  flex: 0 0 4px;
+  background: linear-gradient(to bottom, #241006, #4d2614 55%, #241006);
+}
+
+/* Copper scrollwork course — the curling cloud/vine repoussé. */
+.mwt-scroll {
+  flex: 0 0 19px;
+  background-color: #93513a;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='19'%3E%3Cg fill='none' stroke='%234a2314' stroke-width='1.7' stroke-linecap='round'%3E%3Cpath d='M2 14c0-5 5-7 7-3 1-4 6-4 7 0 2-2 4 0 4 3'/%3E%3Cpath d='M6 13c-.6-1.4.5-2.6 1.8-2'/%3E%3C/g%3E%3Cg fill='none' stroke='%23cf9066' stroke-width='1' stroke-linecap='round' opacity='.6'%3E%3Cpath d='M2 12.6c0-5 5-7 7-3 1-4 6-4 7 0 2-2 4 0 4 3'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(to bottom, #a35c41, #8a4b35 60%, #6b3826);
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+/* Raised bead ring dividing the courses. */
+.mwt-bead {
+  flex: 0 0 5px;
+  background: linear-gradient(to bottom, #d79a70, #9c5637 45%, #3f1d0e);
+  box-shadow: 0 1px 0 rgba(24, 10, 3, 0.6);
+}
+
+/* The mantra course. */
+.mwt-mantra {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(226, 158, 112, 0.22), transparent 70%),
+    linear-gradient(to bottom, #7e4229, #954f34 40%, #6d3722);
+}
+.mwt-mantra > span {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-tibetan);
+  font-size: 15px;
+  line-height: 1;
+  pointer-events: none;
+}
+/* Repoussé: light catches the top edge of a raised character, and it casts
+   downward. Highlight above, shadow below, metal face on top. */
+.mwt-mantra-hi {
+  color: #e7ac7e;
+  transform: translateY(-1.1px);
+  opacity: 0.9;
+}
+.mwt-mantra-lo {
+  color: #2e1206;
+  transform: translateY(1.1px);
+  opacity: 0.95;
+}
+.mwt-mantra-face {
+  color: #a95f3d;
+}
+
+/* --- hardware --- */
+.mani-wheel-ring {
+  position: absolute;
+  left: -3px;
+  bottom: 26px;
+  width: 13px;
   height: 13px;
-  transform: translateX(-50%);
-  pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(ellipse at 38% 30%, #fbeec2 0%, #cfa348 38%, #7a5719 72%, #2e1f08 100%);
-  box-shadow: inset 0 0 4px rgba(20, 12, 4, 0.65);
+  border: 2.5px solid #8c8752;
+  box-shadow: inset 0 0 2px rgba(20, 10, 4, 0.7);
 }
-.wheel-cap-top {
-  top: 12px;
-}
-.wheel-cap-bottom {
-  bottom: 12px;
-}
-
-/* The pin the drum turns on. */
-.wheel-spindle {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(to right, #2e1f08, #b08a3c 45%, #f3e3b0 52%, #6b4d18 70%, #2e1f08);
-  border-radius: 2px;
-}
-
-.prayer-wheel-stage:focus-visible {
-  outline: 2px solid var(--color-butter);
-  outline-offset: 6px;
-  border-radius: 6px;
+.mani-wheel-foot {
+  display: block;
+  width: 26px;
+  height: 12px;
+  margin-top: -1px;
+  border-radius: 0 0 40% 40%;
+  background: linear-gradient(to bottom, #8c8752, #55522e 60%, #241f10);
 }
 
 /* The mantra leaving a turning wheel. Rises, drifts, fades — transform and

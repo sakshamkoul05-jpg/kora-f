@@ -127,46 +127,51 @@ how you actually meet them, five in a line, not one on a plinth.
 **Interface job:** it is the way into the kora route. Spinning any drum reveals
 the circuit.
 
-**Rendered as drums, not discs.** Five cylinders, 20 vertical faces each on
-`transform-style: preserve-3d`. A flat spinning circle is the tell of a wheel
-nobody looked at. Because each is a real cylinder, spinning one writes exactly
-**one** transform per frame — on that drum's parent — instead of restyling
-every face.
+**Modelled on the photograph of the actual object**, not on a generic gold
+cylinder. That means: patinated **copper** body (not bright brass), olive-brass
+**Greek key meander** bands top and bottom, copper **scrollwork** courses, a
+**raised mantra register**, dark recessed rules between courses, an ornate
+**domed lid** with a finial, a hanging ring and a foot. It is an old handled
+object, so it is dark, not shiny.
 
-**It has to read as brass**, so: hard-stop gradients rather than a smooth ramp
-(metal is sharp value jumps, not hue), repeating engraved chasing on every
-face, cast collars top and bottom, raised rims, and a spindle. The specular
-sheen is a **fixed overlay that does not rotate** — the light stays in the room
-and the metal turns through it. That, more than the colour, is what makes it
-look like metal.
+### Why it is a scrolling skin, not a faceted cylinder
 
-**Two gestures, because both are real:**
-- drag a single drum, or
-- **sweep along the row with the button held** — each drum starts as the
-  pointer crosses it, the way you brush a wall of wheels walking past.
+The first attempt built each drum from 20 flat faces in `preserve-3d`. That
+cannot carry this object: the meander rings, the scrollwork and the mantra all
+**break at every face seam**, and no face is remotely wide enough to hold a
+legible character. Real wheels are chased with unbroken bands.
 
-**Spinning releases the mantra.** Syllables rise off the turning drum and fade
+So the drum is a **clipped window onto a skin** that carries the register stack
+twice over, translated horizontally — one rotation consumes exactly one tile,
+so it loops seamlessly. Rotation is still `transform` only, so it stays on the
+compositor, and the ornament runs continuously all the way round.
+
+The cylinder comes from a **fixed shading overlay** — dark cheeks at both edges,
+a specular band off-centre — which does *not* turn. The light stays in the room
+and the metal moves through it. That, more than the colour, is what makes a
+flat rectangle read as a round metal drum.
+
+**Hover to turn.** Pointer-enter or focus eases the drum up to speed; leaving
+lets it coast down under friction. There is no drag — the object is something
+you brush past, not something you grab.
+
+**Turning releases the mantra.** Syllables rise off the drum and fade
 (`transform` and `opacity` only, removed from the DOM on `animationend`). That
-is what the object is *for* — the wheel turns so the mantra goes out. Emission
-is capped at five in flight and never happens under reduced motion.
+is what the object is *for* — the wheel turns so the mantra goes out. Capped at
+five in flight, and never under reduced motion.
 
-**Physics.** Angular velocity integrated in `requestAnimationFrame` under
-exponential friction, drag velocity sampled over the last ~90ms. Tested: a firm
-spin (900°/s) coasts **4.7s**, and a drum genuinely reaches rest from maximum
-velocity rather than decaying asymptotically forever — which is what lets the
-loop stop.
+**Physics.** Angular velocity integrated in `requestAnimationFrame`; friction
+and the clockwise clamp come from the unit-tested `lib/wheel-physics.ts`.
 
 **Each loop stops dead at rest.** No idle spin, ever.
 
-**CLOCKWISE ONLY.** `clampSpin` never returns a negative velocity, so no
-gesture can make a drum turn backwards. Dragging anticlockwise of where the
-gesture began is damped to 22% and springs back on release — sprung, not stuck.
-Unit tested.
+**CLOCKWISE ONLY.** `clampSpin` never returns a negative velocity, so nothing
+can make a drum turn backwards. Unit tested.
 
-**Keyboard:** every drum is a focusable button; Enter, Space, → or ↑ spin it.
-← and ↓ are deliberately inert.
+**Keyboard:** every drum is a focusable button. Tab to one and it turns; Enter
+gives it a push.
 
-**Reduced motion:** the drums do not spin, no mantra is emitted, and the route
+**Reduced motion:** the drums do not turn, no mantra is emitted, and the route
 is revealed from the start rather than gated.
 
 > The route is **never trapped behind the gesture**. The content is always in
