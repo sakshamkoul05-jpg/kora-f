@@ -40,17 +40,38 @@ All of these live as `null` values or comments in `lib/site.ts` and
 guessed at; get these from Rohitash and Ashish before shipping:
 
 - **Phone / WhatsApp number** (`lib/site.ts`) — currently carries the number
-  from the brief, unconfirmed.
-- **Host name spelling** for Rohitash and Ashish, and how each wants to be
-  named on the site.
-- **Caretaker name spelling** for Suraj.
+  from the brief, unconfirmed. Every CTA on the site now routes to it, so this
+  is the highest-priority item on the list.
+- **Host identity** — the content plan flags that existing guest reviews name
+  *previous* hosts and a caretaker. If this is a relaunch under new ownership,
+  the Story page bios are wrong, not just unconfirmed. Settle this before
+  launch.
+- **Host and caretaker name spellings**, and how each wants to be named.
 - **Google review listing URL** (`site.googleReviewUrl`) — placeholder only,
   needed to link out to the real 4.7★ / 69-review listing.
-- **Per-room data** for all six rooms (`lib/rooms.ts`): real names (currently
-  "Room 1"–"Room 6" placeholders), occupancy, bed configuration, size in m²,
-  and nightly rate. Do not invent these — ask.
-- **Cancellation / booking policy** — not defined anywhere yet; the FAQ page
-  says this is being finalised.
+- **Room name → room mapping** (`lib/rooms.ts`). The six names (Mani,
+  Zangskar, Deodar, Chorten, Dhauladhar, Butter Lamp) come from the content
+  plan, which proposed them *without* sight of the floor plan and said to
+  confirm which name belongs to which room. They are currently assigned in
+  order, which is a guess.
+- **What each room looks out at.** The content plan suggested a view per name
+  (valley-facing, temple roofline, west-facing sunset…). Those were written to
+  illustrate the naming idea and are **not** recorded in the data or used in
+  the copy, because nobody has confirmed them. Room differentiation is the
+  plan's core selling strategy and it cannot be delivered until someone stands
+  in each room. This is the biggest content gap on the site.
+- **Per-room data**: occupancy, bed configuration, size in m², nightly rate,
+  and whether all six have attached baths and heaters — guests reportedly value
+  the last two, so do not promise them site-wide until confirmed.
+- **Distances and times** (`app/getting-here/page.tsx`) — walking time from the
+  bus stand, driving distance from Kangra (Gaggal) airport, and parking. Left
+  as visible `TODO_CONFIRM` rather than guessed: a wrong walking time at 11pm
+  with a bag is worse than no number.
+- **Temple opening hours** — the Walk page says times are approximate and to
+  ask at the house, rather than stating hours that drift with the season.
+- **Cancellation / booking policy** — not defined anywhere; the FAQ says so.
+- **Testimonials** — none on the site. Do not lift quotes from Tripadvisor,
+  Google or Booking; collect a few fresh, permissioned ones from recent guests.
 
 ## Photography
 
@@ -162,6 +183,40 @@ mismatch during this pass (`37.11221408841084` vs `37.11221408849815`). The
 fix, and the rule for anything similar here: use an integer-only hash
 (`Math.imul`/xor/shift) for jitter, and round every number that reaches the
 DOM (`round3`). Avoiding `Math.random()` alone is *not* sufficient.
+
+## Content pass
+
+Copy now follows the content plan, whose spine is a single claim: **Kora House
+is not near the pilgrimage circuit, it is on it.** The Lingkhor runs past the
+door, so that fact leads the hero and recurs on every page rather than sitting
+in one paragraph on the About page.
+
+Structural changes made:
+
+- **Nav labels** are now The Story · Rooms · The Walk · Getting Here · Book.
+  **The routes did not change** — `/house` and `/experiences` keep their slugs,
+  because renaming them would break any link already shared and the plan was
+  written without sight of the built IA. Labels move, slugs don't.
+- **`/book` is new**: a WhatsApp-first enquiry page. It is deliberately **not a
+  form** — a form with no backend looks like it sent something and didn't. It
+  shows what to include and hands the guest to WhatsApp with those fields
+  pre-filled. This is not the booking engine; spec step 6 remains untouched.
+- **FAQ** left the main nav and lives in the footer. It still carries the
+  housekeeping caveat, which the spec requires to stay findable.
+- **Rooms are named** rather than numbered, each for a stop on the walk.
+
+Two places where the plan was followed only partway, both deliberately:
+
+1. **Room views are not stated.** The plan's per-name views were illustrative
+   and unconfirmed, and view is the whole basis of its room-differentiation
+   strategy. Writing them now would be shipping fiction about rooms guests are
+   about to pay for. Framework is in place; see TODO_CONFIRM.
+2. **Distances stayed blank.** The plan left `[X]` placeholders; those render
+   as visible `TODO_CONFIRM` rather than being filled with plausible guesses.
+
+The three honest caveats (stairs, market distance, housekeeping) now appear on
+the Story page, Getting Here, the FAQ, each room page **and** the new Book page
+— i.e. in front of the guest before they commit, not after.
 
 ## Redesign notes (second pass)
 

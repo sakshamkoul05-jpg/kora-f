@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { SectionMark } from "@/components/Ornament";
-import { site } from "@/lib/site";
+import { site, whatsappUrl } from "@/lib/site";
 
-export const metadata: Metadata = { title: "FAQ & Policies — Kora House" };
+export const metadata: Metadata = {
+  title: "FAQ & Policies — Kora House, McLeodganj",
+  description:
+    "Practical answers about staying at Kora House: stairs and access, the walk to the market, housekeeping, kitchens, and how to reach the hosts.",
+};
 
 const faqs = [
   {
@@ -16,7 +20,11 @@ const faqs = [
   },
   {
     q: "Which rooms have a kitchen?",
-    a: "Three of the six rooms are self-catering with their own kitchen. The rooms page lets you filter for them.",
+    a: "Three of the six — Zangskar, Deodar and Chorten — are self-catering with their own kitchen. The rooms page lets you filter for them.",
+  },
+  {
+    q: "Is the house actually on the kora path?",
+    a: "Yes. Kora House is on Buddha House Road, on the stretch the Lingkhor runs along, past the Dalai Lama security quarters. The circuit is the road outside the door rather than somewhere you travel to.",
   },
   {
     q: "How do I get in touch during my stay?",
@@ -61,7 +69,9 @@ export default function FaqPage() {
           Message the house — one of the hosts will reply, usually the same day.
         </p>
         <a
-          href={`https://wa.me/${site.whatsapp.replace(/[^\d]/g, "")}`}
+          href={whatsappUrl()}
+          target="_blank"
+          rel="noreferrer"
           className="mt-7 inline-block rounded-[var(--radius-kora)] bg-deodar px-7 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
         >
           Message on WhatsApp

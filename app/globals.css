@@ -200,8 +200,8 @@
     0 2px 14px color-mix(in srgb, var(--color-ink) 40%, transparent);
 }
 
-/* Warms and slightly ages photography so nine sources from nine cameras
-   read as one commissioned set. */
+/* Warms and slightly ages photography so a set shot on many different cameras
+   reads as one commissioned series. */
 .photo-warm {
   filter: sepia(0.16) saturate(0.94) contrast(1.03) brightness(0.99);
 }

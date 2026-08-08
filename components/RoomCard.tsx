@@ -27,7 +27,9 @@ export function RoomCard({ room }: { room: Room }) {
           )}
         </div>
 
-        {room.notes && <p className="text-sm leading-relaxed text-ink-soft">{room.notes}</p>}
+        <p className="text-sm leading-relaxed text-ink-soft">
+          {room.notes ?? room.nameNote}
+        </p>
 
         <p className="mt-auto border-t border-ink/10 pt-4 font-data text-sm text-ink-soft">
           {room.nightlyRate ? `From ₹${room.nightlyRate} / night` : "Rate on request"}

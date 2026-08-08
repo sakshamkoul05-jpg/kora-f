@@ -5,7 +5,9 @@ import { RoomsFilterGrid } from "@/components/RoomsFilterGrid";
 import { rooms, sharedSpaces } from "@/lib/rooms";
 
 export const metadata: Metadata = {
-  title: "Rooms — Kora House",
+  title: "Rooms — Kora House, McLeodganj",
+  description:
+    "Six rooms at Kora House, each named for a stop on the kora walk, with views across the Dhauladhar range and Kangra valley.",
 };
 
 export default function RoomsIndexPage() {
@@ -16,9 +18,10 @@ export default function RoomsIndexPage() {
       <SectionMark eyebrow="Six rooms" variant="knot" />
       <h1 className="display-xl mt-5">Where to stay</h1>
       <p className="lede mt-6 max-w-xl">
-        Three rooms are self-catering with their own kitchen; the rest share
-        the dining room and the common balcony. All six look out at the same
-        hills.
+        Each room is named for a stop on the walk outside — a mani stone, the
+        stupa, the cedar, the range — rather than a room tier. Three are
+        self-catering with their own kitchen; the rest share the dining room
+        and the balcony.
       </p>
 
       {groundFloorRoom && (

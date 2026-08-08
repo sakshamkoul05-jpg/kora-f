@@ -10,8 +10,8 @@ export function Footer() {
           <div>
             <p className="display-md">{site.name}</p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-mist/55">
-              A six-room house on the ridge above the temple, run by the family
-              who live in it.
+              Six rooms on Buddha House Road, on the Lingkhor — the pilgrim&apos;s
+              path that circles the temple.
             </p>
             <address className="mt-6 space-y-0.5 text-sm not-italic text-mist/70">
               <p>{site.address.line1}</p>
@@ -47,6 +47,9 @@ export function Footer() {
                   {item.label}
                 </Link>
               ))}
+              <Link href="/faq" className="text-sm text-mist/65 transition-colors hover:text-mist">
+                FAQ &amp; policies
+              </Link>
               <Link href="/credits" className="text-sm text-mist/40 transition-colors hover:text-mist/70">
                 Photo credits
               </Link>
@@ -59,7 +62,7 @@ export function Footer() {
         </div>
 
         <p className="mt-6 text-center text-xs text-mist/35">
-          © {new Date().getFullYear()} {site.name} · McLeodganj, Himachal Pradesh
+          © {new Date().getFullYear()} {site.name} — {site.footerTagline}
         </p>
       </div>
     </footer>

@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PaperTexture } from "@/components/PaperTexture";
 import { KhataTransition } from "@/components/KhataTransition";
-import { site } from "@/lib/site";
 import "./globals.css";
 
 const marcellus = Marcellus({
@@ -37,9 +36,12 @@ const notoTibetan = Noto_Serif_Tibetan({
 });
 
 export const metadata: Metadata = {
-  title: `${site.name} — ${site.tagline}`,
+  title: {
+    default: "Kora House — Stay on the Lingkhor, McLeodganj",
+    template: "%s",
+  },
   description:
-    "A six-room hilltop guesthouse in McLeodganj, Himachal Pradesh. Quiet, secluded, and run by its hosts — with a balcony that is the reason most people book.",
+    "A homestay on the pilgrim's kora circuit beside the Dalai Lama temple, McLeodganj. Six rooms, valley and mountain views, walking distance to the temple and market.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

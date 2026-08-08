@@ -3,7 +3,8 @@
 
 export const site = {
   name: "Kora House",
-  tagline: "A house on the hill, not a hotel",
+  tagline: "Stay on the circle",
+  footerTagline: "On the circle, McLeodganj.",
   address: {
     line1: "Buddha House Road",
     line2: "McLeod Ganj, Dharamshala",
@@ -17,7 +18,9 @@ export const site = {
   googleReviewUrl: "https://www.google.com/maps/place/?q=place_id:TODO_CONFIRM",
   rating: { value: 4.7, count: 69 },
   hosts: [
-    // TODO_CONFIRM: confirm spelling and how each host wants to be named.
+    // TODO_CONFIRM: confirm spelling, and whether these are the current hosts.
+    // The content plan flags that existing guest reviews name previous hosts —
+    // if this is a relaunch under new ownership the bios must be rewritten.
     { name: "Rohitash", role: "Host" },
     { name: "Ashish", role: "Host" },
   ],
@@ -28,19 +31,34 @@ export const site = {
     onSiteHours: "9am–5pm",
     note: "Reachable by phone outside those hours",
   },
+  // These three are load-bearing. The build spec requires them present and
+  // findable rather than buried — they prevent the mismatched-expectation
+  // review. Do not soften them to fit a nicer sentence.
   caveats: {
     stairs:
-      "A significant number of stairs and no lift. Not suited to guests with mobility difficulty — Room 1 is the one ground-floor option.",
+      "A significant number of stairs and no lift. Not suited to guests with mobility difficulty — Mani, on the ground floor, is the one room reachable without the climb.",
     market: "The market is roughly a kilometre away.",
     housekeeping: "Housekeeping is not daily.",
   },
   roomCount: 6,
 } as const;
 
+/** Pre-filled WhatsApp enquiry, since booking runs through WhatsApp for now. */
+export function whatsappUrl(message?: string): string {
+  const digits = site.whatsapp.replace(/[^\d]/g, "");
+  const body =
+    message ??
+    "Hello — I'd like to check availability at Kora House.\n\nDates:\nGuests:\nRoom preference (optional):\nAnything else:";
+  return `https://wa.me/${digits}?text=${encodeURIComponent(body)}`;
+}
+
+// Routes are unchanged; only the labels are new. Renaming /house and
+// /experiences would break any link already shared, and the content plan was
+// written without sight of the built IA — so the labels move, the slugs don't.
 export const nav = [
+  { label: "The Story", href: "/house" },
   { label: "Rooms", href: "/rooms" },
-  { label: "The House", href: "/house" },
-  { label: "Experiences", href: "/experiences" },
+  { label: "The Walk", href: "/experiences" },
   { label: "Getting Here", href: "/getting-here" },
-  { label: "FAQ", href: "/faq" },
+  { label: "Book", href: "/book" },
 ] as const;

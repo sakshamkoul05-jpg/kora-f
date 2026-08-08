@@ -18,7 +18,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const room = getRoomBySlug(slug);
-  return { title: room ? `${room.name} — Kora House` : "Room not found" };
+  if (!room) return { title: "Room not found — Kora House" };
+  return {
+    title: `${room.name} — Kora House, McLeodganj`,
+    description: `${room.name} at Kora House, a homestay on the Lingkhor pilgrim's path in McLeodganj. ${room.nameNote}`,
+  };
 }
 
 export default async function RoomDetailPage({
@@ -59,7 +63,8 @@ export default async function RoomDetailPage({
         <div>
           <Ornament variant="knot" />
           <h1 className="display-xl mt-4">{room.name}</h1>
-          <p className="mt-3 font-data text-sm text-ink-soft">{metaParts.join(" · ")}</p>
+          <p className="mt-2 text-ink-soft">{room.nameNote}</p>
+          <p className="mt-3 font-data text-sm text-ink/45">{metaParts.join(" · ")}</p>
 
           <div className="mt-7 flex flex-wrap gap-2">
             <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar">
@@ -75,8 +80,10 @@ export default async function RoomDetailPage({
           {room.notes && <p className="lede mt-8">{room.notes}</p>}
 
           <p className="mt-6 border-l-2 border-butter/50 pl-4 text-sm text-ink-soft/80">
-            Exact occupancy, bed configuration and room size are still being
-            confirmed with the hosts — message the house for the current detail.
+            What this room looks out at, its bed configuration, size and rate
+            are still being confirmed with the hosts. Rather than guess, we&apos;d
+            rather you asked — message the house and they&apos;ll tell you which
+            of the six suits your stay.
           </p>
 
           <div className="mt-14 border-t border-ink/10 pt-10">

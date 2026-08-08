@@ -3,9 +3,21 @@ import Image from "next/image";
 import { SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages } from "@/lib/image-credits";
-import { site } from "@/lib/site";
+import { site, whatsappUrl } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Getting Here — Kora House" };
+export const metadata: Metadata = {
+  title: "Getting to Kora House, McLeodganj",
+  description:
+    "Directions to Kora House on Buddha House Road, McLeodganj — near the Dalai Lama temple complex and the Lingkhor walk.",
+};
+
+// TODO_CONFIRM: every figure in this block. Left deliberately unstated rather
+// than guessed — a wrong walking time at 11pm with a bag is worse than none.
+const practical = [
+  { label: "From McLeodganj bus stand", value: "TODO_CONFIRM — minutes on foot / short taxi" },
+  { label: "From Kangra (Gaggal) airport", value: "TODO_CONFIRM — distance by road" },
+  { label: "Parking", value: "TODO_CONFIRM — on-site or street" },
+];
 
 export default function GettingHerePage() {
   const mapsUrl = `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}`;
@@ -14,10 +26,13 @@ export default function GettingHerePage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="Getting here" variant="cloud" />
-      <h1 className="display-xl mt-5">Find the house</h1>
+      <h1 className="display-xl mt-5">Finding the house</h1>
       <p className="lede mt-7 max-w-xl">
-        Up past the security quarters and Horizon Villa, where the road narrows
-        and the steps start. Tell your driver Buddha House Road.
+        Kora House is on Buddha House Road, past the Dalai Lama security
+        quarters, on the same stretch as the Lingkhor walk itself. It is a
+        homestay, not a hotel with a lit-up signboard — the easiest way in is to
+        message us when you&apos;re close, and we&apos;ll walk you the last
+        stretch if you need it.
       </p>
 
       <div className="mt-14 grid gap-14 md:grid-cols-2">
@@ -66,6 +81,22 @@ export default function GettingHerePage() {
             </p>
           </div>
 
+          <div className="border-t border-ink/10 pt-8">
+            <p className="eyebrow text-ink/45">Practical</p>
+            <dl className="mt-4 space-y-3">
+              {practical.map((row) => (
+                <div key={row.label} className="flex flex-wrap justify-between gap-2 text-sm">
+                  <dt className="text-ink-soft">{row.label}</dt>
+                  <dd className="font-data text-xs text-ink/40">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+              What to expect: a quiet residential stretch, unmarked from the
+              main road. Send us your arrival time and we&apos;ll guide you in.
+            </p>
+          </div>
+
           <div className="rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
             <p className="eyebrow text-maroon">The last stretch, honestly</p>
             <ul className="mt-4 space-y-4">
@@ -88,6 +119,14 @@ export default function GettingHerePage() {
               {site.caretaker.name} ({site.caretaker.role}) is on site{" "}
               {site.caretaker.onSiteHours}; {site.caretaker.note.toLowerCase()}.
             </p>
+            <a
+              href={whatsappUrl("Hello — I'm on my way to Kora House and would like directions.")}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-block rounded-[var(--radius-kora)] bg-deodar px-6 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
+            >
+              Message us for directions
+            </a>
           </div>
         </div>
       </div>
