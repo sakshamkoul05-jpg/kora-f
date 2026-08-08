@@ -332,52 +332,127 @@
   transform-style: preserve-3d;
   will-change: transform;
 }
+/* Brass. Metal reads as metal because of the sharp value jumps between light
+   and dark bands, not because of the hue — hence the hard stops rather than a
+   smooth ramp. Each face carries the same repeating engraved lines, so the
+   turning drum shows chased metalwork passing under a fixed light. */
 .prayer-wheel-face {
   position: absolute;
   left: 50%;
   top: 0;
-  margin-left: -8.8px;
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-maroon-deep) 92%, black),
-    var(--color-maroon) 45%,
-    color-mix(in srgb, var(--color-maroon-deep) 88%, black)
-  );
-  border-left: 1px solid color-mix(in srgb, var(--color-butter) 22%, transparent);
   backface-visibility: hidden;
+  background-image:
+    /* engraved horizontal chasing */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(60, 40, 12, 0.34) 0px,
+      rgba(60, 40, 12, 0.34) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    /* the metal itself */
+    linear-gradient(
+      to right,
+      #4a3410 0%,
+      #7d5a1c 18%,
+      #c79a3c 42%,
+      #f2dfa4 52%,
+      #c79a3c 62%,
+      #7d5a1c 84%,
+      #4a3410 100%
+    );
+  border-left: 1px solid rgba(20, 12, 4, 0.45);
 }
-/* Fixed lighting. Does not rotate with the drum. */
-.prayer-wheel-shade {
+
+/* Fixed lighting: a specular streak that stays put while the brass turns
+   through it. This is what sells the material. */
+.wheel-sheen {
   position: absolute;
   pointer-events: none;
-  border-radius: 3px;
   background: linear-gradient(
     to right,
-    color-mix(in srgb, var(--color-ink) 72%, transparent) 0%,
-    transparent 26%,
-    color-mix(in srgb, var(--color-butter) 26%, transparent) 42%,
-    transparent 62%,
-    color-mix(in srgb, var(--color-ink) 78%, transparent) 100%
+    rgba(18, 12, 4, 0.72) 0%,
+    rgba(18, 12, 4, 0.28) 14%,
+    rgba(255, 246, 214, 0.42) 40%,
+    rgba(255, 252, 238, 0.62) 49%,
+    rgba(255, 246, 214, 0.34) 58%,
+    rgba(18, 12, 4, 0.3) 86%,
+    rgba(18, 12, 4, 0.78) 100%
   );
 }
-.prayer-wheel-cap {
+
+/* Raised rims that divide the drum, as on a cast wheel. */
+.wheel-band {
   position: absolute;
   left: 50%;
-  height: 16px;
+  height: 5px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(to bottom, #f0d99a, #8a6520 60%, #33220a);
+  box-shadow: 0 1px 0 rgba(255, 240, 200, 0.25);
+}
+
+/* Cast top and bottom collars. */
+.wheel-cap {
+  position: absolute;
+  left: 50%;
+  height: 13px;
   transform: translateX(-50%);
   pointer-events: none;
   border-radius: 50%;
-  background: linear-gradient(
-    to bottom,
-    var(--color-butter),
-    color-mix(in srgb, var(--color-butter) 55%, var(--color-ink))
-  );
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-ink) 35%, transparent);
+  background: radial-gradient(ellipse at 38% 30%, #fbeec2 0%, #cfa348 38%, #7a5719 72%, #2e1f08 100%);
+  box-shadow: inset 0 0 4px rgba(20, 12, 4, 0.65);
 }
+.wheel-cap-top {
+  top: 12px;
+}
+.wheel-cap-bottom {
+  bottom: 12px;
+}
+
+/* The pin the drum turns on. */
+.wheel-spindle {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(to right, #2e1f08, #b08a3c 45%, #f3e3b0 52%, #6b4d18 70%, #2e1f08);
+  border-radius: 2px;
+}
+
 .prayer-wheel-stage:focus-visible {
   outline: 2px solid var(--color-butter);
   outline-offset: 6px;
   border-radius: 6px;
+}
+
+/* The mantra leaving a turning wheel. Rises, drifts, fades — transform and
+   opacity only, and removed from the DOM on animationend. */
+@keyframes mantra-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.82);
+  }
+  18% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--drift, 0px)), -76px) scale(1.04);
+  }
+}
+.mantra-emit {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  white-space: nowrap;
+  color: var(--color-maroon);
+  font-size: 15px;
+  animation: mantra-rise 2.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 /* ---------- Kora circuit draw ---------- */

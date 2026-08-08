@@ -117,39 +117,57 @@ as a spiritual amenity. The restraint is the point.
 
 ---
 
-## 2. Prayer wheel — entry point to the route
+## 2. Prayer wheels — a wall of brass drums
 
-`components/motion/PrayerWheel.tsx` · physics in `lib/wheel-physics.ts`
+`components/motion/PrayerWheelRow.tsx` · physics in `lib/wheel-physics.ts`
 
-**Derived from:** the mani chos 'khor, the hand-turned prayer drum.
+**Derived from:** the mani chos 'khor set in rows along a kora wall — which is
+how you actually meet them, five in a line, not one on a plinth.
 
-**Interface job:** it is the way into the kora route. Spinning it reveals the
-circuit.
+**Interface job:** it is the way into the kora route. Spinning any drum reveals
+the circuit.
 
-**Rendered as a drum, not a disc.** 24 vertical faces on a
-`transform-style: preserve-3d` cylinder. A flat spinning circle is the tell of
-a wheel nobody looked at. Because it is a real cylinder the physics loop writes
-exactly **one** transform per frame — on the parent — instead of restyling
-every face, so it composites cheaply. The lighting is a static overlay that
-does *not* rotate: the light stays in the room and the faces turn through it.
+**Rendered as drums, not discs.** Five cylinders, 20 vertical faces each on
+`transform-style: preserve-3d`. A flat spinning circle is the tell of a wheel
+nobody looked at. Because each is a real cylinder, spinning one writes exactly
+**one** transform per frame — on that drum's parent — instead of restyling
+every face.
+
+**It has to read as brass**, so: hard-stop gradients rather than a smooth ramp
+(metal is sharp value jumps, not hue), repeating engraved chasing on every
+face, cast collars top and bottom, raised rims, and a spindle. The specular
+sheen is a **fixed overlay that does not rotate** — the light stays in the room
+and the metal turns through it. That, more than the colour, is what makes it
+look like metal.
+
+**Two gestures, because both are real:**
+- drag a single drum, or
+- **sweep along the row with the button held** — each drum starts as the
+  pointer crosses it, the way you brush a wall of wheels walking past.
+
+**Spinning releases the mantra.** Syllables rise off the turning drum and fade
+(`transform` and `opacity` only, removed from the DOM on `animationend`). That
+is what the object is *for* — the wheel turns so the mantra goes out. Emission
+is capped at five in flight and never happens under reduced motion.
 
 **Physics.** Angular velocity integrated in `requestAnimationFrame` under
-exponential friction. Drag imparts velocity proportional to gesture speed,
-sampled over the last ~90ms. Tested: a firm spin (900°/s) coasts **4.7s**, and
-the drum genuinely reaches rest from maximum velocity rather than decaying
-asymptotically forever — which is what lets the loop stop.
+exponential friction, drag velocity sampled over the last ~90ms. Tested: a firm
+spin (900°/s) coasts **4.7s**, and a drum genuinely reaches rest from maximum
+velocity rather than decaying asymptotically forever — which is what lets the
+loop stop.
 
-**The loop stops dead at rest.** No idle spin, ever.
+**Each loop stops dead at rest.** No idle spin, ever.
 
 **CLOCKWISE ONLY.** `clampSpin` never returns a negative velocity, so no
-gesture can make the drum turn backwards. Dragging anticlockwise of where the
+gesture can make a drum turn backwards. Dragging anticlockwise of where the
 gesture began is damped to 22% and springs back on release — sprung, not stuck.
 Unit tested.
 
-**Keyboard:** Enter, Space, → or ↑ spin it. ← and ↓ are deliberately inert.
+**Keyboard:** every drum is a focusable button; Enter, Space, → or ↑ spin it.
+← and ↓ are deliberately inert.
 
-**Reduced motion:** the drum does not spin, and the route is revealed from the
-start rather than gated.
+**Reduced motion:** the drums do not spin, no mantra is emitted, and the route
+is revealed from the start rather than gated.
 
 > The route is **never trapped behind the gesture**. The content is always in
 > the DOM, the reveal is opacity and transform only, there is a plain "Or show
@@ -208,18 +226,46 @@ it would read as a UI card; moving the light reads as stone.
 Each stone is a real `<button>` — clicking opens its note — and each gets a
 unique filter id via `useId`.
 
-### The stones are deliberately UNCARVED
+### The carving
 
-The standard is correct Uchen or nothing. *Om mani padme hum* requires stacked
-subjoined consonants (the ྨ of པདྨེ, the vowel-plus-nasal cluster of ཧཱུྃ) —
-exactly the sequences that render as tofu or mis-stacked glyphs when font
-loading or shaping fails. **That failure is invisible to anyone who does not
-read Tibetan**, and it could not be visually verified in the build environment,
-so it is not shipped. The incisions on the stones are plain tool marks,
-deliberately not letterforms, so nothing can be mistaken for badly-set script.
+The stones are carved with **om mani padme hum** in Uchen, set in Noto Serif
+Tibetan. The engraved groove is dark; a lit lip sits on the far side of it from
+the light source and **moves as the azimuth changes**, so the carving catches
+the light as you hover.
 
-The correct sequence is recorded in the component's header comment for whoever
-enables this **after checking it renders with a native reader present**.
+The codepoints live in `lib/mantra.ts`, written as escapes with a per-syllable
+audit comment, so they can be checked without depending on what an editor
+renders:
+
+```
+U+0F68 U+0F7C U+0F7E · U+0F0B · U+0F58 · U+0F0B · U+0F4E U+0F72 · U+0F0B ·
+U+0F54 U+0F51 U+0FA8 U+0F7A · U+0F0B · U+0F67 U+0F71 U+0F74 U+0F83
+```
+
+**Shaping is verified, not assumed.** Two clusters carry the risk — པདྨེ, where
+the subjoined ma must stack *under* the da, and ཧཱུྃ, where vowels stack under
+and the nasal above. Both were measured in the browser:
+
+| check | result |
+|---|---|
+| whole mantra, shaped | 100.6px |
+| whole mantra, naive per-codepoint sum | 193.0px |
+| པདྨེ vs པདེ | identical (25.62px) — subjoined ma adds no advance |
+| ཧཱུྃ vs ཧ alone | identical (11.8px) — vowels and nasal stack |
+
+If shaping had failed, combining marks would advance instead of stacking and
+the string would approach the 193px sum. It doesn't.
+
+**The guard stays.** `ensureTibetan()` requests the face, waits, then checks
+`document.fonts.check` against the actual mantra string. Nothing draws Uchen
+until that resolves true; if the face genuinely fails to load the stone stays
+plain. Unshaped Tibetan is meaningless to anyone who reads it, and a blank
+stone is the correct failure — never tofu.
+
+> A trap worth knowing about: checking `document.fonts.check` *without* first
+> calling `document.fonts.load` deadlocks. Browsers only fetch a face when
+> something already needs it, so the face sits `unloaded` forever and the
+> stones never carve. This bit during implementation.
 
 ---
 
@@ -258,9 +304,9 @@ React/Next external, shared modules deduped):
 | module | min (B) | min+gzip (B) |
 |---|---:|---:|
 | 1 · MalaRail | 3298 | 1599 |
-| 2 · PrayerWheel | 3762 | 1715 |
+| 2 · PrayerWheelRow | 5326 | 2308 |
 | 3 · KoraCircuit | 3261 | 1528 |
-| 4 · ManiStone | 3226 | 1668 |
+| 4 · ManiStone | 3933 | 2005 |
 | 5 · PrayerFlags | 3108 | 1670 |
 | 6 · useButterLamp | 1371 | 775 |
 | — NamchuWangden (static) | 667 | 451 |
@@ -269,11 +315,14 @@ React/Next external, shared modules deduped):
 | shared · deterministic | 351 | 234 |
 | shared · mala-state | 424 | 238 |
 | shared · wheel-physics | 346 | 261 |
+| shared · mantra | 459 | 325 |
 | data · kora-route | 811 | 492 |
-| **all six, deduped, as shipped** | **17189** | **7187** |
+| **all six, deduped, as shipped** | **19261** | **7996** |
 
-**7187 B of 20480 B — 35.1% used, 13293 B headroom.** No GSAP, no Three.js, no
-Lottie; the only added dependency is nothing at all.
+**7996 B of 20480 B — 39.0% used, 12484 B headroom.** No GSAP, no Three.js, no
+Lottie; the only added dependency is nothing at all. The Noto Serif Tibetan
+webfont is *not* counted here — it is a font payload, not JS, and it is loaded
+only when a page actually carves the mantra.
 
 ## Testing
 
@@ -305,7 +354,15 @@ Be honest about this when reviewing:
   verified by unit test, computed style, or DOM structure — not by eye.
   **Open `/motion` and look at it.**
 - **The 60fps target on a mid-range Android over 4G has not been measured.**
-  Profile with CPU throttling at 4x. The likely hot spot is interaction 4: the
-  `feTurbulence` + `feDiffuseLighting` filter re-renders while the azimuth
-  tweens. It is bounded to 280ms on one stone at a time, but it is the first
-  thing to check on device, and the first thing to cut if it does not hold.
+  Profile with CPU throttling at 4x. Two suspects, in order:
+  1. **Interaction 4** — the `feTurbulence` + `feDiffuseLighting` filter
+     re-renders while the azimuth tweens. Bounded to 280ms on one stone, but
+     SVG filters are the most expensive thing here.
+  2. **Interaction 2** — five drums can be spinning at once after a sweep, so
+     five rAF loops run concurrently. Each writes only one transform, so it
+     should hold, but it is the worst case in the set. If it doesn't, cap the
+     number of simultaneously spinning drums rather than removing the sweep.
+- **The carved mantra has not been read by anyone who reads Tibetan.** Shaping
+  is verified by measurement (see above), which proves the glyphs are stacking
+  correctly — it does *not* prove the text is well-set or that the size and
+  spacing look right to a native eye. Have someone check it before launch.

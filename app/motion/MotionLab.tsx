@@ -6,7 +6,7 @@ import { KoraCircuit } from "@/components/motion/KoraCircuit";
 import { MalaRail } from "@/components/motion/MalaRail";
 import { ManiStone } from "@/components/motion/ManiStone";
 import { NamchuWangden } from "@/components/motion/NamchuWangden";
-import { PrayerWheel } from "@/components/motion/PrayerWheel";
+import { PrayerWheelRow } from "@/components/motion/PrayerWheelRow";
 import { koraWaypoints } from "@/lib/kora-route";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -25,7 +25,7 @@ const status = [
   { n: 2, name: "Prayer wheel", state: "built" },
   { n: 5, name: "Prayer flags", state: "built · noise-driven" },
   { n: 6, name: "Butter lamp", state: "built · noise-driven" },
-  { n: 4, name: "Mani stones", state: "built · uncarved by decision" },
+  { n: 4, name: "Mani stones", state: "built · carved, shaping verified" },
   { n: 0, name: "Namchu Wangden", state: "placeholder · never animated" },
 ];
 
@@ -38,9 +38,8 @@ export function MotionLab() {
       <p className="eyebrow text-maroon">Internal · not linked in navigation</p>
       <h1 className="display-lg mt-3">Motion lab</h1>
       <p className="lede mt-5">
-        Each signature interaction in isolation, for review with the hosts.
-        Build order per the brief is 1, 3, 2, 5, 6, 4 — interactions 1 and 3
-        are complete and everything below the divider is not yet reworked.
+        Each signature interaction in isolation, for review with the hosts. All
+        six are built.
       </p>
 
       <div
@@ -138,16 +137,23 @@ export function MotionLab() {
 
       {/* ---- 2. Prayer wheel ---- */}
       <section className="mt-20 border-t border-ink/10 pt-10">
-        <h2 className="display-md">2 · Prayer wheel</h2>
+        <h2 className="display-md">2 · Prayer wheels</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
-          A drum with visible vertical faces, not a flat disc. Drag it and let
-          go: angular velocity decays under friction and it coasts for several
-          seconds. <strong>Clockwise only</strong> — pull it anticlockwise and
-          it resists, then springs back on release. The rAF loop stops dead at
-          rest; it never idle-spins. Keyboard: Enter or → to spin.
+          Five brass drums in a row, as they are set along the kora wall. Each
+          is a real cylinder with 20 vertical faces, turning under a fixed
+          light — the sheen stays put and the metal moves through it.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+          Drag one and let go: velocity decays under friction and it coasts for
+          several seconds. Or <strong>sweep across the row with the button
+          held</strong> and each drum starts as you pass it, the way you brush a
+          wall of wheels walking by. Spinning releases the mantra, which rises
+          off the drum and fades. <strong>Clockwise only</strong> — pull one
+          backwards and it resists, then springs back. Each loop stops dead at
+          rest; none of them idle-spin. Keyboard: Enter or → to spin.
         </p>
         <div className="mt-10 flex justify-center rounded-[var(--radius-card)] border border-ink/10 bg-paper-raised py-12">
-          <PrayerWheel />
+          <PrayerWheelRow />
         </div>
       </section>
 

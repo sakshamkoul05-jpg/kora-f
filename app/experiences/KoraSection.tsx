@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { KoraCircuit } from "@/components/motion/KoraCircuit";
 import { ManiStone } from "@/components/motion/ManiStone";
-import { PrayerWheel } from "@/components/motion/PrayerWheel";
+import { PrayerWheelRow } from "@/components/motion/PrayerWheelRow";
 import { koraNotes, koraWaypoints } from "@/lib/kora-route";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -23,7 +23,7 @@ export function KoraSection() {
   return (
     <div>
       <div className="flex flex-col items-center">
-        <PrayerWheel onSpin={() => setSpun(true)} />
+        <PrayerWheelRow onSpin={() => setSpun(true)} />
         {!revealed && (
           <button
             type="button"
