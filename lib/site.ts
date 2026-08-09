@@ -30,15 +30,23 @@ export const site = {
     onSiteHours: "9am–5pm",
     note: "Reachable by phone outside those hours",
   },
-  // These three are load-bearing. The build spec requires them present and
-  // findable rather than buried — they prevent the mismatched-expectation
-  // review. Do not soften them to fit a nicer sentence.
+  // These are load-bearing. The build spec requires them present and findable
+  // rather than buried — they prevent the mismatched-expectation review. Do
+  // not soften them to fit a nicer sentence.
+  //
+  // The step count is the hosts' own figure and is far more use than "a
+  // significant number of stairs" ever was: 61 is a number someone can weigh
+  // against their own knees.
   caveats: {
     stairs:
-      "A significant number of stairs and no lift. Not suited to guests with mobility difficulty — Mani, on the ground floor, is the one room reachable without the climb.",
+      "61 steps from the car park up to the rooms, and no lift. The caretaker will carry bags up, but the climb itself is unavoidable, so the house is not suited to guests with mobility difficulty.",
     market: "The market is roughly a kilometre away.",
     housekeeping: "Housekeeping is not daily.",
+    sounds:
+      "Street dogs bark at night sometimes, and there is occasional movement from the police post behind the house. Rain is quiet indoors — the attic and roof absorb most of it.",
   },
+  /** Confirmed by the hosts. */
+  steps: 61,
   roomCount: 6,
 } as const;
 
@@ -68,11 +76,27 @@ export const nav = [
  * still unknown — do not estimate it.
  */
 export const distances = {
-  templeEntrance: "550 m",
+  // The hosts state ~500 m to the entrance of His Holiness' residence. Their
+  // guidebook separately puts One Two Café, at the temple entrance, at 550 m.
+  // Same walk, two roundings — the hosts' own direct figure is used.
+  templeEntrance: "About 500 m",
   theOtherSpace: "800 m",
   tushita: "40 minutes to an hour on foot",
   bhagsu: "About 2 km from McLeodganj",
   library: "About 30 minutes on foot down Jogiwara Road",
   sidhbari: "About 20 minutes by taxi",
   triund: "9 km · 1,105 m ascent · about 3 hours up",
+} as const;
+
+/**
+ * The approach, in the hosts' own description. Buddha House Road is what the
+ * map calls it; locals call it the Kora.
+ */
+export const approach = {
+  road: "Buddha House Road — locals call it the Kora",
+  vehicles: "Restricted vehicular access",
+  view:
+    "The stone boundary wall of His Holiness' residence on one side, the valley open on the other.",
+  gradient:
+    "Parts of it climb. That is the point, more or less: it lifts your heart rate and fills your lungs with mountain air on the way.",
 } as const;

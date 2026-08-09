@@ -40,6 +40,18 @@ export default function BookPage() {
         whether you have a room in mind, and we&apos;ll take it from there.
       </p>
 
+      {/* Said plainly, because it is unusual and people should know it up front */}
+      <div className="mt-8 rounded-[var(--radius-card)] border border-ink/12 bg-paper p-6">
+        <p className="eyebrow text-deodar">How we take bookings</p>
+        <p className="mt-3 leading-relaxed text-ink-soft">
+          We like to talk to guests before accepting a booking — not to vet
+          anyone, but to be sure the house is genuinely right for the stay you
+          have in mind. It is a quiet home on a steep hillside, not a hotel.
+          Guests who are respectful, considerate of others and happy in a
+          peaceful place tend to love it here.
+        </p>
+      </div>
+
       <div className="mt-12 rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-8">
         <p className="eyebrow text-ink/45">What to include</p>
         <ul className="mt-5 space-y-3">

@@ -23,6 +23,22 @@ const faqs = [
     a: "Three of the six — Zangskar, Deodar and Chorten — are self-catering with their own kitchen. The rooms page lets you filter for them.",
   },
   {
+    q: "What will I hear at night?",
+    a: "Street dogs bark sometimes. The police who provide security for His Holiness are stationed behind the property, so there is occasional movement from back there. Otherwise it is quiet — this is not the market. Rain is muffled indoors, because the attic and roof structure absorb most of it.",
+  },
+  {
+    q: "Is there wildlife around the house?",
+    a: "Monkeys and langurs pass through from time to time. Keep food out of sight and your windows shut when you go out and they will leave you alone.",
+  },
+  {
+    q: "How many steps are there?",
+    a: `${site.steps} from the car park up to the rooms, and there is no lift. The caretaker will happily carry your luggage up. The climb itself can't be avoided, so if stairs are difficult for you, please tell us before booking rather than after.`,
+  },
+  {
+    q: "Do you accept every booking?",
+    a: "Not automatically. We like to have a conversation first, to make sure the house is the right fit and that we can give you the stay you're after. We welcome guests who are respectful, considerate of others, and comfortable in a quiet place.",
+  },
+  {
     q: "Is the house actually on the kora path?",
     a: "Yes. Kora House is on Buddha House Road, on the stretch the Lingkhor runs along, past the Dalai Lama security quarters. The circuit is the road outside the door rather than somewhere you travel to.",
   },

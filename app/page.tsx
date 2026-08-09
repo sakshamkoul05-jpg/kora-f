@@ -22,7 +22,9 @@ const sections = [
 
 const valleyPhotos = [
   placeImages.monasteryNamgyal,
+  placeImages.templeArchitecturalDetail,
   placeImages.prayerFlagsBhagsu,
+  placeImages.mcleodganjStreet,
   placeImages.triundTrek,
   placeImages.dharamkotHouses,
 ] as const;
@@ -111,8 +113,12 @@ export default function HomePage() {
             <p className="lede mt-6">
               The house opens onto the valley from one long shared balcony. It
               catches the mist coming off the Kangra valley in the morning and
-              the last of the light at the end of the day, and it is where
-              guests take their tea without anyone suggesting it.
+              the last of the light at the end of the day.
+            </p>
+            <p className="mt-4 text-ink-soft">
+              Most guests tell the hosts the same thing within a few minutes of
+              arriving: what they want is to sit out here with a chai and watch
+              the sun go down behind the mountains.
             </p>
             <p className="mt-6 border-l-2 border-butter/50 pl-4 text-sm text-ink-soft/80">
               Pictured is the view over McLeodganj toward the Dhauladhar range.
@@ -162,12 +168,13 @@ export default function HomePage() {
             <SectionMark eyebrow="McLeodganj & nearby" variant="lotus" tone="text-butter" />
             <h2 className="display-lg mt-5 text-mist">The valley the house sits above</h2>
             <p className="lede mt-5 text-mist/65">
-              The temple complex, the forest paths to Bhagsu and Dharamkot, and
-              the ridge up to Triund — all of it on foot from the front steps.
+              The temple complex about five hundred metres down the road, the
+              forest paths to Bhagsu and Dharamkot, and the ridge up to Triund
+              — all of it on foot from the front steps.
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+          <div className="mt-14 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
             {valleyPhotos.map((photo, i) => (
               <div
                 key={photo.file}
@@ -180,7 +187,7 @@ export default function HomePage() {
                   alt={photo.alt}
                   fill
                   className="photo-warm object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
-                  sizes="(min-width: 768px) 25vw, 50vw"
+                  sizes="(min-width: 768px) 33vw, 50vw"
                 />
                 <PhotoCredit image={photo} />
               </div>

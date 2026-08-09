@@ -4,7 +4,7 @@ import Link from "next/link";
 import { OrnamentDivider, SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { PhotoPending } from "@/components/PhotoPending";
-import { placeImages } from "@/lib/image-credits";
+import { housePhotos, placeImages } from "@/lib/image-credits";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -88,6 +88,61 @@ export default function HousePage() {
               What comes next is sustainable power and water, and a communal
               space for gatherings and events.
             </p>
+          </div>
+        </div>
+
+        {/* The family's own photograph. Placed here, in the family's part of
+            the story, rather than on the homepage: on a homepage next to a
+            booking button it would read as an endorsement of the guesthouse,
+            which it is not. */}
+        <figure className="mt-14">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-[var(--radius-card)]">
+            <Image
+              src={housePhotos.hostsWithHisHoliness.file}
+              alt={housePhotos.hostsWithHisHoliness.alt}
+              fill
+              className="object-cover"
+              sizes="(min-width: 768px) 72rem, 100vw"
+            />
+          </div>
+          <figcaption className="mt-3 text-sm text-ink-soft">
+            {housePhotos.hostsWithHisHoliness.caption}
+          </figcaption>
+        </figure>
+      </section>
+
+      {/* ---------- In their own words ---------- */}
+      <section className="mx-auto mt-24 max-w-6xl px-5 md:px-8">
+        <div className="border-t border-ink/10 pt-14">
+          <SectionMark eyebrow="In their own words" variant="cloud" />
+          <div className="mt-8 grid gap-12 md:grid-cols-[1fr_1fr] md:gap-16">
+            <div className="space-y-5">
+              <p className="lede">
+                &ldquo;We originally built this home for ourselves, our family
+                and our friends. Over time we realised that the joy of staying
+                here — the mountain views, and being a short walk from the
+                residence of His Holiness — was worth sharing with travellers
+                from around the world.&rdquo;
+              </p>
+              <p className="text-ink-soft">
+                &ldquo;Hosting has given us the chance to meet people from very
+                different backgrounds, hear their stories, and have
+                conversations that often turn into lasting friendships.&rdquo;
+              </p>
+            </div>
+            <div className="space-y-5">
+              <p className="text-ink-soft">
+                &ldquo;From the moment guests arrive they are met by the
+                panorama and a kind of quiet that makes this place what it is.
+                Some come for the closeness to His Holiness&apos; residence. Many
+                simply tell us, within the first few minutes, that what they
+                want is to sit on the balcony with a chai and watch the sunset
+                over the mountains.&rdquo;
+              </p>
+              <p className="font-data text-[11px] tracking-[0.14em] text-ink/45">
+                — ROHITASH &amp; ASHISH
+              </p>
+            </div>
           </div>
         </div>
       </section>

@@ -15,6 +15,23 @@ export type PlaceImage = {
   sourceUrl: string;
 };
 
+/**
+ * The house's OWN photographs, supplied by the hosts. These are not Commons
+ * images and carry no attribution requirement — they belong to the property.
+ * Keep them separate from `placeImages` so the credits page never implies the
+ * family's own pictures were licensed from a stranger.
+ */
+export type HousePhoto = { file: string; alt: string; caption?: string };
+
+export const housePhotos = {
+  hostsWithHisHoliness: {
+    file: "/images/house/hosts-with-his-holiness.jpg",
+    alt: "Rohitash and his mother with His Holiness the Dalai Lama, who is holding both their hands.",
+    caption:
+      "Rohitash and his mother with His Holiness the Dalai Lama. The family have lived below the temple for a long time.",
+  },
+} satisfies Record<string, HousePhoto>;
+
 export const placeImages = {
   heroMcLeodganj: {
     file: "/images/place/hero-view-over-mcleodganj.jpg",

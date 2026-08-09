@@ -75,8 +75,10 @@ guessed at; get these from Rohitash and Ashish before shipping:
   construction and the house day to day, Ashish on bookings and everything
   online. Still open: **how many years ago their father bought the land** — the
   guidebook itself leaves that as an unanswered note.
-- **Caretaker** — Suraj is on the site but is *not* mentioned anywhere in the
-  guidebook. Confirm he is still with the house before publishing him.
+- **Caretaker's name** — the hosts' latest content confirms there *is* a
+  caretaker (he carries guests' luggage up the 61 steps), so the role is live.
+  The name "Suraj" came from the original brief and is not in either host
+  document; confirm the spelling and that it is still him.
 - **Taxi drivers' consent.** `lib/guidebook.ts` holds Hari's, Rahul's and
   Vikas's mobile numbers but renders "ask at the house" instead. Personal
   numbers in a printed in-room guidebook are one thing; on a public,
@@ -110,7 +112,19 @@ guessed at; get these from Rohitash and Ashish before shipping:
 
 ## Photography
 
-Two different kinds of image on this site, handled two different ways:
+Three kinds of image now, handled three ways:
+
+**The house's own photographs** (`housePhotos` in `lib/image-credits.ts`).
+Currently one: the family with His Holiness, supplied by the hosts. Kept in a
+separate export from the Commons set so the credits page can never imply the
+family's own picture was licensed from a stranger — it carries no attribution
+because none is owed.
+
+It sits on the Story page, in the family's part of the story, **not** on the
+homepage. Next to a booking button it would read as an endorsement of the
+guesthouse by His Holiness, which it is not. Worth preserving that placement.
+
+Two more:
 
 **Location/culture photography (real, in place today).** Nine photos of
 McLeodganj, Dharamshala and the surrounding area — hero, balcony-view stand-in,

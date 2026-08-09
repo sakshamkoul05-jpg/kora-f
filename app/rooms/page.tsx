@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
 import { RoomsFilterGrid } from "@/components/RoomsFilterGrid";
 import { rooms, sharedSpaces } from "@/lib/rooms";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Rooms — Kora House, McLeodganj",
@@ -28,7 +29,8 @@ export default function RoomsIndexPage() {
         <div className="mt-10 max-w-xl rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
           <p className="eyebrow text-maroon">Before you book</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            The house has a significant number of stairs and no lift.{" "}
+            There are {site.steps} steps from the car park up to the rooms, and
+            no lift.{" "}
             <Link
               href={`/rooms/${groundFloorRoom.slug}`}
               className="border-b border-maroon/40 text-maroon hover:border-maroon"

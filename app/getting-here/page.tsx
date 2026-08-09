@@ -3,7 +3,7 @@ import Image from "next/image";
 import { SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages } from "@/lib/image-credits";
-import { distances, site, whatsappUrl } from "@/lib/site";
+import { approach, distances, site, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Getting to Kora House, McLeodganj",
@@ -32,12 +32,43 @@ export default function GettingHerePage() {
       <SectionMark eyebrow="Getting here" variant="cloud" />
       <h1 className="display-xl mt-5">Finding the house</h1>
       <p className="lede mt-7 max-w-xl">
-        Kora House is on Buddha House Road, past the Dalai Lama security
-        quarters, on the same stretch as the Lingkhor walk itself. It is a
-        homestay, not a hotel with a lit-up signboard — the easiest way in is to
-        message us when you&apos;re close, and we&apos;ll walk you the last
-        stretch if you need it.
+        Kora House is on Buddha House Road — the road the locals call the Kora
+        — about 500 m from the entrance to the residence of His Holiness. It is
+        a homestay, not a hotel with a lit-up signboard. Message us when
+        you&apos;re close and we&apos;ll walk you the last stretch.
       </p>
+
+      {/* The two things people actually need to know before they arrive */}
+      <div className="mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+        <div className="rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
+          <p className="font-display text-3xl text-maroon">{site.steps} steps</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            From the car park up to the rooms, and no lift. The caretaker will
+            carry your bags up — but the climb is unavoidable, so please weigh
+            it honestly before you book.
+          </p>
+        </div>
+        <div className="rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-6">
+          <p className="font-display text-3xl">{distances.templeEntrance}</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            To the entrance of His Holiness&apos; residence. {approach.vehicles}{" "}
+            on the approach road, so the last part is on foot.
+          </p>
+        </div>
+      </div>
+
+      {/* The walk in */}
+      <div className="mt-10 max-w-3xl rounded-[var(--radius-card)] border border-ink/12 bg-paper p-7">
+        <p className="eyebrow text-deodar">The walk in</p>
+        <p className="mt-3 leading-relaxed text-ink-soft">
+          {approach.view} You will pass monks and devotees walking the same
+          route. {approach.gradient}
+        </p>
+        <p className="mt-4 leading-relaxed text-ink-soft">
+          If you have the time, do the whole circuit rather than just the
+          stretch to our door. It is the quietest hour you will get here.
+        </p>
+      </div>
 
       <div className="mt-14 grid gap-14 md:grid-cols-2">
         <div className="space-y-8">
@@ -101,7 +132,8 @@ export default function GettingHerePage() {
             </dl>
             <p className="mt-4 text-sm leading-relaxed text-ink-soft">
               What to expect: a quiet residential stretch, unmarked from the
-              main road. Send us your arrival time and we&apos;ll guide you in.
+              main road, with {approach.vehicles.toLowerCase()}. Send us your
+              arrival time and we&apos;ll guide you in.
             </p>
           </div>
 
