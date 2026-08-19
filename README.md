@@ -114,9 +114,19 @@ guessed at; get these from Rohitash and Ashish before shipping:
   Maps *search* by name and address, which works. A canonical
   `place_id` URL would be exact — and is required if you ever want a
   direct "write a review" deep link.
-- **Photographs along the kora path**, tagged to the five waypoints, as the
-  client asked. Cannot be invented; needs someone to walk it with a camera.
-  The waypoint data in `lib/kora-route.ts` is ready to take them.
+- **Photographs along the kora path** — *partly done.* Five freely-licensed
+  photographs taken on this same kora (Gerd Eichmann's series, CC BY / CC BY-SA
+  4.0) are now attached to the five waypoints, in `koraPhotos`.
+
+  They are captioned as **what the path looks like along that stretch, not as
+  portraits of the named landmarks**. No freely-licensed photograph of Tarani
+  Mata Mandir or Lhagyal Ri exists, and captioning a stupa as "Tarani Mata
+  Mandir" because it falls at roughly the right point on the loop would be
+  inventing a fact about a real place. The page says so, plainly, beneath the
+  row.
+
+  The hosts' own photographs of their own stretch will beat these outright and
+  drop straight into `koraPhotos` — same keys, same shape.
 - **Google review listing URL** (`site.googleReviewUrl`) — placeholder only,
   needed to link out to the real 4.7★ / 69-review listing.
 - **Room name → room mapping** (`lib/rooms.ts`). The six names (Mani,

@@ -17,6 +17,14 @@ export type Waypoint = {
   note?: string;
   /** The house. Rendered as the climax of the sequence. */
   isHouse?: boolean;
+  /**
+   * Key into `koraPhotos`. These show what the path looks like along this
+   * stretch — they are not portraits of the named landmark. See the note in
+   * lib/image-credits.ts before changing a caption.
+   */
+  photo?: keyof typeof import("./image-credits").koraPhotos;
+  /** What the photograph actually shows, said plainly. */
+  photoCaption?: string;
 };
 
 export const koraWaypoints: Waypoint[] = [
@@ -25,17 +33,23 @@ export const koraWaypoints: Waypoint[] = [
     name: "Tsuglagkhang main entrance",
     minutes: "0 min",
     note: "The circuit starts and ends here.",
+    photo: "prayerWheels",
+    photoCaption: "The wheel wall at the temple end of the circuit.",
   },
   {
     at: 0.2,
     name: "Tarani Mata Mandir",
     minutes: "~5 min",
+    photo: "stupa",
+    photoCaption: "A stupa standing on the circuit.",
   },
   {
     at: 0.4,
     name: "Forest path",
     minutes: "~10 min",
     note: "Mani stones and prayer wheels set along the wall.",
+    photo: "forestPath",
+    photoCaption: "The shaded, pine-lined stretch.",
   },
   {
     // 0.57 is not arbitrary: it is the point on this path where the circuit
@@ -47,12 +61,16 @@ export const koraWaypoints: Waypoint[] = [
     minutes: "~14 min",
     note: "Kora House sits on the route here.",
     isHouse: true,
+    photo: "maniStones",
+    photoCaption: "Mani stones along the wall on this stretch.",
   },
   {
     at: 0.82,
     name: "Return to temple entrance",
     minutes: "~21 min",
     note: "The circuit closes.",
+    photo: "pilgrims",
+    photoCaption: "Walkers completing the circuit.",
   },
 ];
 

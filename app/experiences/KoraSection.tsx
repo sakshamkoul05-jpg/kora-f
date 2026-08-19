@@ -1,9 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
+import { PhotoCredit } from "@/components/PhotoCredit";
 import { KoraCircuit } from "@/components/motion/KoraCircuit";
 import { ManiStone } from "@/components/motion/ManiStone";
 import { PrayerWheelRow } from "@/components/motion/PrayerWheelRow";
+import { koraPhotos } from "@/lib/image-credits";
 import { koraNotes, koraWaypoints } from "@/lib/kora-route";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
@@ -59,20 +62,46 @@ export function KoraSection() {
         </p>
 
         <div className="mt-16">
-          <p className="eyebrow text-center text-ink/45">Waypoints</p>
-          <div className="mt-8 grid gap-8 sm:grid-cols-3 lg:grid-cols-5">
-            {koraWaypoints.map((w, i) => (
-              <ManiStone
-                key={w.name}
-                index={i}
-                name={w.isHouse ? "Kora House" : w.name}
-                meta={w.minutes}
-                note={w.note}
-              />
-            ))}
+          <p className="eyebrow text-center text-ink/45">Along the way</p>
+          <p className="mx-auto mt-3 max-w-md text-center text-sm text-ink-soft">
+            Five stops, in the order you walk them.
+          </p>
+
+          <div className="mt-10 grid gap-8 sm:grid-cols-3 lg:grid-cols-5">
+            {koraWaypoints.map((w, i) => {
+              const photo = w.photo ? koraPhotos[w.photo] : null;
+              return (
+                <div key={w.name} className="flex flex-col">
+                  {photo && (
+                    <figure className="group relative mb-4 aspect-[4/5] overflow-hidden rounded-[var(--radius-card)]">
+                      <Image
+                        src={photo.file}
+                        alt={photo.alt}
+                        fill
+                        className="photo-warm object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+                        sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                      />
+                      <PhotoCredit image={photo} />
+                    </figure>
+                  )}
+                  <ManiStone
+                    index={i}
+                    name={w.isHouse ? "Kora House" : w.name}
+                    meta={w.minutes}
+                    note={w.note}
+                  />
+                  {w.photoCaption && (
+                    <p className="mt-2 text-xs leading-relaxed text-ink/40">{w.photoCaption}</p>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <p className="mt-6 text-center text-xs text-ink/35">
-            Stones are left uncarved — see MOTION.md.
+
+          <p className="mx-auto mt-8 max-w-lg text-center text-xs leading-relaxed text-ink/35">
+            These photographs were taken on this kora, but they show the path
+            rather than each named landmark. The hosts&apos; own pictures of
+            their stretch will replace them.
           </p>
         </div>
       </div>

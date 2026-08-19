@@ -23,6 +23,67 @@ export type PlaceImage = {
  */
 export type HousePhoto = { file: string; alt: string; caption?: string };
 
+/**
+ * Photographs taken ON the Dharamsala kora — the circuit this house stands on.
+ * All from Gerd Eichmann's series, freely licensed, and all genuinely shot on
+ * the path rather than being generic Himalayan stock.
+ *
+ * IMPORTANT, on how these are captioned. They are attached to the waypoints as
+ * "what you see along this stretch", NOT as portraits of the named landmarks.
+ * No freely-licensed photograph of Tarani Mata Mandir or Lhagyal Ri exists, and
+ * captioning a stupa as "Tarani Mata Mandir" because it sits at roughly the
+ * right point on the loop would be inventing a fact about a real place. Each
+ * caption says what is actually in the frame.
+ *
+ * TODO_PHOTOS: the client asked for pictures taken along the pathway and tagged
+ * to the five stops. These stand in until the hosts walk it with a camera —
+ * their own photographs of their own stretch of the kora will beat these, and
+ * can be dropped straight in here.
+ */
+export const koraPhotos = {
+  prayerWheels: {
+    file: "/images/kora/kora-prayer-wheels.jpg",
+    alt: "A long wall of brass prayer wheels beside the kora path in Dharamsala.",
+    title: "Prayer wheels on the kora, Dharamsala",
+    author: "Gerd Eichmann",
+    license: "CC BY 4.0",
+    sourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Dharamsala-Kora-31-Gebetsmuehlen-2016-gje.jpg",
+  },
+  stupa: {
+    file: "/images/kora/kora-stupa.jpg",
+    alt: "A whitewashed stupa standing beside the kora path.",
+    title: "Stupa on the kora, Dharamsala",
+    author: "Gerd Eichmann",
+    license: "CC BY-SA 4.0",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Dharamsala-Kora-20-Stupa-gje.jpg",
+  },
+  forestPath: {
+    file: "/images/kora/kora-forest-path.jpg",
+    alt: "A monk walking the shaded, pine-lined section of the kora path.",
+    title: "Pines and a monk on the kora, Dharamsala",
+    author: "Gerd Eichmann",
+    license: "CC BY-SA 4.0",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Dharamsala-Kora-06-Pinie-Moench-gje.jpg",
+  },
+  maniStones: {
+    file: "/images/kora/kora-mani-stones.jpg",
+    alt: "Carved mani stones stacked along the wall beside the kora path.",
+    title: "Mani stones on the kora, Dharamsala",
+    author: "Gerd Eichmann",
+    license: "CC BY-SA 4.0",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Dharamsala-Kora-02-Manisteine-gje.jpg",
+  },
+  pilgrims: {
+    file: "/images/kora/kora-pilgrims.jpg",
+    alt: "Pilgrims walking the kora circuit.",
+    title: "Pilgrims on the kora, Dharamsala",
+    author: "Gerd Eichmann",
+    license: "CC BY-SA 4.0",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Dharamsala-Kora-26-Pilger-gje.jpg",
+  },
+} satisfies Record<string, PlaceImage>;
+
 export const housePhotos = {
   hostsWithHisHoliness: {
     file: "/images/house/hosts-with-his-holiness.jpg",
