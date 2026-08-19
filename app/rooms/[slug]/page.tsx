@@ -67,12 +67,17 @@ export default async function RoomDetailPage({
           <p className="mt-3 font-data text-sm text-ink/45">{metaParts.join(" · ")}</p>
 
           <div className="mt-7 flex flex-wrap gap-2">
-            <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar">
-              {room.hasKitchen ? "Self-catering kitchen" : "No kitchen"}
+            <span className="rounded-[var(--radius-kora)] bg-ink/8 px-3 py-1.5 text-xs text-ink-soft">
+              Room {room.number}
             </span>
-            {room.noStairsFromEntrance && (
-              <span className="rounded-[var(--radius-kora)] bg-maroon/12 px-3 py-1.5 text-xs text-maroon">
-                No stairs from entrance
+            {room.hasKitchenette && (
+              <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar">
+                Kitchenette
+              </span>
+            )}
+            {room.floor === "Ground" && (
+              <span className="rounded-[var(--radius-kora)] bg-butter/20 px-3 py-1.5 text-xs text-ink/70">
+                Ground floor
               </span>
             )}
           </div>

@@ -12,17 +12,22 @@ export function RoomCard({ room }: { room: Room }) {
 
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="display-md">{room.name}</p>
+          <p className="display-md">
+            {room.name}{" "}
+            <span className="font-data text-[13px] text-ink/40">(Room {room.number})</span>
+          </p>
           <span className="eyebrow shrink-0 text-ink/40">{room.floor}</span>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] tracking-wide text-deodar">
-            {room.hasKitchen ? "Self-catering" : "No kitchen"}
-          </span>
-          {room.noStairsFromEntrance && (
-            <span className="rounded-[var(--radius-kora)] bg-maroon/12 px-2.5 py-1 text-[11px] tracking-wide text-maroon">
-              No stairs
+          {room.hasKitchenette && (
+            <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] tracking-wide text-deodar">
+              Kitchenette
+            </span>
+          )}
+          {room.floor === "Ground" && (
+            <span className="rounded-[var(--radius-kora)] bg-butter/20 px-2.5 py-1 text-[11px] tracking-wide text-ink/70">
+              Ground floor
             </span>
           )}
         </div>

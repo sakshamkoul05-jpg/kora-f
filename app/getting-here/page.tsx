@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 // 11pm with a bag is worse than no number.
 const practical = [
   { label: "To the Dalai Lama temple entrance", value: distances.templeEntrance, known: true },
+  { label: "To the market", value: distances.market, known: true },
   { label: "To Bhagsu", value: distances.bhagsu, known: true },
   { label: "To Tushita, Dharamkot", value: distances.tushita, known: true },
   { label: "From McLeodganj bus stand", value: "TODO_CONFIRM", known: false },
@@ -41,11 +42,12 @@ export default function GettingHerePage() {
       {/* The two things people actually need to know before they arrive */}
       <div className="mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
         <div className="rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
-          <p className="font-display text-3xl text-maroon">{site.steps} steps</p>
+          <p className="font-display text-3xl text-maroon">~{site.stepsApprox} steps</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            From the car park up to the rooms, and no lift. The caretaker will
-            carry your bags up — but the climb is unavoidable, so please weigh
-            it honestly before you book.
+            From the car park up to the house, and no lift.{" "}
+            <strong>Every room is above that climb</strong>, the ground-floor
+            one included. The caretaker will carry your bags — but the steps are
+            unavoidable, so please weigh them honestly before you book.
           </p>
         </div>
         <div className="rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-6">

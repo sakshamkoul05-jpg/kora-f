@@ -213,8 +213,8 @@ export default function HomePage() {
         </div>
         <p className="lede mt-6 max-w-xl">
           Each named for a stop on the walk outside rather than a room tier.
-          Three are self-catering with their own kitchen; one is on the ground
-          floor, with no stairs from the entrance.
+          Two have their own kitchenette, and there is a common kitchen, a
+          sitting room and the balcony for everyone.
         </p>
         <div className="mt-12 grid gap-7 md:grid-cols-3">
           {rooms.slice(0, 3).map((room) => (

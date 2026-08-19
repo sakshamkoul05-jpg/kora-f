@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { nav, site } from "@/lib/site";
 import { OrnamentDivider } from "./Ornament";
@@ -8,8 +9,14 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-5 pb-10 pt-20 md:px-8">
         <div className="grid gap-12 md:grid-cols-[1.3fr_1fr_1fr]">
           <div>
-            <p className="display-md">{site.name}</p>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-mist/55">
+            <Image
+              src="/brand/kora-house-logo.png"
+              alt={`${site.name} logo`}
+              width={200}
+              height={155}
+              className="h-auto w-[150px] brightness-0 invert opacity-90"
+            />
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-mist/55">
               Six rooms on Buddha House Road, on the Lingkhor — the pilgrim&apos;s
               path that circles the temple.
             </p>
@@ -18,26 +25,61 @@ export function Footer() {
               <p>{site.address.line2}</p>
               <p>{site.address.line3}</p>
             </address>
+            <a
+              href={site.mapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-block border-b border-butter/40 pb-0.5 text-sm text-butter transition-colors hover:border-butter"
+            >
+              Open in Google Maps
+            </a>
           </div>
 
           <div>
             <p className="eyebrow text-butter/70">Contact</p>
-            <div className="mt-4 space-y-2 font-data text-sm text-mist/75">
-              <p>{site.phone}</p>
-              <p>WhatsApp {site.whatsapp}</p>
+            <div className="mt-4 space-y-2 text-sm text-mist/75">
+              <p className="font-data">{site.phone}</p>
+              <p className="font-data">WhatsApp {site.whatsapp}</p>
+              <a
+                href={`mailto:${site.email}`}
+                className="block break-all transition-colors hover:text-mist"
+              >
+                {site.email}
+              </a>
+              {site.instagram && (
+                <a
+                  href={`https://instagram.com/${site.instagram}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block transition-colors hover:text-mist"
+                >
+                  Instagram
+                </a>
+              )}
             </div>
+
             <a
               href={site.googleReviewUrl}
+              target="_blank"
+              rel="noreferrer"
               className="mt-5 inline-flex items-baseline gap-2 text-sm text-butter hover:text-butter-pale"
             >
               <span className="font-display text-lg">{site.rating.value}</span>
               <span className="text-mist/50">· {site.rating.count} Google reviews</span>
             </a>
+            <a
+              href={site.googleReviewUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1.5 block text-xs text-mist/45 transition-colors hover:text-mist/80"
+            >
+              Stayed with us? Leave a review →
+            </a>
           </div>
 
           <div>
             <p className="eyebrow text-butter/70">Explore</p>
-            <nav className="mt-4 flex flex-col gap-2.5">
+            <nav className="mt-4 flex flex-col gap-2.5" aria-label="Footer">
               {nav.map((item) => (
                 <Link
                   key={item.href}
@@ -50,7 +92,10 @@ export function Footer() {
               <Link href="/faq" className="text-sm text-mist/65 transition-colors hover:text-mist">
                 FAQ &amp; policies
               </Link>
-              <Link href="/credits" className="text-sm text-mist/40 transition-colors hover:text-mist/70">
+              <Link
+                href="/credits"
+                className="text-sm text-mist/40 transition-colors hover:text-mist/70"
+              >
                 Photo credits
               </Link>
             </nav>

@@ -60,6 +60,26 @@ working note from Ashish, a reference to a map photocopied from a Lonely Planet
 book (reproducing it would be a copyright problem), and a passage quoted from
 Wikivoyage, which is paraphrased instead. See `lib/guidebook.ts`.
 
+## Corrections applied from client feedback
+
+One of these was a genuine safety issue, so it is recorded rather than just
+fixed:
+
+- **There is no step-free room.** An earlier version said the ground-floor room
+  could be reached without climbing. That was wrong, and wrong in the direction
+  that matters — a guest with bad knees could have booked on it. Every room is
+  above the climb from the car park. **Do not reintroduce that claim.**
+- **Step count is now a range (~50–60), not a figure.** The hosts' written
+  content said 61; their feedback then said "I think there are 50, I can find
+  out". Precision we don't have is worse than an honest range on an
+  accessibility fact. Replace with the exact count when it arrives.
+- The ground-floor room is **Room 6**, not Room 1. Rooms 1–5 are upstairs,
+  numbered right to left facing the building. Names are shown with numbers.
+- **Two** rooms have a **kitchenette**, not three with a "kitchen". There is
+  also a common kitchen any guest may use.
+- The market is **500 m** away, not "roughly a kilometre".
+- Their father was a **1965 war veteran**; wording updated throughout.
+
 ## TODO_CONFIRM — facts pending confirmation from the hosts
 
 All of these live as `null` values or comments in `lib/site.ts` and
@@ -84,6 +104,19 @@ guessed at; get these from Rohitash and Ashish before shipping:
   numbers in a printed in-room guidebook are one thing; on a public,
   search-indexed page they are another. Ask each of them, then flip
   `TAXIS.consentToPublish`.
+- **Exact step count** — see corrections above.
+- **The production domain.** `lib/seo.ts` defaults to `https://korahouse.com`.
+  Set `NEXT_PUBLIC_SITE_URL` in the deployment environment, or every canonical
+  URL, the sitemap and the OpenGraph tags point at a placeholder.
+- **Instagram handle** — `site.instagram` is `null`, so no link renders. Set it
+  and the footer link appears. Better a missing link than a dead one.
+- **Google Business place_id.** The reviews and Maps links currently use a
+  Maps *search* by name and address, which works. A canonical
+  `place_id` URL would be exact — and is required if you ever want a
+  direct "write a review" deep link.
+- **Photographs along the kora path**, tagged to the five waypoints, as the
+  client asked. Cannot be invented; needs someone to walk it with a camera.
+  The waypoint data in `lib/kora-route.ts` is ready to take them.
 - **Google review listing URL** (`site.googleReviewUrl`) — placeholder only,
   needed to link out to the real 4.7★ / 69-review listing.
 - **Room name → room mapping** (`lib/rooms.ts`). The six names (Mani,

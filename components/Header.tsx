@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -11,20 +12,29 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink/10 bg-mist/90 backdrop-blur-md">
-      {/* Five-colour band in the traditional order. Muted and 2px tall — a
-          binding thread along the top of the page, not a flag graphic. */}
+      {/* The logo's own flag colours, as a binding thread along the top. */}
       <div className="flex h-[3px] w-full" aria-hidden>
-        <span className="flex-1 bg-sky/70" />
-        <span className="flex-1 bg-paper-raised" />
-        <span className="flex-1 bg-maroon/80" />
-        <span className="flex-1 bg-deodar/70" />
-        <span className="flex-1 bg-butter/80" />
+        <span className="flex-1" style={{ background: "var(--flag-red)" }} />
+        <span className="flex-1" style={{ background: "var(--color-deodar)" }} />
+        <span className="flex-1" style={{ background: "var(--flag-yellow)" }} />
+        <span className="flex-1" style={{ background: "var(--color-sky)" }} />
+        <span className="flex-1" style={{ background: "var(--flag-white)" }} />
       </div>
 
-      <div className="mx-auto flex h-[68px] max-w-6xl items-center justify-between px-5 md:px-8">
-        <Link href="/" className="group flex flex-col leading-none">
-          <span className="font-display text-[19px] tracking-[0.06em]">{site.name}</span>
-          <span className="eyebrow mt-1 text-[9px] text-ink/40">McLeodganj</span>
+      <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 md:px-8">
+        <Link href="/" className="flex items-center gap-2.5" aria-label={`${site.name} — home`}>
+          <Image
+            src="/brand/kora-house-mark.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-9 w-9 object-contain"
+            priority
+          />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-[19px] tracking-[0.06em]">{site.name}</span>
+            <span className="eyebrow mt-1 text-[9px] text-ink/40">McLeodganj</span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-9 md:flex">

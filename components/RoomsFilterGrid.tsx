@@ -14,8 +14,8 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
   const filtered = useMemo(
     () =>
       rooms.filter((room) => {
-        if (kitchen === "kitchen" && !room.hasKitchen) return false;
-        if (kitchen === "no-kitchen" && room.hasKitchen) return false;
+        if (kitchen === "kitchen" && !room.hasKitchenette) return false;
+        if (kitchen === "no-kitchen" && room.hasKitchenette) return false;
         if (floor !== "all" && room.floor !== floor) return false;
         return true;
       }),
@@ -28,13 +28,13 @@ export function RoomsFilterGrid({ rooms }: { rooms: Room[] }) {
           not buried amenity icons. */}
       <div className="flex flex-wrap gap-6">
         <fieldset>
-          <legend className="eyebrow text-ink/45">Kitchen</legend>
+          <legend className="eyebrow text-ink/45">Kitchenette</legend>
           <div className="mt-2 flex gap-2">
             {(
               [
                 ["all", "All"],
-                ["kitchen", "Self-catering"],
-                ["no-kitchen", "No kitchen"],
+                ["kitchen", "Has one"],
+                ["no-kitchen", "Shared only"],
               ] as const
             ).map(([value, label]) => (
               <button

@@ -121,6 +121,7 @@ export const attractions: Place[] = [
     name: "Library of Tibetan Works and Archives",
     meta: "About 30 minutes on foot, or a taxi down Jogiwara Road",
     body: "The seat of the Tibetan Government in Exile, a monastery, and buildings painted with Tibetan designs and murals. The public library has an English reading room of books, magazines and newspapers on Buddhism, Tibet and local politics, and a collection of Tibetan artefacts in the museum upstairs. Buddhist philosophy classes are taught here — ask in the library for the schedule. Everything closes for lunch between 1 and 2pm. Illiterati Café is a good halfway stop if you walk.",
+    url: "https://tibetanlibrary.org",
   },
   {
     name: "Tushita Meditation Centre",

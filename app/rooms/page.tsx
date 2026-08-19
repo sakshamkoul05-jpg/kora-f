@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function RoomsIndexPage() {
-  const groundFloorRoom = rooms.find((r) => r.noStairsFromEntrance);
+  const groundFloorRoom = rooms.find((r) => r.floor === "Ground");
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
@@ -20,27 +20,29 @@ export default function RoomsIndexPage() {
       <h1 className="display-xl mt-5">Where to stay</h1>
       <p className="lede mt-6 max-w-xl">
         Each room is named for a stop on the walk outside — a mani stone, the
-        stupa, the cedar, the range — rather than a room tier. Three are
-        self-catering with their own kitchen; the rest share the dining room
-        and the balcony.
+        stupa, the cedar, the range — rather than a room tier. Two have their
+        own kitchenette. There is also a common kitchen any guest can use, a
+        sitting room beside the dining room, and the balcony.
       </p>
 
-      {groundFloorRoom && (
-        <div className="mt-10 max-w-xl rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
-          <p className="eyebrow text-maroon">Before you book</p>
-          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            There are {site.steps} steps from the car park up to the rooms, and
-            no lift.{" "}
+      <div className="mt-10 max-w-xl rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-6">
+        <p className="eyebrow text-maroon">Before you book</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+          There are roughly {site.stepsApprox} steps from the car park up to the
+          house, and no lift. <strong>Every room is above that climb</strong> —
+          including{" "}
+          {groundFloorRoom && (
             <Link
               href={`/rooms/${groundFloorRoom.slug}`}
               className="border-b border-maroon/40 text-maroon hover:border-maroon"
             >
               {groundFloorRoom.name}
-            </Link>{" "}
-            is the only room reachable without climbing them.
-          </p>
-        </div>
-      )}
+            </Link>
+          )}
+          , which is on the ground floor of the house but still up the steps
+          from the car park. The caretaker will carry your bags.
+        </p>
+      </div>
 
       <div className="mt-14">
         <RoomsFilterGrid rooms={rooms} />

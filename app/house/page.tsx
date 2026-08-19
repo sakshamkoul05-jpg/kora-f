@@ -43,6 +43,12 @@ export default function HousePage() {
             rung both to call the deity and to wake up whoever is about to
             worship.
           </p>
+          <p className="text-ink-soft">
+            The house sits inside a restricted core zone, where commercial
+            expansion and construction are tightly controlled. It is the reason
+            the view from the balcony is likely to stay the view from the
+            balcony.
+          </p>
         </div>
 
         <div className="group relative mt-14 aspect-[21/9] overflow-hidden rounded-[var(--radius-card)]">
@@ -74,15 +80,17 @@ export default function HousePage() {
           </div>
           <div className="space-y-5">
             <p className="text-ink-soft">
-              Rohitash and Ashish&apos;s father bought this land. He died before
-              the building was finished.
+              Rohitash and Ashish&apos;s late father, a veteran of the 1965 war,
+              bought this land. He passed away before the building was
+              completed.
             </p>
             <p className="text-ink-soft">
               His sons completed it between them — Rohitash took on the
               construction and runs the house day to day; Ashish handles the
               bookings and everything online. What they wanted was to
               commemorate their father, and the thing he had wanted: somewhere
-              people could come together and learn from each other.
+              people could come together, enjoy the beauty, and learn from each
+              other.
             </p>
             <p className="text-ink-soft">
               What comes next is sustainable power and water, and a communal

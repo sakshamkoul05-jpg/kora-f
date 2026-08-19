@@ -15,7 +15,17 @@ export const site = {
   // TODO_CONFIRM: confirm this number is current and correct before shipping.
   phone: "+91 94180 66891",
   whatsapp: "+91 94180 66891",
-  googleReviewUrl: "https://www.google.com/maps/place/?q=place_id:TODO_CONFIRM",
+  email: "jaikaria@gmail.com",
+  // TODO_CONFIRM: the Instagram handle. The link is hidden until this is real
+  // rather than shipping a button that goes nowhere.
+  instagram: null as string | null,
+  // A Maps search by name and place is stable without a place_id, so the
+  // address link and the reviews link both work today. Swap in the canonical
+  // place_id URL when the hosts send it — it is more precise.
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Kora+House+Buddha+House+Road+McLeod+Ganj",
+  googleReviewUrl:
+    "https://www.google.com/maps/search/?api=1&query=Kora+House+Buddha+House+Road+McLeod+Ganj",
   rating: { value: 4.7, count: 69 },
   // Confirmed by the hosts' own guidebook: Rohitash and Ashish are brothers,
   // and these are their actual roles rather than a generic "Host" label.
@@ -38,15 +48,20 @@ export const site = {
   // significant number of stairs" ever was: 61 is a number someone can weigh
   // against their own knees.
   caveats: {
+    // TODO_CONFIRM the exact count. The hosts' written content said 61; their
+    // feedback then said "I think there are 50, I can find out". A range is
+    // used rather than false precision, because this is the fact a guest with
+    // bad knees decides on. NOTE: there is NO step-free room — an earlier
+    // version wrongly said the ground-floor room avoided the climb.
     stairs:
-      "61 steps from the car park up to the rooms, and no lift. The caretaker will carry bags up, but the climb itself is unavoidable, so the house is not suited to guests with mobility difficulty.",
-    market: "The market is roughly a kilometre away.",
+      "Roughly 50 to 60 steps from the car park up to the house, and no lift. Every room is above that climb, including the ground-floor one. The caretaker will carry your bags, but the steps themselves are unavoidable, so the house is not suited to guests with mobility difficulty.",
+    market: "The market is about 500 metres away.",
     housekeeping: "Housekeeping is not daily.",
     sounds:
       "Street dogs bark at night sometimes, and there is occasional movement from the police post behind the house. Rain is quiet indoors — the attic and roof absorb most of it.",
   },
-  /** Confirmed by the hosts. */
-  steps: 61,
+  /** Approximate, pending an exact count from the hosts. */
+  stepsApprox: "50–60",
   roomCount: 6,
 } as const;
 
@@ -76,6 +91,7 @@ export const nav = [
  * still unknown — do not estimate it.
  */
 export const distances = {
+  market: "About 500 m",
   // The hosts state ~500 m to the entrance of His Holiness' residence. Their
   // guidebook separately puts One Two Café, at the temple entrance, at 550 m.
   // Same walk, two roundings — the hosts' own direct figure is used.

@@ -19,8 +19,8 @@ const faqs = [
     a: `${site.caveats.housekeeping} Ask ${site.caretaker.name} if you need anything in between.`,
   },
   {
-    q: "Which rooms have a kitchen?",
-    a: "Three of the six — Zangskar, Deodar and Chorten — are self-catering with their own kitchen. The rooms page lets you filter for them.",
+    q: "Which rooms have a kitchenette?",
+    a: "Two of the six — Zangskar and Deodar — have their own kitchenette. There is also a common kitchen downstairs that any guest can use, whichever room you are in.",
   },
   {
     q: "What will I hear at night?",
@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "How many steps are there?",
-    a: `${site.steps} from the car park up to the rooms, and there is no lift. The caretaker will happily carry your luggage up. The climb itself can't be avoided, so if stairs are difficult for you, please tell us before booking rather than after.`,
+    a: `Roughly ${site.stepsApprox} from the car park up to the house, and there is no lift. Every room is above that climb — including the ground-floor one, which is on the lower floor of the house but still up the steps from the car. The caretaker will happily carry your luggage. The climb itself can't be avoided, so if stairs are difficult for you, please tell us before booking rather than after.`,
   },
   {
     q: "Do you accept every booking?",

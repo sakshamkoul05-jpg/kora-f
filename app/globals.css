@@ -11,8 +11,15 @@
   --color-maroon-deep: #4a1724;
   --color-butter: #d99f3c;
   --color-butter-pale: #e8c98a;
-  --color-deodar: #3d5244;
-  --color-sky: #35536f;
+  /* Matched to the logo's green so the mark doesn't sit on the page as a
+     foreign object. Sampled from kora house-RGB.jpg. */
+  --color-deodar: #4e7f3e;
+  --color-deodar-deep: #3a6130;
+  --color-sky: #4a5fa0;
+  /* The logo's prayer-flag colours, used for the header thread. */
+  --flag-red: #c64f4f;
+  --flag-white: #dfe2e6;
+  --flag-yellow: #f2ce55;
 
   /* Paper: warm, slightly uneven parchment. Paper-raised is for cards that
      need to lift off the page without a shadow. */
@@ -32,6 +39,7 @@
   --color-butter: var(--color-butter);
   --color-butter-pale: var(--color-butter-pale);
   --color-deodar: var(--color-deodar);
+  --color-deodar-deep: var(--color-deodar-deep);
   --color-sky: var(--color-sky);
   --color-mist: var(--color-mist);
   --color-paper: var(--color-paper);
@@ -72,6 +80,13 @@
 
   html {
     scroll-padding-top: 5rem;
+  }
+
+  /* Visible focus everywhere. The default ring is invisible on parchment. */
+  :focus-visible {
+    outline: 2px solid var(--color-maroon);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   body {
@@ -234,6 +249,26 @@
    purpose: if Noto Serif Tibetan is missing we want nothing rather than a
    substituted face producing broken stacks — and ManiStone gates on
    isTibetanReady() before drawing this at all. */
+/* Off-screen until focused, then anchored top-left. */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  transform: translateY(-120%);
+  background: var(--color-maroon);
+  color: var(--color-paper);
+  font-family: var(--font-data);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 12px 20px;
+  border-bottom-right-radius: var(--radius-kora);
+  transition: transform 150ms ease-out;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .mani-mantra {
   font-family: var(--font-tibetan);
   font-size: 21px;
