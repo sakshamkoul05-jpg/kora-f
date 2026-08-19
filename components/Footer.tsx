@@ -9,13 +9,19 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-5 pb-10 pt-20 md:px-8">
         <div className="grid gap-12 md:grid-cols-[1.3fr_1fr_1fr]">
           <div>
-            <Image
-              src="/brand/kora-house-logo.png"
-              alt={`${site.name} logo`}
-              width={200}
-              height={155}
-              className="h-auto w-[150px] brightness-0 invert opacity-90"
-            />
+            {/* The mark is transparent, so it keeps its green on the dark band —
+                no need for the brightness-0/invert trick that flattened it to
+                white. The wordmark stays real text rather than pixels. */}
+            <div className="flex items-center gap-3">
+              <Image
+                src="/brand/kora-house-mark.png"
+                alt=""
+                width={112}
+                height={50}
+                className="h-auto w-[84px]"
+              />
+              <span className="display-md text-mist">{site.name}</span>
+            </div>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-mist/55">
               Six rooms on Buddha House Road, on the Lingkhor — the pilgrim&apos;s
               path that circles the temple.

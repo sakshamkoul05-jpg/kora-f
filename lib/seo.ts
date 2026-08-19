@@ -12,7 +12,14 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://korahouse.com"
 ).replace(/\/$/, "");
 
-export const OG_IMAGE = `${SITE_URL}/brand/kora-house-logo.png`;
+/**
+ * Social card. Deliberately NOT the transparent logo — platforms composite
+ * transparent PNGs onto white or black unpredictably, so this one carries the
+ * parchment ground and the flag thread baked in. 1200×630 is the OG standard.
+ */
+export const OG_IMAGE = `${SITE_URL}/brand/og-image.png`;
+/** The transparent lockup, for schema.org `logo`. */
+export const LOGO_IMAGE = `${SITE_URL}/brand/kora-house-logo.png`;
 
 /**
  * Structured data. `LodgingBusiness` is the right type for a guesthouse — it
@@ -32,7 +39,7 @@ export function lodgingJsonLd() {
     description:
       "A six-room homestay on the Lingkhor, the pilgrim's path around the Dalai Lama's temple in McLeodganj, Himachal Pradesh.",
     url: SITE_URL,
-    logo: OG_IMAGE,
+    logo: LOGO_IMAGE,
     image: [OG_IMAGE, `${SITE_URL}/images/place/hero-view-over-mcleodganj.jpg`],
     telephone: site.phone,
     email: site.email,

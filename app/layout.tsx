@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     locale: "en_IN",
-    images: [{ url: OG_IMAGE, width: 900, height: 700, alt: "Kora House" }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Kora House, McLeodganj" }],
   },
   twitter: {
     card: "summary_large_image",

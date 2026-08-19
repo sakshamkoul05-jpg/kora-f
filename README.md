@@ -60,6 +60,33 @@ working note from Ashish, a reference to a map photocopied from a Lonely Planet
 book (reproducing it would be a copyright problem), and a passage quoted from
 Wikivoyage, which is paraphrased instead. See `lib/guidebook.ts`.
 
+## Brand assets
+
+`public/brand/` is generated from the client's `kora house-RGB.jpg`. That
+source is a JPEG, so it cannot carry transparency — the background is cut out
+programmatically instead.
+
+The cut is a **flood fill from the image borders**, not a global "make white
+transparent" threshold. That distinction matters: one of the prayer flags in
+the mark is white, and a global threshold deletes it. Flood fill only removes
+white that is reachable from the edge, so the white flag and the white door
+survive because both are enclosed by green. Edges get graded alpha, so there is
+no pale halo when the mark sits on the dark footer band.
+
+| file | use |
+|---|---|
+| `kora-house-mark.png` | transparent mark — header and footer |
+| `kora-house-logo.png` | transparent full lockup |
+| `og-image.png` | 1200×630 social card, **with** a parchment ground |
+| `icon-32/180/512.png` | favicon and apple-touch |
+
+The social card is deliberately *not* transparent: platforms composite
+transparent PNGs onto white or black unpredictably, so it carries its own
+background and the flag thread.
+
+To regenerate after a logo change, redo the flood-fill cutout — and check the
+result composited on **both** the dark band and the parchment before shipping.
+
 ## Corrections applied from client feedback
 
 One of these was a genuine safety issue, so it is recorded rather than just
