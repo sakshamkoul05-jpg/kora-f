@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
 import { rooms } from "@/lib/rooms";
-import { site, whatsappUrl } from "@/lib/site";
+import { site } from "@/lib/site";
+import { BookingForm } from "./BookingForm";
 
 export const metadata: Metadata = {
   title: "Book Kora House, McLeodganj",
@@ -11,25 +12,21 @@ export const metadata: Metadata = {
 };
 
 /**
- * Enquiry page, not a booking engine.
+ * Booking REQUEST page.
  *
- * The build spec puts the real booking flow — Razorpay, accounts, a database —
- * at step 6, which has not been started. This page does the job that actually
- * needs doing now: it hands the guest to WhatsApp with the right questions
- * already asked, which is how the house takes bookings today.
+ * There is a backend now, so the earlier no-form placeholder has been replaced
+ * with a real one. It is still a request rather than an instant booking: the
+ * hosts read each and reply, which is how this house has always worked, and
+ * the copy says so rather than implying a room is held.
  *
- * Deliberately NOT a form. A form with no backend is a trap: it looks like it
- * sent something and it didn't. The fields below are shown as the things to
- * include in the message, and the WhatsApp link is pre-filled with them.
+ * WhatsApp is kept beside the form throughout. If the database is unreachable
+ * or simply not configured yet, the route the house has always used still
+ * works — the form degrades to it rather than failing.
+ *
+ * Payment is NOT here, deliberately. No nightly rate has been confirmed, so
+ * there is no amount to charge. See BACKEND.md.
  */
 export default function BookPage() {
-  const asks = [
-    "Your dates",
-    "How many guests",
-    "Room preference, if you have one",
-    "Anything else we should know",
-  ];
-
   return (
     <div className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="Book" variant="lotus" />
@@ -53,28 +50,7 @@ export default function BookPage() {
       </div>
 
       <div className="mt-12 rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-8">
-        <p className="eyebrow text-ink/45">What to include</p>
-        <ul className="mt-5 space-y-3">
-          {asks.map((a) => (
-            <li key={a} className="flex gap-3 text-ink-soft">
-              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-butter" aria-hidden />
-              {a}
-            </li>
-          ))}
-        </ul>
-
-        <a
-          href={whatsappUrl()}
-          target="_blank"
-          rel="noreferrer"
-          className="lamp-hover mt-8 inline-block rounded-[var(--radius-kora)] bg-maroon px-8 py-3.5 font-display text-[15px] tracking-wide text-paper transition-colors hover:bg-maroon-deep"
-        >
-          Send on WhatsApp
-        </a>
-        <p className="mt-4 text-xs leading-relaxed text-ink/45">
-          Opens WhatsApp with the questions above already filled in. Or call{" "}
-          <span className="font-data">{site.phone}</span>.
-        </p>
+        <BookingForm />
       </div>
 
       {/* Room shortcut, so an enquiry can name a room */}

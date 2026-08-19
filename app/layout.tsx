@@ -1,11 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Karla, Marcellus, Noto_Serif_Tibetan } from "next/font/google";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
-import { PaperTexture } from "@/components/PaperTexture";
-import { KhataTransition } from "@/components/KhataTransition";
-import { OG_IMAGE, SITE_URL, lodgingJsonLd } from "@/lib/seo";
+import { OG_IMAGE, SITE_URL } from "@/lib/seo";
 import "./globals.css";
+
+/**
+ * Document shell only — fonts, metadata, <html>/<body>.
+ *
+ * The marketing chrome (header, footer, paper texture, khata page transition)
+ * lives in app/(site)/layout.tsx instead, so that /admin does not inherit it.
+ * That is not just cosmetic: the build spec forbids animation in the admin, and
+ * the khata transition would otherwise run on every host navigation.
+ */
 
 const marcellus = Marcellus({
   variable: "--font-marcellus",
@@ -91,25 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${marcellus.variable} ${karla.variable} ${plexMono.variable} ${notoTibetan.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col">
-        {/* Keyboard users shouldn't have to tab the whole nav on every page. */}
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
-        <PaperTexture />
-        <KhataTransition>
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </KhataTransition>
-        <script
-          type="application/ld+json"
-          // Static, locally-generated object — no user input reaches this.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingJsonLd()) }}
-        />
-      </body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
