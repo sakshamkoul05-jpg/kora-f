@@ -2,11 +2,20 @@
 
 Booking requests, availability, and a host view for triaging them.
 
-**Nothing here is live yet.** No Supabase project was reachable from the build
-environment, so the SQL has never been executed and no request has ever made a
-round trip. Everything below is written to run, and the pure logic is unit
-tested, but the first person to follow these steps is also the first person to
-prove them. Expect to hit at least one thing.
+**What is proven, and what is not.**
+
+`npm run test:db` applies `supabase/setup.sql` to a real Postgres 16 (PGlite,
+in-process — no Docker, no cloud) and exercises it: 21 checks covering the
+triggers, every check constraint, the exclusion constraint, and the
+availability functions. So the schema definitely applies and the
+double-booking guarantee definitely bites.
+
+**The RLS policies are not covered by that.** PGlite runs everything as
+superuser, and superusers bypass row security — so the policies are proven to
+*parse*, not to grant the right things to the right roles. Nor has any request
+made a real HTTP round trip through PostgREST and Supabase Auth. Those need a
+live project; there is a short manual check for them at the bottom of this
+file.
 
 ---
 
@@ -163,4 +172,30 @@ npm test
 
 29 tests over the date and validation logic — half-open overlap, timezone-safe
 parsing, impossible calendar dates, the honeypot, and the guest-count bounds.
-The database logic itself is untested, for the reason at the top of this file.
+
+```bash
+npm run test:db
+```
+
+21 checks against a real Postgres 16, in-process via PGlite. It applies
+`setup.sql` exactly as you would paste it, then proves the behaviour: the
+reference trigger, the trigger that stops a crafted insert self-confirming,
+each check constraint, the exclusion constraint (including that a check-out
+day frees the room and that a declined stay releases it), and availability
+including site-wide blocks. Run it after any change to a migration.
+
+### The one check that needs a live project
+
+RLS is the security boundary and the harness above cannot test it, because
+PGlite runs as superuser. Once you are set up, confirm it directly — in the SQL
+editor:
+
+```sql
+set local role anon;
+select * from public.booking_requests;   -- must return 0 rows, not an error
+reset role;
+```
+
+Zero rows is correct and is the whole design: anon can insert a request but can
+never read one back. If that returns actual bookings, stop and check that
+`20260819120100_rls.sql` ran.
