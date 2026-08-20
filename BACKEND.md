@@ -154,6 +154,36 @@ booking form degrades to a clear message plus the WhatsApp link, and `/admin`
 says it isn't configured. That is deliberate — the marketing site should not be
 hostage to a missing environment variable.
 
+## Deployment (Vercel)
+
+Live at **https://kora-front-seven.vercel.app** — Vercel project `kora-front`
+under `sakshamkoul05-jpgs-projects`. Note that the GitHub repo is `kora-f` but
+the Vercel project is `kora-front`; the similarly-named `kora-f` Vercel project
+is an old client-questions page and is **not** this site.
+
+Deploys are manual from the CLI, not triggered by pushing to GitHub:
+
+```bash
+npx vercel --prod
+```
+
+Pushing to `main` alone does **not** update the live site.
+
+Three environment variables are set for Production and Development:
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+`NEXT_PUBLIC_SITE_URL`. Preview has none — `main` is the production branch, so
+Vercel refuses to attach Preview variables to it, and no other branches exist.
+Create a branch and they will need adding.
+
+### When a real domain is ready
+
+`NEXT_PUBLIC_SITE_URL` currently points at the `.vercel.app` address, so every
+canonical tag, the sitemap, `robots.txt` and all OpenGraph images resolve there.
+Change it in Vercel and redeploy at the same time as pointing the domain, or
+the site will advertise the wrong address to search engines. The placeholder
+`korahouse.com` in `lib/seo.ts` is only a fallback for when the variable is
+unset.
+
 ## Not built yet
 
 - **Payments.** Blocked on confirmed rates, not on effort.
