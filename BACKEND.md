@@ -50,10 +50,16 @@ table this key can reach**.
 Set `NEXT_PUBLIC_SITE_URL` too, or canonical URLs and OpenGraph tags point at
 the placeholder domain.
 
-### 3. Run the migrations, in order
+### 3. Run the migrations
 
-Paste each into the Supabase SQL editor, or `supabase db push` if you link the
-project. Order matters — later files depend on earlier ones.
+**Easiest:** open `supabase/setup.sql`, copy all of it, paste into the Supabase
+SQL editor, Run. That file is the five migrations concatenated in order.
+
+Run it **once**, on a fresh project — it is not re-runnable, and its header
+explains how to reset if a run half-fails.
+
+Or run the five files individually, or `supabase db push` if you link the
+project. Order matters either way — later files depend on earlier ones.
 
 | # | File | What it does |
 |---|---|---|
