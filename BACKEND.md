@@ -184,6 +184,19 @@ each check constraint, the exclusion constraint (including that a check-out
 day frees the room and that a declined stay releases it), and availability
 including site-wide blocks. Run it after any change to a migration.
 
+### If local dev cannot reach Supabase
+
+`TypeError: fetch failed` with cause `UNABLE_TO_VERIFY_LEAF_SIGNATURE` is not
+an application error. Some antivirus products (Avast, Kaspersky, ESET) and most
+corporate proxies intercept HTTPS and re-sign certificates with their own root,
+which Node does not trust by default. They usually set `NODE_EXTRA_CA_CERTS`
+system-wide to compensate — so `npm run dev` in a normal terminal works, while
+anything launched from a process that did not inherit that variable fails.
+
+Check it with `echo $NODE_EXTRA_CA_CERTS`. If it is set, start the dev server
+from a shell that has it. Nothing needs changing in the code, and deployed
+environments are unaffected.
+
 ### The one check that needs a live project
 
 RLS is the security boundary and the harness above cannot test it, because

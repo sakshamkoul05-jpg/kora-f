@@ -131,29 +131,52 @@ if (process.argv.includes("--write")) {
   if (direct.status >= 400) ok(`a direct insert asking for the row back is refused (${direct.status})`);
   else no("anon can read a row back from booking_requests", "an anon SELECT policy has been added — remove it");
 
-  // There is no status parameter on the RPC, so this should be rejected
-  // outright rather than accepted-and-corrected.
-  const craft = await req("/rest/v1/rpc/submit_booking_request", {
-    method: "POST",
-    body: JSON.stringify({
-      p_check_in: "2027-12-01", p_check_out: "2027-12-03",
-      p_guest_name: "self confirm attempt", p_guest_email: "a@example.com",
-      p_status: "confirmed",
-    }),
-  });
-  if (craft.status >= 400) ok(`a payload smuggling status='confirmed' is rejected (${craft.status})`);
-  else no("SELF-CONFIRM PAYLOAD ACCEPTED", craft.text.slice(0, 200));
+  // Every call below sends the complete required parameter set. Omitting one
+  // makes PostgREST answer 404 PGRST202 ("no function with those parameters"),
+  // which looks like a rejection and is not one — an earlier version of this
+  // file passed for exactly that wrong reason.
+  const base = { p_adults: 2, p_children: 0, p_guest_email: "verify@example.com" };
+  const rpcCall = (extra) =>
+    req("/rest/v1/rpc/submit_booking_request", {
+      method: "POST",
+      body: JSON.stringify({ ...base, ...extra }),
+    });
 
-  // Past dates must not be accepted even though the form blocks them.
-  const past = await req("/rest/v1/rpc/submit_booking_request", {
-    method: "POST",
-    body: JSON.stringify({
-      p_check_in: "2020-01-01", p_check_out: "2020-01-03",
-      p_guest_name: "time traveller", p_guest_email: "t@example.com",
-    }),
+  // There is no p_status parameter, so status cannot be smuggled in at all.
+  // PostgREST cannot match an overload and refuses before reaching Postgres.
+  const craft = await rpcCall({
+    p_check_in: "2027-12-01", p_check_out: "2027-12-03",
+    p_guest_name: "DELETE ME — self-confirm attempt", p_status: "confirmed",
   });
-  if (past.status >= 400) ok(`a past check-in is refused server-side (${past.status})`);
-  else no("A PAST BOOKING WAS ACCEPTED", past.text.slice(0, 200));
+  if (craft.status === 404 && craft.json?.code === "PGRST202") {
+    ok("status='confirmed' cannot be smuggled in — no such parameter exists");
+  } else if (craft.status >= 400) {
+    ok(`a payload carrying status='confirmed' is rejected (${craft.status})`);
+  } else {
+    no("SELF-CONFIRM PAYLOAD ACCEPTED", craft.text.slice(0, 200));
+  }
+
+  // Past dates must be refused by the database, not merely by the form.
+  const past = await rpcCall({
+    p_check_in: "2020-01-01", p_check_out: "2020-01-03", p_guest_name: "time traveller",
+  });
+  if (past.json?.code === "22023" && /past/i.test(past.json?.message ?? "")) {
+    ok(`a past check-in is refused by the database ("${past.json.message}")`);
+  } else {
+    no("past check-in", `expected 22023 'check_in is in the past', got ${past.status} ${past.text.slice(0, 160)}`);
+  }
+
+  const backwards = await rpcCall({
+    p_check_in: "2028-07-10", p_check_out: "2028-07-08", p_guest_name: "backwards",
+  });
+  if (backwards.json?.code === "22023") ok(`check_out before check_in is refused ("${backwards.json.message}")`);
+  else no("backwards dates", `${backwards.status} ${backwards.text.slice(0, 160)}`);
+
+  const tooLong = await rpcCall({
+    p_check_in: "2028-07-01", p_check_out: "2028-12-01", p_guest_name: "very long stay",
+  });
+  if (tooLong.json?.code === "22023") ok(`a stay beyond 90 nights is refused ("${tooLong.json.message}")`);
+  else no("over-long stay", `${tooLong.status} ${tooLong.text.slice(0, 160)}`);
 } else {
   console.log("\n(skipping the write test — pass --write to include it)");
 }
