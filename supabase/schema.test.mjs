@@ -38,7 +38,7 @@ async function rejects(name, sql, params, code) {
 // --- Supabase-provided objects that setup.sql assumes already exist ---------
 console.log("\nStubbing the Supabase environment (roles, auth schema)...");
 await db.exec(`
-  create role anon;
+  create role anon login;
   create role authenticated;
   create role service_role;
   create schema if not exists auth;
@@ -205,6 +205,101 @@ await check("a site-wide block (room_id null) closes every room", async () => {
   const free = r.rows.filter((x) => x.is_available === true);
   if (free.length) throw new Error(`${free.length} rooms still bookable during a full closure`);
 });
+
+// --- 7. As the anon role ---------------------------------------------------
+// Supabase sets these grants via default privileges; PGlite does not, so they
+// are applied here to match what the real project looks like.
+await db.exec(`
+  grant usage on schema public to anon, authenticated;
+  grant select, insert, update, delete on all tables in schema public to anon, authenticated;
+  grant execute on all functions in schema public to anon, authenticated;
+`);
+
+/** Run fn with the session role set to anon, so RLS actually applies. */
+async function asAnon(fn) {
+  await db.exec("set role anon");
+  try { return await fn(); } finally { await db.exec("reset role"); }
+}
+
+console.log("\nAs the anon role (RLS enforced)");
+await check("anon cannot read booking_requests", () => asAnon(async () => {
+  const r = await db.query("select id from public.booking_requests");
+  if (r.rows.length) throw new Error(`GUEST DATA EXPOSED: ${r.rows.length} rows readable`);
+}));
+await check("anon cannot read the staff allow-list", () => asAnon(async () => {
+  const r = await db.query("select * from public.staff");
+  if (r.rows.length) throw new Error(`${r.rows.length} staff rows readable`);
+}));
+await check("anon can read rooms", () => asAnon(async () => {
+  const r = await db.query("select slug from public.rooms");
+  if (r.rows.length !== 6) throw new Error(`expected 6 rooms, got ${r.rows.length}`);
+}));
+await check("anon cannot UPDATE a request to confirmed", () => asAnon(async () => {
+  const r = await db.query("update public.booking_requests set status='confirmed' returning id");
+  if (r.rows.length) throw new Error(`${r.rows.length} rows updated — anon can confirm its own booking`);
+}));
+await check("anon cannot DELETE a request", () => asAnon(async () => {
+  const r = await db.query("delete from public.booking_requests returning id");
+  if (r.rows.length) throw new Error(`${r.rows.length} rows deleted`);
+}));
+
+// The bug that motivated submit_booking_request(). Kept as a test so nobody
+// "simplifies" the RPC back into a plain insert.
+console.log("\nWhy submit_booking_request() exists");
+await check("INSERT ... RETURNING is refused for anon (no SELECT policy)", () => asAnon(async () => {
+  try {
+    await db.query(
+      `insert into public.booking_requests (check_in, check_out, guest_name, guest_email)
+       values ('2028-02-01','2028-02-04','Direct','d@example.com') returning reference`
+    );
+    throw new Error("RETURNING succeeded — has an anon SELECT policy been added? It must not be.");
+  } catch (e) {
+    if (e.code !== "42501") throw new Error(`expected 42501, got ${e.code}: ${e.message}`);
+  }
+}));
+
+console.log("\nsubmit_booking_request()");
+const submit = (ci, co, slug = null, name = "RPC Guest") =>
+  db.query(
+    `select public.submit_booking_request($1,$2,2,0,$3,'rpc@example.com',null,null,null,$4) as reference`,
+    [ci, co, name, slug]
+  );
+
+await check("anon gets a reference back", () => asAnon(async () => {
+  const r = await submit("2028-04-01", "2028-04-04");
+  if (!/^KH-\d{4}-\d{4}$/.test(r.rows[0].reference)) throw new Error(`bad reference: ${r.rows[0].reference}`);
+}));
+await check("the row it wrote is pending, with no host fields set", async () => {
+  const r = await db.query(
+    `select status, host_note, quoted_total_inr from public.booking_requests
+      where guest_email='rpc@example.com' order by created_at desc limit 1`);
+  const row = r.rows[0];
+  if (row.status !== "pending") throw new Error(`status ${row.status}`);
+  if (row.host_note !== null || row.quoted_total_inr !== null) throw new Error("host fields were set");
+});
+await check("it resolves a room slug", () => asAnon(async () => {
+  const slug = (await db.query("select slug from public.rooms order by sort_order limit 1")).rows[0].slug;
+  const r = await submit("2028-05-01", "2028-05-03", slug, "Slug Guest");
+  if (!r.rows[0].reference) throw new Error("no reference returned");
+}));
+await check("an unknown room slug does not become someone else's room", async () => {
+  // Submit as anon, but verify as superuser — anon cannot read the row back,
+  // which is the whole point of the design.
+  await asAnon(() => submit("2028-06-01", "2028-06-03", "no-such-room", "Bad Slug"));
+  const r = await db.query(
+    `select room_id from public.booking_requests where guest_name='Bad Slug'`);
+  if (!r.rows.length) throw new Error("the request was not written at all");
+  if (r.rows[0].room_id !== null) throw new Error("a bogus slug resolved to a real room");
+});
+await rejects("a past check-in is refused",
+  `select public.submit_booking_request(current_date - 5, current_date + 2, 2, 0, 'Past', 'p@example.com')`,
+  [], "22023");
+await rejects("check_out before check_in is refused",
+  `select public.submit_booking_request('2028-07-10'::date, '2028-07-08'::date, 2, 0, 'Back', 'b@example.com')`,
+  [], "22023");
+await rejects("a stay beyond 90 nights is refused",
+  `select public.submit_booking_request('2028-07-01'::date, '2028-12-01'::date, 2, 0, 'Long', 'l@example.com')`,
+  [], "22023");
 
 console.log(`\n${"=".repeat(52)}\n  ${pass} passed, ${fail} failed\n${"=".repeat(52)}`);
 process.exit(fail ? 1 : 0);

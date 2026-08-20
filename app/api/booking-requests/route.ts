@@ -70,36 +70,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "unconfigured" }, { status: 503 });
   }
 
-  // Resolve the room slug server-side. Never trust a client-supplied room id.
-  let roomId: string | null = null;
-  if (input.roomSlug) {
-    const { data: room } = await supabase
-      .from("rooms")
-      .select("id")
-      .eq("slug", input.roomSlug)
-      .eq("is_active", true)
-      .maybeSingle();
-    roomId = room?.id ?? null;
-  }
-
-  const { data, error } = await supabase
-    .from("booking_requests")
-    .insert({
-      check_in: input.checkIn,
-      check_out: input.checkOut,
-      adults: input.adults,
-      children: input.children,
-      room_id: roomId,
-      guest_name: input.name,
-      guest_email: input.email,
-      guest_phone: input.phone || null,
-      guest_country: input.country || null,
-      message: input.message || null,
-      source: "website",
-    })
-    // Only the caller's own reference comes back — nothing else, and no other row.
-    .select("reference")
-    .single();
+  // Submitted through a SECURITY DEFINER function rather than a plain insert.
+  //
+  // A direct `insert(...).select("reference")` is refused by RLS: RETURNING
+  // needs a SELECT privilege, and anon deliberately has none on this table.
+  // The function returns a single text reference and can yield nothing else,
+  // so the reference comes back without opening any read path to guest data.
+  // It also resolves the room slug internally — no room id crosses the wire.
+  const { data, error } = await supabase.rpc("submit_booking_request", {
+    p_check_in: input.checkIn,
+    p_check_out: input.checkOut,
+    p_adults: input.adults,
+    p_children: input.children,
+    p_guest_name: input.name,
+    p_guest_email: input.email,
+    p_guest_phone: input.phone || null,
+    p_guest_country: input.country || null,
+    p_message: input.message || null,
+    p_room_slug: input.roomSlug || null,
+  });
 
   if (error) {
     // Log server-side; never hand a database message to the browser, since it
@@ -115,5 +104,6 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, reference: data.reference }, { status: 201 });
+  // The function returns the reference as a bare string.
+  return NextResponse.json({ ok: true, reference: data as string }, { status: 201 });
 }

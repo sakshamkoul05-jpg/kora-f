@@ -100,42 +100,60 @@ if (avail.status === 200 && Array.isArray(avail.json) && avail.json.length === 6
 if (process.argv.includes("--write")) {
   console.log("\nSubmitting a test request (--write)");
   const stamp = new Date().toISOString().slice(0, 16).replace("T", " ");
-  const ins = await req("/rest/v1/booking_requests", {
+
+  // The production path: the SECURITY DEFINER RPC, not a direct insert.
+  const rpc = await req("/rest/v1/rpc/submit_booking_request", {
     method: "POST",
-    headers: { Prefer: "return=representation" },
     body: JSON.stringify({
-      check_in: "2027-11-02", check_out: "2027-11-05", adults: 2, children: 0,
-      guest_name: `DELETE ME — automated test ${stamp}`,
-      guest_email: "verify@example.com",
-      message: "Created by supabase/verify-live.mjs. Safe to delete.",
+      p_check_in: "2027-11-02", p_check_out: "2027-11-05",
+      p_adults: 2, p_children: 0,
+      p_guest_name: `DELETE ME — automated test ${stamp}`,
+      p_guest_email: "verify@example.com",
+      p_message: "Created by supabase/verify-live.mjs. Safe to delete.",
     }),
   });
-  if (ins.status === 201 && ins.json?.[0]?.reference) {
-    ok(`anon may submit a request — reference ${ins.json[0].reference}`);
-    if (ins.json[0].status === "pending") ok("it landed as pending, not confirmed");
-    else no("status on insert", `expected pending, got ${ins.json[0].status}`);
+  if (rpc.status === 200 && typeof rpc.json === "string" && /^KH-/.test(rpc.json)) {
+    ok(`anon may submit via submit_booking_request() — reference ${rpc.json}`);
     console.log("        NOTE: delete this row from /admin when you are done.");
   } else {
-    no("anon may submit a booking request", `${ins.status} ${ins.text.slice(0, 250)}`);
+    no("anon may submit a booking request", `${rpc.status} ${rpc.text.slice(0, 250)}`);
   }
 
-  const selfConfirm = await req("/rest/v1/booking_requests", {
+  // Still refused, and must stay refused — this is what the RPC exists for.
+  const direct = await req("/rest/v1/booking_requests", {
     method: "POST",
     headers: { Prefer: "return=representation" },
     body: JSON.stringify({
       check_in: "2027-11-20", check_out: "2027-11-22",
-      guest_name: "DELETE ME — self-confirm attempt", guest_email: "attack@example.com",
-      status: "confirmed",
+      guest_name: "should not exist", guest_email: "x@example.com",
     }),
   });
-  if (selfConfirm.status === 201 && selfConfirm.json?.[0]?.status === "pending") {
-    ok("a crafted 'confirmed' payload is forced back to pending");
-    console.log("        NOTE: delete this row too.");
-  } else if (selfConfirm.status >= 400) {
-    ok(`a crafted 'confirmed' payload is rejected outright (${selfConfirm.status})`);
-  } else {
-    no("SELF-CONFIRM SUCCEEDED", `status came back as ${selfConfirm.json?.[0]?.status}`);
-  }
+  if (direct.status >= 400) ok(`a direct insert asking for the row back is refused (${direct.status})`);
+  else no("anon can read a row back from booking_requests", "an anon SELECT policy has been added — remove it");
+
+  // There is no status parameter on the RPC, so this should be rejected
+  // outright rather than accepted-and-corrected.
+  const craft = await req("/rest/v1/rpc/submit_booking_request", {
+    method: "POST",
+    body: JSON.stringify({
+      p_check_in: "2027-12-01", p_check_out: "2027-12-03",
+      p_guest_name: "self confirm attempt", p_guest_email: "a@example.com",
+      p_status: "confirmed",
+    }),
+  });
+  if (craft.status >= 400) ok(`a payload smuggling status='confirmed' is rejected (${craft.status})`);
+  else no("SELF-CONFIRM PAYLOAD ACCEPTED", craft.text.slice(0, 200));
+
+  // Past dates must not be accepted even though the form blocks them.
+  const past = await req("/rest/v1/rpc/submit_booking_request", {
+    method: "POST",
+    body: JSON.stringify({
+      p_check_in: "2020-01-01", p_check_out: "2020-01-03",
+      p_guest_name: "time traveller", p_guest_email: "t@example.com",
+    }),
+  });
+  if (past.status >= 400) ok(`a past check-in is refused server-side (${past.status})`);
+  else no("A PAST BOOKING WAS ACCEPTED", past.text.slice(0, 200));
 } else {
   console.log("\n(skipping the write test — pass --write to include it)");
 }
