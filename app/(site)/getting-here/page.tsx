@@ -61,7 +61,7 @@ export default function GettingHerePage() {
 
       {/* The walk in */}
       <div className="mt-10 max-w-3xl rounded-[var(--radius-card)] border border-ink/12 bg-paper p-7">
-        <p className="eyebrow text-deodar">The walk in</p>
+        <p className="eyebrow text-deodar-deep">The walk in</p>
         <p className="mt-3 leading-relaxed text-ink-soft">
           {approach.view} You will pass monks and devotees walking the same
           route. {approach.gradient}
@@ -165,7 +165,7 @@ export default function GettingHerePage() {
               href={whatsappUrl("Hello — I'm on my way to Kora House and would like directions.")}
               target="_blank"
               rel="noreferrer"
-              className="mt-6 inline-block rounded-[var(--radius-kora)] bg-deodar px-6 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
+              className="mt-6 inline-block rounded-[var(--radius-kora)] bg-deodar-deep px-6 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
             >
               Message us for directions
             </a>

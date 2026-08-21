@@ -58,7 +58,7 @@ const stops: Stop[] = [
 export default function ExperiencesPage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-      <SectionMark eyebrow="The walk" variant="cloud" tone="text-deodar" />
+      <SectionMark eyebrow="The walk" variant="cloud" tone="text-deodar-deep" />
       <h1 className="display-xl mt-5 max-w-3xl">What&apos;s outside the door</h1>
       <p className="lede mt-7 max-w-xl">
         McLeodganj rewards people who walk it rather than drive it. Everything

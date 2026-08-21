@@ -88,7 +88,7 @@ export default function FaqPage() {
           href={whatsappUrl()}
           target="_blank"
           rel="noreferrer"
-          className="mt-7 inline-block rounded-[var(--radius-kora)] bg-deodar px-7 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
+          className="mt-7 inline-block rounded-[var(--radius-kora)] bg-deodar-deep px-7 py-3 font-display text-sm tracking-wide text-paper transition-opacity hover:opacity-90"
         >
           Message on WhatsApp
         </a>

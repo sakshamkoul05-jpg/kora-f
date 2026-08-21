@@ -61,7 +61,7 @@ export default async function PaidPage({
           href={whatsappUrl(
             reference ? `Hello — I've just paid the deposit for ${reference}.` : undefined
           )}
-          className="rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 text-sm font-medium text-paper"
+          className="rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 text-sm font-medium text-paper"
         >
           Message us on WhatsApp
         </a>

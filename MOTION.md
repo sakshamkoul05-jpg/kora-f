@@ -309,6 +309,67 @@ stone is the correct failure — never tofu.
 
 ---
 
+## 7. Daylight — light that matches the hillside
+
+`components/motion/Daylight.tsx`, phase logic in `lib/daylight.ts`.
+
+The page is lit by the real hour in **McLeodganj**, not the visitor's own
+timezone. Someone browsing from London at midnight sees the house in morning
+light, because that is what it is there.
+
+Four phases — dawn (05–08), day (08–17), dusk (17–20), night — chosen for the
+Dhauladhar rather than a generic clock: at roughly 32°N first light is early
+and the sun drops behind the ridge well before it sets on the plain. IST is
+UTC+5:30 all year, so no daylight-saving handling is needed and the arithmetic
+is exact.
+
+**Two constraints shaped it, and both are load-bearing.**
+
+*SSR safety.* Every marketing page is statically generated, so the build-time
+hour is meaningless and baking a phase into the HTML would be wrong the moment
+it was cached. The phase is written to `<html data-daylight>` in an effect
+**after mount**, never during render, so hydration has nothing to disagree
+about. The unset state is daytime — which is what the static HTML ships and
+what a visitor without JavaScript keeps.
+
+*Contrast.* The palette moves in **hue**, barely in lightness. Every phase is
+still light parchment. A real dark night theme would mean rechecking every text
+colour on the site, and that failure has already happened here once. Measured
+across all four phases: ink 13.8–15.6:1, ink-soft 8.6–9.8:1, both comfortably
+past AA.
+
+The visible drama is `--daylight-wash`, a gradient fixed across the top 70vh
+where no text sits. It is at `z-index: -1` — behind content, in front of the
+body background. An earlier version lifted every direct child of `<body>` to
+`z-index: 1` to clear it and **silently killed the sticky header**; don't go
+back to that.
+
+Transition is 4000ms linear. Nobody should ever catch it changing.
+
+## 8. Singing bowl — the one struck action
+
+`components/motion/BowlRing.tsx`, physics in `lib/bowl-ring.ts` (12 tests).
+
+Three rings leave the point of contact, widen and fade. Cubic ease-out, so they
+travel fast away from the strike and slow as they spread — a struck bowl, not a
+splash. Material Design's ripple runs at constant speed and stops dead, which
+is exactly the button-press feel this is avoiding. Each ring is quieter than
+the last, like overtones, so the three read as one event.
+
+Rings are 2px circles scaled by `transform`, so widening costs a composite and
+never a layout or repaint. Reach is the distance to the furthest corner, so
+striking a corner throws wider rings than striking the middle — same bowl, hit
+somewhere else.
+
+**Used on `Send request` and nowhere else.** A bowl struck on every button is
+not a bowl, it is a tic. The restraint is the whole point; if a second use is
+ever proposed, the answer is no.
+
+Under `prefers-reduced-motion` no rings are created at all and the button
+behaves as if the wrapper were not there. A safety timeout retires every strike
+even if rAF never fires — verified no leak: five rapid strikes peak at 15 rings
+and settle to zero.
+
 ## Kalachakra — Namchu Wangden
 
 Do **not** animate the monogram, and do not use it as a loader, spinner,

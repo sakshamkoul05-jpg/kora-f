@@ -229,7 +229,7 @@ export default function HomePage() {
       <section id="walk-teaser" className="mx-auto max-w-6xl px-5 py-24 md:px-8 md:py-32">
         <div className="grid gap-12 md:grid-cols-2 md:items-center md:gap-16">
           <div>
-            <SectionMark eyebrow="What's outside the door" variant="cloud" tone="text-deodar" />
+            <SectionMark eyebrow="What's outside the door" variant="cloud" tone="text-deodar-deep" />
             <h2 className="display-lg mt-5">Step outside and you&apos;re on it</h2>
             <p className="lede mt-6">
               Ten minutes further and you&apos;re at the Tsuglagkhang complex,

@@ -116,7 +116,7 @@ export function SearchBar({
 
         <button
           type="submit"
-          className="rounded-[var(--radius-kora)] bg-deodar px-6 py-3 font-medium text-paper transition-opacity hover:opacity-90"
+          className="rounded-[var(--radius-kora)] bg-deodar-deep px-6 py-3 font-medium text-paper transition-opacity hover:opacity-90"
         >
           Check dates
         </button>

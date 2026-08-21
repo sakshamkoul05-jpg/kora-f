@@ -204,7 +204,7 @@ export default function HousePage() {
             {[
               { c: "bg-maroon", n: "Zangskar maroon" },
               { c: "bg-butter", n: "Butter lamp" },
-              { c: "bg-deodar", n: "Deodar" },
+              { c: "bg-deodar-deep", n: "Deodar" },
               { c: "bg-ink", n: "Ink slate" },
             ].map((s) => (
               <div key={s.n} className="flex items-center gap-2.5">

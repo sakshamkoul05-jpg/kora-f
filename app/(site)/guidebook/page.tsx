@@ -45,7 +45,7 @@ function PlaceCard({ place }: { place: Place }) {
           {place.amenities.map((a) => (
             <span
               key={a}
-              className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] text-deodar"
+              className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] text-deodar-deep"
             >
               {a}
             </span>

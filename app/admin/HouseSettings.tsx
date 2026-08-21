@@ -112,7 +112,7 @@ export function HouseSettings({
                   >
                     Save
                   </button>
-                  {saved === room.id && <span className="text-xs text-deodar">Saved</span>}
+                  {saved === room.id && <span className="text-xs text-deodar-deep">Saved</span>}
                   {rates[room.id] && Number(rates[room.id]) > 0 && (
                     <span className="text-xs text-ink/40">
                       3 nights ≈ {formatInr(Number(rates[room.id]) * 3)}
@@ -166,12 +166,12 @@ export function HouseSettings({
               type="button"
               onClick={saveSettings}
               disabled={pending}
-              className="mt-6 rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 font-display text-sm text-paper disabled:opacity-50"
+              className="mt-6 rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 font-display text-sm text-paper disabled:opacity-50"
             >
               {pending ? "Saving…" : "Save rules"}
             </button>
             {saved === "settings" && (
-              <span className="ml-3 text-xs text-deodar">Saved</span>
+              <span className="ml-3 text-xs text-deodar-deep">Saved</span>
             )}
           </div>
         </div>

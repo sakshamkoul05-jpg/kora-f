@@ -41,7 +41,7 @@ export type BookingRequest = {
 const STATUS_STYLE: Record<BookingStatus, string> = {
   pending: "bg-butter/25 text-ink",
   accepted: "bg-maroon/15 text-maroon",
-  confirmed: "bg-deodar/15 text-deodar",
+  confirmed: "bg-deodar/15 text-deodar-deep",
   declined: "bg-ink/10 text-ink-soft",
   cancelled: "bg-ink/10 text-ink-soft",
   expired: "bg-ink/10 text-ink/45",
@@ -263,7 +263,7 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
               type="button"
               onClick={accept}
               disabled={pending || !r.rooms}
-              className="rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 font-display text-sm text-paper disabled:opacity-40"
+              className="rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 font-display text-sm text-paper disabled:opacity-40"
             >
               {pending ? "Saving…" : "Accept and hold"}
             </button>
@@ -340,7 +340,7 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
               type="button"
               onClick={() => decide("confirmed")}
               disabled={pending}
-              className="rounded-[var(--radius-kora)] border border-deodar/40 px-4 py-2 text-xs text-deodar disabled:opacity-60"
+              className="rounded-[var(--radius-kora)] border border-deodar/40 px-4 py-2 text-xs text-deodar-deep disabled:opacity-60"
             >
               Mark deposit received
             </button>
@@ -360,7 +360,7 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
       {r.status === "confirmed" && (
         <div className="mt-5 border-t border-ink/10 pt-4">
           {r.deposit_paid_at && (
-            <p className="text-sm text-deodar">
+            <p className="text-sm text-deodar-deep">
               Deposit received {fmt(r.deposit_paid_at.slice(0, 10))}.
             </p>
           )}

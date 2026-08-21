@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
 import { getAvailability } from "@/lib/availability";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
+import { formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
 import { formatInr } from "@/lib/pricing";
 import { rooms as staticRooms } from "@/lib/rooms";
 import { site, whatsappUrl } from "@/lib/site";
@@ -64,7 +65,7 @@ export default async function BookPage({
 
       {/* Said plainly and early, because it is unusual */}
       <div className="mt-6 rounded-[var(--radius-card)] border border-ink/12 bg-paper p-6">
-        <p className="eyebrow text-deodar">How booking works here</p>
+        <p className="eyebrow text-deodar-deep">How booking works here</p>
         <p className="mt-3 leading-relaxed text-ink-soft">
           We like to talk to guests before accepting a booking — not to vet
           anyone, but to be sure the house is genuinely right for the stay you
@@ -77,13 +78,12 @@ export default async function BookPage({
       {/* ---------------------------------------------------------- results */}
       {datesValid && result && (
         <section className="mt-14" aria-live="polite">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink/10 pb-4">
-            <h2 className="display-lg">
-              {nights} night{nights === 1 ? "" : "s"}
-            </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-ink/10 pb-4">
+            {/* The dates are the headline — they're what the guest just chose
+                and what they're scanning to confirm they got right. */}
+            <h2 className="display-lg">{formatRange(from, to)}</h2>
             <p className="text-sm text-ink-soft">
-              {from} → {to} · {adults} adult{adults === 1 ? "" : "s"}
-              {childCount > 0 && `, ${childCount} child${childCount === 1 ? "" : "ren"}`}
+              {nightsLabel(nights)} · {guestsLabel(adults, childCount)}
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export default async function BookPage({
                         {room.available && !tooSmall && room.quote.kind !== "unbookable" && (
                           <Link
                             href={`/book/checkout?room=${room.slug}&from=${from}&to=${to}&adults=${adults}&children=${childCount}`}
-                            className="rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 text-sm font-medium text-paper transition-opacity hover:opacity-90"
+                            className="rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 text-sm font-medium text-paper transition-opacity hover:opacity-90"
                           >
                             Request this room
                           </Link>

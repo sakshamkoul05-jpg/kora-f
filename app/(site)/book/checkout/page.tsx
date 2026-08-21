@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SectionMark } from "@/components/Ornament";
 import { getAvailability } from "@/lib/availability";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
+import { formatNight, formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
 import { formatInr } from "@/lib/pricing";
 import { site, whatsappUrl } from "@/lib/site";
 import { CheckoutForm } from "./CheckoutForm";
@@ -59,7 +60,7 @@ export default async function CheckoutPage({
         </p>
         <a
           href={whatsappUrl(`Hello — I'd like to ask about ${from} to ${to}.`)}
-          className="mt-5 inline-block rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 text-sm font-medium text-paper"
+          className="mt-5 inline-block rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 text-sm font-medium text-paper"
         >
           Message us on WhatsApp
         </a>
@@ -80,7 +81,7 @@ export default async function CheckoutPage({
         </p>
         <Link
           href={`/book?from=${from}&to=${to}&adults=${adults}&children=${childCount}`}
-          className="mt-5 inline-block rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 text-sm font-medium text-paper"
+          className="mt-5 inline-block rounded-[var(--radius-kora)] bg-deodar-deep px-5 py-2.5 text-sm font-medium text-paper"
         >
           See what else is free
         </Link>
@@ -100,9 +101,7 @@ export default async function CheckoutPage({
       <SectionMark eyebrow="Your request" variant="lotus" />
       <h1 className="display-xl mt-5">{room.name}</h1>
       <p className="lede mt-4">
-        {from} → {to} · {nights} night{nights === 1 ? "" : "s"} · {adults} adult
-        {adults === 1 ? "" : "s"}
-        {childCount > 0 && `, ${childCount} child${childCount === 1 ? "" : "ren"}`}
+        {formatRange(from, to)} · {nightsLabel(nights)} · {guestsLabel(adults, childCount)}
       </p>
 
       {/* ------------------------------------------------ price breakdown */}
@@ -120,7 +119,7 @@ export default async function CheckoutPage({
                   {quote.nights.map((n) => (
                     <Line
                       key={n.date}
-                      label={`${n.date}${n.label ? ` · ${n.label}` : ""}`}
+                      label={`${formatNight(n.date)}${n.label ? ` · ${n.label}` : ""}`}
                       value={formatInr(n.rateInr)}
                       muted
                     />
@@ -137,7 +136,7 @@ export default async function CheckoutPage({
             <div className="mt-6 rounded-[var(--radius-kora)] border border-deodar/30 bg-deodar/[0.06] p-5">
               <div className="flex items-baseline justify-between gap-4">
                 <span className="font-medium text-ink">Deposit to hold the room</span>
-                <span className="display-sm text-deodar">{formatInr(quote.depositInr)}</span>
+                <span className="display-sm text-deodar-deep">{formatInr(quote.depositInr)}</span>
               </div>
               <div className="mt-2 flex items-baseline justify-between gap-4 text-sm text-ink-soft">
                 <span>Balance, paid when you arrive</span>

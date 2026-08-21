@@ -724,3 +724,121 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================== daylight ===
+   The page is lit by the hour it actually is in McLeodganj.
+
+   Only the paper's TEMPERATURE moves, never far in lightness — every phase
+   stays a light parchment, so no text colour anywhere on the site has to be
+   rechecked. The visible drama comes from `--daylight-wash`, a soft gradient
+   laid across the top of the page where nothing is read.
+
+   Applied by components/motion/Daylight.tsx after mount. The unset state is
+   daytime, which is what the static HTML ships as and what a visitor without
+   JavaScript keeps. */
+
+:root {
+  --daylight-wash: transparent;
+  --daylight-veil: transparent;
+}
+
+/* First light. Cool and thin, the valley still in shadow. */
+:root[data-daylight="dawn"] {
+  --color-paper: #f5eee6;
+  --color-paper-raised: #fbf6ef;
+  --color-mist: #e9e1d4;
+  --daylight-wash: radial-gradient(
+    120% 60% at 50% 0%,
+    color-mix(in srgb, #8fa4c8 16%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+/* Full day. The site's own parchment, unaltered — this is the baseline. */
+:root[data-daylight="day"] {
+  --daylight-wash: radial-gradient(
+    120% 55% at 50% 0%,
+    color-mix(in srgb, #f2ce55 10%, transparent) 0%,
+    transparent 68%
+  );
+}
+
+/* The sun goes behind the ridge long before it sets on the plain. */
+:root[data-daylight="dusk"] {
+  --color-paper: #f8ecd6;
+  --color-paper-raised: #fdf5e4;
+  --color-mist: #f0e0c4;
+  --daylight-wash: radial-gradient(
+    120% 62% at 50% 0%,
+    color-mix(in srgb, #d9803c 20%, transparent) 0%,
+    color-mix(in srgb, #6b2436 7%, transparent) 38%,
+    transparent 72%
+  );
+}
+
+/* Night. Deepened and cooled, but still parchment — see the note above. */
+:root[data-daylight="night"] {
+  --color-paper: #efe8db;
+  --color-paper-raised: #f6f1e6;
+  --color-mist: #e4dccc;
+  --daylight-wash: radial-gradient(
+    130% 70% at 50% 0%,
+    color-mix(in srgb, #2f3d63 24%, transparent) 0%,
+    color-mix(in srgb, #2f3d63 8%, transparent) 40%,
+    transparent 78%
+  );
+}
+
+/* The wash itself. Fixed, behind everything, and inert to the pointer.
+   Four minutes to cross a phase — slow enough that nobody catches it
+   changing, which is the point. */
+/* Negative z-index puts the wash behind normal-flow content but still in
+   front of the body's own background, so nothing else needs repositioning.
+   An earlier version lifted every direct child of <body> to z-index 1 to
+   clear it, which silently killed the sticky header. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 70vh;
+  background: var(--daylight-wash);
+  pointer-events: none;
+  z-index: -1;
+  transition: background 4000ms linear;
+}
+
+body {
+  transition: background-color 4000ms linear;
+}
+
+/* ---------------------------------------------------------- singing bowl ---
+   One ring of a struck bowl. Sized 2px and scaled by transform, so widening
+   costs a composite and never a layout or a repaint. Position and opacity are
+   written per frame by components/motion/BowlRing. */
+.bowl-ring {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  margin: 0;
+  border-radius: 9999px;
+  /* Struck metal: a thin bright edge, not a filled splash. The border scales
+     with the element, which is why it thins as the ring travels — exactly
+     what a spreading wavefront does. */
+  border: 1px solid color-mix(in srgb, var(--color-butter) 85%, white);
+  box-shadow: 0 0 2px color-mix(in srgb, var(--color-butter) 60%, transparent);
+  transform: translate(-50%, -50%) scale(0.01);
+  will-change: transform, opacity;
+}
+
+/* On a dark action the gold reads better than white; on paper-coloured
+   buttons the deodar green does. */
+.bowl-on-paper .bowl-ring {
+  border-color: color-mix(in srgb, var(--color-deodar) 70%, white);
+  box-shadow: 0 0 2px color-mix(in srgb, var(--color-deodar) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bowl-ring {
+    display: none;
+  }
+}

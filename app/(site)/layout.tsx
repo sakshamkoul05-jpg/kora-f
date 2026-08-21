@@ -1,6 +1,7 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { KhataTransition } from "@/components/KhataTransition";
+import { Daylight } from "@/components/motion/Daylight";
 import { PaperTexture } from "@/components/PaperTexture";
 import { lodgingJsonLd } from "@/lib/seo";
 
@@ -21,6 +22,10 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         Skip to content
       </a>
       <PaperTexture />
+      {/* Lights the page by the hour it is in McLeodganj. Renders nothing —
+          it sets a data attribute on <html> after mount, so static pages stay
+          static and hydration has nothing to disagree about. */}
+      <Daylight />
       <KhataTransition>
         <Header />
         <main id="main" className="flex-1">

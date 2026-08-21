@@ -21,7 +21,7 @@ export function RoomCard({ room }: { room: Room }) {
 
         <div className="flex flex-wrap gap-2">
           {room.hasKitchenette && (
-            <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] tracking-wide text-deodar">
+            <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-2.5 py-1 text-[11px] tracking-wide text-deodar-deep">
               Kitchenette
             </span>
           )}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { BowlRing } from "@/components/motion/BowlRing";
 import { whatsappUrl } from "@/lib/site";
 
 type Errors = Record<string, string>;
@@ -117,7 +118,7 @@ export function CheckoutForm({
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <p className="eyebrow text-deodar">Your details</p>
+      <p className="eyebrow text-deodar-deep">Your details</p>
 
       {/*
         Honeypot. Off-screen rather than display:none — some bots skip hidden
@@ -158,13 +159,20 @@ export function CheckoutForm({
         </p>
       )}
 
-      <button
-        type="submit"
+      {/* The one struck bowl on the site. This is the moment that matters —
+          the guest committing to ask — and nothing else gets it. */}
+      <BowlRing
+        className="mt-7 w-full rounded-[var(--radius-kora)]"
         disabled={status === "sending"}
-        className="mt-7 w-full rounded-[var(--radius-kora)] bg-deodar px-6 py-3.5 font-medium text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
       >
-        {status === "sending" ? "Sending…" : "Send request"}
-      </button>
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="w-full rounded-[var(--radius-kora)] bg-deodar-deep px-6 py-3.5 font-medium text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          {status === "sending" ? "Sending…" : "Send request"}
+        </button>
+      </BowlRing>
 
       <p className="mt-4 text-center text-sm text-ink/50">
         This is a request, not a confirmed booking. Nothing is charged now.

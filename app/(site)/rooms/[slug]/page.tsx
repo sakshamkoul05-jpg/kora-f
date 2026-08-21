@@ -71,7 +71,7 @@ export default async function RoomDetailPage({
               Room {room.number}
             </span>
             {room.hasKitchenette && (
-              <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar">
+              <span className="rounded-[var(--radius-kora)] bg-deodar/12 px-3 py-1.5 text-xs text-deodar-deep">
                 Kitchenette
               </span>
             )}
