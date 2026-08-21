@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { KhataTransition } from "@/components/KhataTransition";
@@ -33,6 +34,14 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         </main>
         <Footer />
       </KhataTransition>
+      {/*
+        Cookieless, so there is no consent banner — which matters on a site
+        whose whole tone is unhurried, and would otherwise be the first thing
+        a guest sees. Mounted only on the public site: what a host does in the
+        admin is not traffic worth measuring, and their movements around
+        guests' personal data are not something to send anywhere.
+      */}
+      <Analytics />
       <script
         type="application/ld+json"
         // Static, locally-generated object — no user input reaches this.

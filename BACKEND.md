@@ -155,6 +155,33 @@ Host   →  /admin (Supabase Auth)  →  confirm / decline
 - **The service role key is not used anywhere.** It bypasses RLS entirely. If
   you ever add it, server-side only, and never with a `NEXT_PUBLIC_` prefix.
 
+## Content-Security-Policy
+
+Built in `proxy.ts` from `lib/csp.ts`, because a nonce has to be generated per
+request. There are two policies, and the reason is worth knowing before anyone
+tries to "fix" it into one:
+
+**A nonce cannot exist on a static page.** It is baked at build time, when
+there is no request to generate one for. The marketing pages are all static;
+forcing 22 of them dynamic to earn a nonce would trade away static rendering
+and CDN caching to defend pages that render no user input.
+
+So `/admin/*` and `/book/*` — already dynamic, and the only places that touch
+credentials or guest data — get a real nonce with `'strict-dynamic'`. Every
+other page gets a policy without one, which still forbids loading script from
+another origin, framing, `base-uri` hijacking, and posting a form anywhere but
+back here.
+
+What must never happen is `'unsafe-inline'` *beside* a nonce: modern browsers
+ignore `'unsafe-inline'` when a nonce is present, so it looks permissive and
+does nothing — while on a policy with no nonce it is the thing making the page
+work. Two policies, kept apart, is the honest version.
+
+`style-src` allows `'unsafe-inline'` in both. React's `style={{}}` compiles to
+inline style attributes, which CSP3 blocks under `style-src`, and they are
+throughout the codebase. An inline style cannot exfiltrate data the way an
+inline script can.
+
 ## Rate limiting — an honest limitation
 
 `lib/rate-limit.ts` is in-memory and therefore per-instance. On a serverless or

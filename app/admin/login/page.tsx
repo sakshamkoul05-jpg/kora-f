@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { LoginForm } from "./LoginForm";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Host sign in — Kora House",
   robots: { index: false, follow: false },

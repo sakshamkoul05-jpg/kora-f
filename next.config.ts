@@ -6,11 +6,8 @@ import type { NextConfig } from "next";
  * Vercel already sends HSTS. Everything below was missing, and each one closes
  * a real hole rather than ticking a scanner box.
  *
- * Content-Security-Policy is deliberately ABSENT. A useful CSP here needs a
- * per-request nonce threaded through proxy.ts and onto Next's inline bootstrap
- * script; the shortcut of allowing 'unsafe-inline' produces a header that
- * passes a scanner and stops nothing. It is worth doing properly, as its own
- * change, with the whole site re-tested — not bolted on here. See BACKEND.md.
+ * Content-Security-Policy is NOT here — it needs a per-request nonce, so it is
+ * built in proxy.ts. See lib/csp.ts for why only some routes get one.
  */
 const securityHeaders = [
   // Stops a browser second-guessing a Content-Type — the vector where an
