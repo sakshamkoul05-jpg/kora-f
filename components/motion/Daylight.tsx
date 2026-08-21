@@ -31,6 +31,9 @@ export function Daylight() {
     const root = document.documentElement;
 
     const apply = () => {
+      // The motion lab pins a phase to preview it. Without this the five-minute
+      // tick would quietly snap it back and look like a bug.
+      if (root.dataset.daylightLock === "1") return;
       root.dataset.daylight = phaseForInstant(new Date());
     };
     apply();

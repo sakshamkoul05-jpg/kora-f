@@ -8,6 +8,8 @@ import { ManiStone } from "@/components/motion/ManiStone";
 import { NamchuWangden } from "@/components/motion/NamchuWangden";
 import { PrayerWheelRow } from "@/components/motion/PrayerWheelRow";
 import { koraWaypoints } from "@/lib/kora-route";
+import { BowlRing } from "@/components/motion/BowlRing";
+import { DaylightPreview } from "./DaylightPreview";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const demoSections = [
@@ -26,6 +28,8 @@ const status = [
   { n: 5, name: "Prayer flags", state: "built · noise-driven" },
   { n: 6, name: "Butter lamp", state: "built · noise-driven" },
   { n: 4, name: "Mani stones", state: "built · carved, shaping verified" },
+  { n: 7, name: "Daylight", state: "built · McLeodganj time, contrast verified" },
+  { n: 8, name: "Singing bowl", state: "built · Send request only" },
   { n: 0, name: "Namchu Wangden", state: "placeholder · never animated" },
 ];
 
@@ -216,6 +220,50 @@ export function MotionLab() {
             />
           ))}
         </div>
+      </section>
+
+      <DaylightPreview />
+
+      {/* ---- Singing bowl ---- */}
+      <section className="mt-24 border-t border-ink/10 pt-12">
+        <h2 className="display-md">8 · Singing bowl</h2>
+        <p className="mt-3 max-w-2xl text-ink-soft">
+          Strike the button anywhere — the rings leave from wherever you hit it,
+          so a corner throws wider ones than the middle. Fast away from the
+          strike, slowing as they widen, each quieter than the last.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm text-ink/45">
+          On the site this appears on <strong>Send request</strong> and nowhere
+          else. A bowl struck on every button is a tic, not a bowl.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center gap-5">
+          <BowlRing className="rounded-[var(--radius-kora)]">
+            <button
+              type="button"
+              className="rounded-[var(--radius-kora)] bg-deodar-deep px-8 py-4 font-medium text-paper"
+            >
+              Strike me
+            </button>
+          </BowlRing>
+
+          <BowlRing className="bowl-on-paper rounded-[var(--radius-kora)]">
+            <button
+              type="button"
+              className="rounded-[var(--radius-kora)] border border-ink/25 bg-paper-raised px-8 py-4 font-medium text-ink"
+            >
+              On paper
+            </button>
+          </BowlRing>
+        </div>
+
+        {reduced && (
+          <p className="mt-5 rounded-[var(--radius-kora)] bg-butter/20 px-3 py-2 text-sm text-ink-soft">
+            Your system asks for reduced motion, so no rings are drawn at all —
+            the buttons behave as if the wrapper were not there. That is
+            deliberate.
+          </p>
+        )}
       </section>
 
       {/* ---- Kalachakra ---- */}
