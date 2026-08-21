@@ -7,7 +7,6 @@ import { isRazorpayConfigured } from "@/lib/razorpay";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { BookingRow, type BookingRequest } from "./BookingRow";
-import { HouseSettings } from "./HouseSettings";
 import { SignOut } from "./SignOut";
 
 export const metadata: Metadata = {
@@ -130,6 +129,12 @@ export default async function AdminPage() {
           >
             Calendar
           </Link>
+          <Link
+            href="/admin/settings"
+            className="rounded-[var(--radius-kora)] border border-ink/25 px-4 py-2.5 text-sm text-ink"
+          >
+            Rates &amp; offers
+          </Link>
           <Link href="/" className="text-sm text-ink-soft underline underline-offset-4">
             View site
           </Link>
@@ -151,8 +156,8 @@ export default async function AdminPage() {
         <div className="mt-8 rounded-[var(--radius-card)] border border-butter/50 bg-butter/[0.09] p-5 text-sm leading-relaxed text-ink-soft">
           <strong className="font-medium text-ink">No rates are set.</strong> The
           site shows &ldquo;price on request&rdquo; for every room and you have to
-          type a figure each time you accept. Set them below and prices appear
-          straight away.
+          type a figure each time you accept. Set them under Rates &amp; offers and
+          prices appear straight away.
         </div>
       )}
 
@@ -177,22 +182,6 @@ export default async function AdminPage() {
       />
       <Section title="Settled" count={settled.length} rows={settled} empty={null} />
 
-      {isStaff && (
-        <HouseSettings
-          rooms={(roomRows ?? []).map((r) => ({
-            id: r.id,
-            name: r.name,
-            number: r.room_number,
-            rateInr: r.base_rate_inr,
-          }))}
-          settings={{
-            depositPercent: pricing.settings.depositPercent,
-            holdHours: pricing.holdHours,
-            taxPercent: pricing.settings.taxPercent,
-            minNights: pricing.settings.minNights,
-          }}
-        />
-      )}
     </div>
   );
 }

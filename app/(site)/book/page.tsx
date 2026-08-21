@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
+import { Offers } from "@/components/Offers";
 import { getAvailability } from "@/lib/availability";
+import { loadPublicOffers } from "@/lib/offers";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
 import { formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
 import { formatInr } from "@/lib/pricing";
@@ -46,7 +48,10 @@ export default async function BookPage({
     nightsBetween(from, to) > 0 &&
     nightsBetween(from, to) <= MAX_NIGHTS;
 
-  const result = datesValid ? await getAvailability(from, to) : null;
+  const [result, publicOffers] = await Promise.all([
+    datesValid ? getAvailability(from, to) : Promise.resolve(null),
+    loadPublicOffers(),
+  ]);
   const nights = datesValid ? nightsBetween(from, to) : 0;
 
   return (
@@ -74,6 +79,8 @@ export default async function BookPage({
           yes.
         </p>
       </div>
+
+      <Offers offers={publicOffers.offers} packages={publicOffers.packages} />
 
       {/* ---------------------------------------------------------- results */}
       {datesValid && result && (

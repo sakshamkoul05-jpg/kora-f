@@ -15,11 +15,13 @@ import { updateRoomRate, updateSettings } from "./actions";
 export function HouseSettings({
   rooms,
   settings,
+  startOpen = false,
 }: {
   rooms: { id: string; name: string; number: number; rateInr: number | null }[];
   settings: { depositPercent: number; holdHours: number; taxPercent: number; minNights: number };
+  startOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(startOpen);
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
