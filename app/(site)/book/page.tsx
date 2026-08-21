@@ -1,79 +1,204 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
-import { rooms } from "@/lib/rooms";
-import { site } from "@/lib/site";
-import { BookingForm } from "./BookingForm";
+import { getAvailability } from "@/lib/availability";
+import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
+import { formatInr } from "@/lib/pricing";
+import { rooms as staticRooms } from "@/lib/rooms";
+import { site, whatsappUrl } from "@/lib/site";
+import { SearchBar } from "./SearchBar";
 
 export const metadata: Metadata = {
   title: "Book Kora House, McLeodganj",
   description:
-    "Check availability and book your stay at Kora House, a homestay on the pilgrim's circuit in McLeodganj, Himachal Pradesh.",
+    "Check dates and rates for Kora House, a six-room homestay on the pilgrim's circuit in McLeodganj, Himachal Pradesh.",
 };
 
 /**
- * Booking REQUEST page.
+ * Search and results.
  *
- * There is a backend now, so the earlier no-form placeholder has been replaced
- * with a real one. It is still a request rather than an instant booking: the
- * hosts read each and reply, which is how this house has always worked, and
- * the copy says so rather than implying a room is held.
+ * Shaped like any booking site — dates in, priced rooms out — but the button
+ * says "Request" rather than "Book now", because that is what it does. A host
+ * reads every request and replies; nothing is held and nothing is charged
+ * until they accept. The copy has to be honest about that at the point of
+ * clicking, not buried in a policy page.
  *
- * WhatsApp is kept beside the form throughout. If the database is unreachable
- * or simply not configured yet, the route the house has always used still
- * works — the form degrades to it rather than failing.
- *
- * Payment is NOT here, deliberately. No nightly rate has been confirmed, so
- * there is no amount to charge. See BACKEND.md.
+ * Where a rate has not been set the room still appears, priced "on request".
+ * That is the live path today: no rate is confirmed for any room yet.
  */
-export default function BookPage() {
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const one = (k: string) => (Array.isArray(sp[k]) ? sp[k][0] : sp[k]) ?? "";
+
+  const from = one("from");
+  const to = one("to");
+  const adults = Math.max(1, Number(one("adults")) || 2);
+  const childCount = Math.max(0, Number(one("children")) || 0);
+
+  const datesValid =
+    Boolean(parseDate(from)) &&
+    Boolean(parseDate(to)) &&
+    nightsBetween(from, to) > 0 &&
+    nightsBetween(from, to) <= MAX_NIGHTS;
+
+  const result = datesValid ? await getAvailability(from, to) : null;
+  const nights = datesValid ? nightsBetween(from, to) : 0;
+
   return (
-    <div className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <div className="mx-auto max-w-4xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="Book" variant="lotus" />
-      <h1 className="display-xl mt-5">Get in touch</h1>
+      <h1 className="display-xl mt-5">Find your dates</h1>
       <p className="lede mt-7">
-        The fastest way to check availability is WhatsApp — we usually reply
-        within the day. Tell us your dates, how many of you there are, and
-        whether you have a room in mind, and we&apos;ll take it from there.
+        Six rooms on the kora path. Pick your dates to see what&apos;s free and
+        what it costs — then send a request and one of the hosts will write back,
+        usually the same day.
       </p>
 
-      {/* Said plainly, because it is unusual and people should know it up front */}
-      <div className="mt-8 rounded-[var(--radius-card)] border border-ink/12 bg-paper p-6">
-        <p className="eyebrow text-deodar">How we take bookings</p>
+      <div className="mt-10">
+        <SearchBar from={from} to={to} adults={adults} childCount={childCount} />
+      </div>
+
+      {/* Said plainly and early, because it is unusual */}
+      <div className="mt-6 rounded-[var(--radius-card)] border border-ink/12 bg-paper p-6">
+        <p className="eyebrow text-deodar">How booking works here</p>
         <p className="mt-3 leading-relaxed text-ink-soft">
           We like to talk to guests before accepting a booking — not to vet
           anyone, but to be sure the house is genuinely right for the stay you
-          have in mind. It is a quiet home on a steep hillside, not a hotel.
-          Guests who are respectful, considerate of others and happy in a
-          peaceful place tend to love it here.
+          have in mind. So you send a request, we reply, and only then do you pay
+          a deposit to hold the room. Nothing is charged before we&apos;ve said
+          yes.
         </p>
       </div>
 
-      <div className="mt-12 rounded-[var(--radius-card)] border border-ink/12 bg-paper-raised p-8">
-        <BookingForm />
-      </div>
+      {/* ---------------------------------------------------------- results */}
+      {datesValid && result && (
+        <section className="mt-14" aria-live="polite">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-ink/10 pb-4">
+            <h2 className="display-lg">
+              {nights} night{nights === 1 ? "" : "s"}
+            </h2>
+            <p className="text-sm text-ink-soft">
+              {from} → {to} · {adults} adult{adults === 1 ? "" : "s"}
+              {childCount > 0 && `, ${childCount} child${childCount === 1 ? "" : "ren"}`}
+            </p>
+          </div>
 
-      {/* Room shortcut, so an enquiry can name a room */}
-      <div className="mt-16 border-t border-ink/10 pt-12">
-        <SectionMark eyebrow="The six rooms" variant="knot" />
-        <p className="mt-4 text-sm text-ink-soft">
-          Named for stops on the walk outside. Mention one if you have a
-          preference — or ask and the hosts will suggest which suits your stay.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {rooms.map((room) => (
-            <Link
-              key={room.slug}
-              href={`/rooms/${room.slug}`}
-              className="rounded-[var(--radius-kora)] border border-ink/15 px-4 py-2 text-sm text-ink-soft transition-colors hover:border-ink/40"
-            >
-              {room.name}
-            </Link>
-          ))}
-        </div>
-      </div>
+          {!result.configured && (
+            <Fallback>
+              Online availability isn&apos;t switched on yet. Message us on
+              WhatsApp with your dates and we&apos;ll reply the same day.
+            </Fallback>
+          )}
 
-      {/* The caveats belong here too — before someone commits, not after */}
+          {result.configured && "error" in result && result.error && (
+            <Fallback>
+              We couldn&apos;t check the calendar just now. Please try again, or
+              message us on WhatsApp.
+            </Fallback>
+          )}
+
+          {result.configured && "rooms" in result && (
+            <>
+              <ul className="mt-8 space-y-4">
+                {result.rooms.map((room) => {
+                  const tooSmall =
+                    room.maxOccupancy !== null && adults + childCount > room.maxOccupancy;
+                  return (
+                    <li
+                      key={room.slug}
+                      className={`rounded-[var(--radius-card)] border p-6 ${
+                        room.available && !tooSmall
+                          ? "border-ink/15 bg-paper-raised"
+                          : "border-ink/10 bg-paper opacity-60"
+                      }`}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                          <h3 className="display-md">
+                            <Link href={`/rooms/${room.slug}`} className="hover:underline">
+                              {room.name}
+                            </Link>
+                          </h3>
+                          <p className="mt-1 text-sm text-ink/50">
+                            Room {room.number}
+                            {room.hasKitchenette && " · kitchenette"}
+                            {room.maxOccupancy && ` · sleeps ${room.maxOccupancy}`}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <PriceBlock quote={room.quote} nights={nights} />
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm text-ink-soft">
+                          {!room.available
+                            ? "Taken for these dates."
+                            : tooSmall
+                              ? `This room sleeps ${room.maxOccupancy}.`
+                              : room.quote.kind === "unbookable"
+                                ? room.quote.reason
+                                : ""}
+                        </p>
+                        {room.available && !tooSmall && room.quote.kind !== "unbookable" && (
+                          <Link
+                            href={`/book/checkout?room=${room.slug}&from=${from}&to=${to}&adults=${adults}&children=${childCount}`}
+                            className="rounded-[var(--radius-kora)] bg-deodar px-5 py-2.5 text-sm font-medium text-paper transition-opacity hover:opacity-90"
+                          >
+                            Request this room
+                          </Link>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {result.rooms.every((r) => !r.available) && (
+                <Fallback>
+                  Every room is taken for those dates. Try shifting them by a day
+                  or two — or message us and we&apos;ll tell you what&apos;s
+                  close.
+                </Fallback>
+              )}
+
+              <p className="mt-8 text-sm text-ink/50">
+                A deposit of {result.depositPercent}% holds the room once a host
+                accepts; the balance is paid when you arrive.
+              </p>
+            </>
+          )}
+        </section>
+      )}
+
+      {/* ------------------------------------------------ nothing searched yet */}
+      {!datesValid && (
+        <section className="mt-14">
+          <SectionMark eyebrow="The six rooms" variant="knot" />
+          <p className="mt-4 text-sm text-ink-soft">
+            Named for stops on the walk outside. Pick dates above to see which
+            are free.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {staticRooms.map((room) => (
+              <Link
+                key={room.slug}
+                href={`/rooms/${room.slug}`}
+                className="rounded-[var(--radius-kora)] border border-ink/15 px-4 py-2 text-sm text-ink-soft transition-colors hover:border-ink/40"
+              >
+                {room.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* The caveats belong before someone commits, not after */}
       <div className="mt-16 rounded-[var(--radius-card)] border border-maroon/25 bg-maroon/[0.06] p-7">
         <p className="eyebrow text-maroon">Before you book</p>
         <ul className="mt-4 space-y-4">
@@ -94,4 +219,51 @@ export default function BookPage() {
       </p>
     </div>
   );
+}
+
+function Fallback({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-8 rounded-[var(--radius-card)] border border-ink/15 bg-paper p-6">
+      <p className="text-ink-soft">{children}</p>
+      <a
+        href={whatsappUrl()}
+        className="mt-4 inline-block rounded-[var(--radius-kora)] border border-ink/20 px-5 py-2.5 text-sm text-ink transition-colors hover:border-ink/40"
+      >
+        Message us on WhatsApp
+      </a>
+    </div>
+  );
+}
+
+/** Price, or an honest absence of one. Never a zero standing in for "unknown". */
+function PriceBlock({
+  quote,
+  nights,
+}: {
+  quote: import("@/lib/pricing").Quote;
+  nights: number;
+}) {
+  if (quote.kind === "priced") {
+    return (
+      <>
+        <p className="display-md">{formatInr(quote.totalInr)}</p>
+        <p className="mt-1 text-sm text-ink/50">
+          {quote.flatRate
+            ? `${formatInr(quote.nights[0].rateInr)} × ${nights} night${nights === 1 ? "" : "s"}`
+            : `${nights} nights, seasonal rates`}
+        </p>
+      </>
+    );
+  }
+  if (quote.kind === "on-request") {
+    return (
+      <>
+        <p className="display-md text-ink/60">On request</p>
+        <p className="mt-1 max-w-[14rem] text-sm text-ink/50">
+          We&apos;ll quote you when you ask.
+        </p>
+      </>
+    );
+  }
+  return <p className="text-sm text-ink/50">{quote.reason}</p>;
 }

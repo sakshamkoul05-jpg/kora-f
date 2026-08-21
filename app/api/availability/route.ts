@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
+import { quoteStay } from "@/lib/pricing";
+import { loadPricingContext } from "@/lib/pricing-data";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,9 +11,16 @@ export const dynamic = "force-dynamic";
 /**
  * Which rooms are free between two dates.
  *
- * Backed by the `room_availability` SQL function, which returns dates only —
- * never who holds a room or why one is blocked. Only CONFIRMED requests hold a
- * room; pending ones do not, so speculative requests can't lock the calendar.
+ * Backed by the `room_availability` SQL function, which never reveals who holds
+ * a room or why one is blocked.
+ *
+ * A room is held by an ACCEPTED request (a host said yes; the guest is paying)
+ * or a CONFIRMED one. A pending request holds nothing — several guests may ask
+ * for the same dates, and a flood of speculative requests must not be able to
+ * lock the calendar.
+ *
+ * Each room comes back with a quote for the requested dates. Where no rate is
+ * set the quote is `on-request` rather than zero.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -62,27 +71,46 @@ export async function GET(request: Request) {
     );
   }
 
+  // Price every room in the same response. One round trip for settings and
+  // overrides, then pure computation — the results page should not have to
+  // make a request per room.
+  const { settings, overrides } = await loadPricingContext();
+
+  type Row = {
+    room_id: string;
+    slug: string;
+    name: string;
+    room_number: number;
+    has_kitchenette: boolean;
+    base_rate_inr: number | null;
+    max_occupancy: number | null;
+    is_available: boolean;
+  };
+
   return NextResponse.json(
     {
       configured: true,
       from,
       to,
       nights,
-      rooms: (data ?? []).map(
-        (r: {
-          slug: string;
-          name: string;
-          room_number: number;
-          has_kitchenette: boolean;
-          is_available: boolean;
-        }) => ({
-          slug: r.slug,
-          name: r.name,
-          number: r.room_number,
-          hasKitchenette: r.has_kitchenette,
-          available: r.is_available,
-        })
-      ),
+      depositPercent: settings.depositPercent,
+      currency: settings.currency,
+      rooms: (data ?? []).map((r: Row) => ({
+        slug: r.slug,
+        name: r.name,
+        number: r.room_number,
+        hasKitchenette: r.has_kitchenette,
+        maxOccupancy: r.max_occupancy,
+        available: r.is_available,
+        quote: quoteStay({
+          roomId: r.room_id,
+          baseRateInr: r.base_rate_inr,
+          checkIn: from,
+          checkOut: to,
+          overrides,
+          settings,
+        }),
+      })),
     },
     // Availability changes rarely; a short cache spares the database.
     { status: 200, headers: { "Cache-Control": "public, max-age=60, s-maxage=60" } }
