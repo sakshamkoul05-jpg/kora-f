@@ -123,7 +123,13 @@ export default async function AdminPage() {
           <h1 className="display-lg mt-2">Booking requests</h1>
           <p className="mt-2 font-data text-xs text-ink/45">Signed in as {user.email}</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href="/admin/calendar"
+            className="rounded-[var(--radius-kora)] border border-ink/25 px-4 py-2.5 text-sm text-ink"
+          >
+            Calendar
+          </Link>
           <Link href="/" className="text-sm text-ink-soft underline underline-offset-4">
             View site
           </Link>

@@ -88,7 +88,7 @@ export async function acceptBooking(
   const { data: booking, error: loadError } = await supabase
     .from("booking_requests")
     .select(
-      "id, reference, room_id, check_in, check_out, guest_name, guest_email, guest_phone, status"
+      "id, reference, room_id, check_in, check_out, guest_name, guest_email, guest_phone, status, coupon_code"
     )
     .eq("id", id)
     .maybeSingle();
@@ -130,7 +130,32 @@ export async function acceptBooking(
     };
   }
 
-  const totalInr = hasOverride ? Math.round(override) : (quote as { totalInr: number }).totalInr;
+  // Re-validate the coupon HERE, from the row as it stands now. Whatever the
+  // guest saw at checkout was advisory: a code can expire, be switched off, or
+  // hit its redemption limit between browsing and accepting, and in every one
+  // of those cases the honest answer is that it no longer applies.
+  let discountInr = 0;
+  let couponNote = "";
+  if (booking.coupon_code) {
+    const baseForCoupon =
+      quote.kind === "priced" ? quote.subtotalInr : hasOverride ? Math.round(override) : 0;
+    const { data: cv } = await supabase.rpc("validate_coupon", {
+      p_code: booking.coupon_code,
+      p_check_in: booking.check_in,
+      p_check_out: booking.check_out,
+      p_subtotal_inr: baseForCoupon,
+      p_room_slug: null,
+    });
+    const row = Array.isArray(cv) ? cv[0] : cv;
+    if (row?.valid) {
+      discountInr = row.discount_inr ?? 0;
+    } else {
+      couponNote = ` Note: code ${booking.coupon_code} no longer applies (${row?.reason ?? "not valid"}).`;
+    }
+  }
+
+  const grossInr = hasOverride ? Math.round(override) : (quote as { totalInr: number }).totalInr;
+  const totalInr = Math.max(0, grossInr - discountInr);
   const depositInr = percentOf(totalInr, pricing.settings.depositPercent);
   const holdExpiresAt = new Date(Date.now() + pricing.holdHours * 3_600_000);
 
@@ -147,6 +172,7 @@ export async function acceptBooking(
       tax_inr: quote.kind === "priced" && !hasOverride ? quote.taxInr : 0,
       total_inr: totalInr,
       deposit_inr: depositInr,
+      discount_inr: discountInr > 0 ? discountInr : null,
     })
     .eq("id", id)
     .select("id, reference")
@@ -172,7 +198,7 @@ export async function acceptBooking(
     return {
       ok: true,
       depositInr,
-      message: "Accepted and the room is held. Razorpay isn't connected yet — send payment details yourself.",
+      message: `Accepted and the room is held. Razorpay isn't connected yet — send payment details yourself.${couponNote}`,
     };
   }
 

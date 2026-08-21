@@ -88,6 +88,7 @@ export async function POST(request: Request) {
     p_guest_country: input.country || null,
     p_message: input.message || null,
     p_room_slug: input.roomSlug || null,
+    p_coupon_code: input.couponCode || null,
   });
 
   if (error) {

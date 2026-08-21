@@ -62,6 +62,10 @@ export type Quote =
       currency: string;
       /** True when every night cost the same — lets the UI say "₹2,500 × 3 nights". */
       flatRate: boolean;
+      /** Set only once a discount has been applied. */
+      discountInr?: number;
+      /** What the subtotal was before the discount, so the UI can strike it. */
+      fullSubtotalInr?: number;
     }
   | {
       kind: "on-request";
@@ -210,6 +214,48 @@ export function quoteStay({
     balanceInr: totalInr - depositInr,
     currency: settings.currency,
     flatRate: nights.every((n) => n.rateInr === nights[0].rateInr),
+  };
+}
+
+/**
+ * Applies a discount to a priced quote.
+ *
+ * Deliberately takes a rupee amount rather than a coupon: what a code is worth
+ * is decided by the database (`validate_coupon`), never here and never in the
+ * browser. This only does the arithmetic, so there is one place that knows how
+ * a discount interacts with tax and the deposit.
+ *
+ * The discount comes off the SUBTOTAL, before tax — tax is owed on what is
+ * actually paid, not on a price nobody was charged. The deposit is then taken
+ * from the discounted total, so a coupon reduces what is due today as well as
+ * overall.
+ *
+ * Anything but a priced quote is returned untouched: there is nothing to
+ * discount, and inventing a total would be worse than showing none.
+ */
+export function applyDiscount(
+  quote: Quote,
+  discountInr: number,
+  settings: PricingSettings = DEFAULT_SETTINGS
+): Quote {
+  if (quote.kind !== "priced") return quote;
+  const discount = Math.max(0, Math.min(Math.round(discountInr), quote.subtotalInr));
+  if (discount === 0) return quote;
+
+  const subtotalInr = quote.subtotalInr - discount;
+  const taxInr = percentOf(subtotalInr, settings.taxPercent);
+  const totalInr = subtotalInr + taxInr;
+  const depositInr = percentOf(totalInr, settings.depositPercent);
+
+  return {
+    ...quote,
+    subtotalInr,
+    taxInr,
+    totalInr,
+    depositInr,
+    balanceInr: totalInr - depositInr,
+    discountInr: discount,
+    fullSubtotalInr: quote.subtotalInr,
   };
 }
 

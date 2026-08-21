@@ -25,6 +25,7 @@ export function CheckoutForm({
   to,
   adults,
   childCount,
+  couponCode = null,
 }: {
   roomSlug: string;
   roomName: string;
@@ -32,6 +33,7 @@ export function CheckoutForm({
   to: string;
   adults: number;
   childCount: number;
+  couponCode?: string | null;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Errors>({});
@@ -51,6 +53,7 @@ export function CheckoutForm({
       adults,
       children: childCount,
       roomSlug,
+      couponCode,
       name: String(fd.get("name") ?? ""),
       email: String(fd.get("email") ?? ""),
       phone: String(fd.get("phone") ?? ""),

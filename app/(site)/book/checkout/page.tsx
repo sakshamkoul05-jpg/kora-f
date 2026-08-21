@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { SectionMark } from "@/components/Ornament";
 import { getAvailability } from "@/lib/availability";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
-import { formatNight, formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
-import { formatInr } from "@/lib/pricing";
+import { formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
+import { loadPricingContext } from "@/lib/pricing-data";
 import { site, whatsappUrl } from "@/lib/site";
-import { CheckoutForm } from "./CheckoutForm";
+import { CheckoutPanel } from "./CheckoutPanel";
 
 export const metadata: Metadata = {
   title: "Request a room — Kora House",
@@ -90,6 +90,7 @@ export default async function CheckoutPage({
   }
 
   const { quote } = room;
+  const { settings } = await loadPricingContext();
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
@@ -104,77 +105,17 @@ export default async function CheckoutPage({
         {formatRange(from, to)} · {nightsLabel(nights)} · {guestsLabel(adults, childCount)}
       </p>
 
-      {/* ------------------------------------------------ price breakdown */}
-      <div className="mt-10 rounded-[var(--radius-card)] border border-ink/15 bg-paper-raised p-7">
-        {quote.kind === "priced" ? (
-          <>
-            <dl className="space-y-3 text-sm">
-              {quote.flatRate ? (
-                <Line
-                  label={`${formatInr(quote.nights[0].rateInr)} × ${nights} night${nights === 1 ? "" : "s"}`}
-                  value={formatInr(quote.subtotalInr)}
-                />
-              ) : (
-                <>
-                  {quote.nights.map((n) => (
-                    <Line
-                      key={n.date}
-                      label={`${formatNight(n.date)}${n.label ? ` · ${n.label}` : ""}`}
-                      value={formatInr(n.rateInr)}
-                      muted
-                    />
-                  ))}
-                  <Line label="Subtotal" value={formatInr(quote.subtotalInr)} />
-                </>
-              )}
-              {quote.taxInr > 0 && <Line label="Taxes" value={formatInr(quote.taxInr)} />}
-              <div className="border-t border-ink/12 pt-3">
-                <Line label="Total" value={formatInr(quote.totalInr)} strong />
-              </div>
-            </dl>
-
-            <div className="mt-6 rounded-[var(--radius-kora)] border border-deodar/30 bg-deodar/[0.06] p-5">
-              <div className="flex items-baseline justify-between gap-4">
-                <span className="font-medium text-ink">Deposit to hold the room</span>
-                <span className="display-sm text-deodar-deep">{formatInr(quote.depositInr)}</span>
-              </div>
-              <div className="mt-2 flex items-baseline justify-between gap-4 text-sm text-ink-soft">
-                <span>Balance, paid when you arrive</span>
-                <span>{formatInr(quote.balanceInr)}</span>
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                <strong className="font-medium text-ink">Nothing is charged now.</strong>{" "}
-                Send this request, and if a host accepts you&apos;ll get a payment
-                link for the deposit. The room is held for you from that moment
-                until the link expires.
-              </p>
-            </div>
-          </>
-        ) : quote.kind === "on-request" ? (
-          <>
-            <p className="display-md text-ink/70">Price on request</p>
-            <p className="mt-3 leading-relaxed text-ink-soft">
-              We haven&apos;t published a rate for these dates yet. Send the
-              request and a host will write back with a price — there&apos;s no
-              obligation either way.
-            </p>
-          </>
-        ) : (
-          <p className="text-ink-soft">{quote.reason}</p>
-        )}
-      </div>
-
-      {/* ------------------------------------------------------------ form */}
-      <div className="mt-10 rounded-[var(--radius-card)] border border-ink/15 bg-paper-raised p-7 md:p-8">
-        <CheckoutForm
-          roomSlug={room.slug}
-          roomName={room.name}
-          from={from}
-          to={to}
-          adults={adults}
-          childCount={childCount}
-        />
-      </div>
+      <CheckoutPanel
+        quote={quote}
+        settings={settings}
+        roomSlug={room.slug}
+        roomName={room.name}
+        from={from}
+        to={to}
+        adults={adults}
+        childCount={childCount}
+        nights={nights}
+      />
 
       <p className="mt-8 text-center text-sm text-ink/50">
         Prefer to talk first? {site.phone}{" "}
@@ -204,27 +145,6 @@ function Shell({
       <div className="mt-6 rounded-[var(--radius-card)] border border-ink/15 bg-paper-raised p-8">
         {children}
       </div>
-    </div>
-  );
-}
-
-function Line({
-  label,
-  value,
-  strong,
-  muted,
-}: {
-  label: string;
-  value: string;
-  strong?: boolean;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <dt className={muted ? "text-ink/50" : "text-ink-soft"}>{label}</dt>
-      <dd className={strong ? "text-lg font-medium text-ink" : muted ? "text-ink/50" : "text-ink"}>
-        {value}
-      </dd>
     </div>
   );
 }

@@ -71,6 +71,12 @@ export const bookingRequestSchema = z
     country: z.string().trim().max(80).optional().or(z.literal("")),
     message: z.string().trim().max(2000).optional().or(z.literal("")),
     /** Honeypot. Real people leave it empty; bots fill everything in. */
+    couponCode: z
+      .string()
+      .trim()
+      .max(24, "That code is too long")
+      .transform((v) => (v ? v.toUpperCase() : ""))
+      .optional(),
     website: z.string().max(0, "Rejected").optional().or(z.literal("")),
   })
   .superRefine((v, ctx) => {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  applyDiscount,
   DEFAULT_SETTINGS,
   eachNight,
   formatInr,
@@ -215,4 +216,65 @@ test("formatInr groups in the Indian style", () => {
   assert.equal(formatInr(100_000), "₹1,00,000");
   assert.equal(formatInr(250_000), "₹2,50,000");
   assert.equal(formatInr(10_000_000), "₹1,00,00,000");
+});
+
+test("a discount comes off the subtotal and reduces the deposit too", () => {
+  const q = quoteStay({
+    roomId: ROOM,
+    baseRateInr: 2000,
+    checkIn: "2027-04-01",
+    checkOut: "2027-04-04",
+  });
+  const discounted = applyDiscount(q, 1200);
+  if (discounted.kind !== "priced") throw new Error("expected a price");
+  assert.equal(discounted.fullSubtotalInr, 6000);
+  assert.equal(discounted.subtotalInr, 4800);
+  assert.equal(discounted.totalInr, 4800);
+  assert.equal(discounted.discountInr, 1200);
+  assert.equal(discounted.depositInr, 1200, "25% of the discounted total");
+  assert.equal(discounted.balanceInr, 3600);
+});
+
+test("tax is charged on what is actually paid, not the pre-discount price", () => {
+  const q = quoteStay({
+    roomId: ROOM,
+    baseRateInr: 5000,
+    checkIn: "2027-04-01",
+    checkOut: "2027-04-03",
+    settings: { ...DEFAULT_SETTINGS, taxPercent: 10 },
+  });
+  const discounted = applyDiscount(q, 2000, { ...DEFAULT_SETTINGS, taxPercent: 10 });
+  if (discounted.kind !== "priced") throw new Error("expected a price");
+  assert.equal(discounted.subtotalInr, 8000);
+  assert.equal(discounted.taxInr, 800, "10% of 8000, not of 10000");
+  assert.equal(discounted.totalInr, 8800);
+});
+
+test("a discount can never exceed the stay or go negative", () => {
+  const q = quoteStay({ roomId: ROOM, baseRateInr: 2000, checkIn: "2027-04-01", checkOut: "2027-04-02" });
+  const over = applyDiscount(q, 999_999);
+  if (over.kind !== "priced") throw new Error("expected a price");
+  assert.equal(over.subtotalInr, 0);
+  assert.equal(over.totalInr, 0);
+  assert.equal(over.depositInr, 0);
+  assert.equal(over.balanceInr, 0);
+
+  const negative = applyDiscount(q, -500);
+  if (negative.kind !== "priced") throw new Error("expected a price");
+  assert.equal(negative.totalInr, 2000, "a negative discount must not inflate the price");
+});
+
+test("deposit plus balance still reconciles after a discount", () => {
+  for (const discount of [0, 1, 333, 1999, 5999]) {
+    const q = quoteStay({ roomId: ROOM, baseRateInr: 2000, checkIn: "2027-04-01", checkOut: "2027-04-04" });
+    const d = applyDiscount(q, discount);
+    if (d.kind !== "priced") throw new Error("expected a price");
+    assert.equal(d.depositInr + d.balanceInr, d.totalInr, `broke at discount ${discount}`);
+  }
+});
+
+test("discounting an on-request quote leaves it alone", () => {
+  const q = quoteStay({ roomId: ROOM, baseRateInr: null, checkIn: "2027-04-01", checkOut: "2027-04-04" });
+  const d = applyDiscount(q, 500);
+  assert.equal(d.kind, "on-request", "there is no total to discount");
 });
