@@ -6,7 +6,10 @@ import { loadPricingContext } from "@/lib/pricing-data";
 import { isRazorpayConfigured } from "@/lib/razorpay";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import { buildDayBoard, todayInIndia, type StayLike } from "@/lib/today";
 import { BookingRow, type BookingRequest } from "./BookingRow";
+import { DayBoard } from "./DayBoard";
+import { NewBooking } from "./NewBooking";
 import { SignOut } from "./SignOut";
 
 export const metadata: Metadata = {
@@ -114,6 +117,24 @@ export default async function AdminPage() {
 
   const noRates = (roomRows ?? []).every((r) => r.base_rate_inr === null);
 
+  const today = todayInIndia();
+  const board = buildDayBoard(
+    raw.map<StayLike>((r) => ({
+      id: r.id,
+      reference: r.reference,
+      status: r.status,
+      checkIn: r.check_in,
+      checkOut: r.check_out,
+      guestName: r.guest_name,
+      guestPhone: r.guest_phone,
+      adults: r.adults,
+      children: r.children,
+      roomId: r.room_id,
+      roomName: r.rooms?.name ?? null,
+    })),
+    today
+  );
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-16 md:px-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -128,6 +149,12 @@ export default async function AdminPage() {
             className="rounded-[var(--radius-kora)] border border-ink/25 px-4 py-2.5 text-sm text-ink"
           >
             Calendar
+          </Link>
+          <Link
+            href="/admin/guests"
+            className="rounded-[var(--radius-kora)] border border-ink/25 px-4 py-2.5 text-sm text-ink"
+          >
+            Guests
           </Link>
           <Link
             href="/admin/settings"
@@ -171,6 +198,20 @@ export default async function AdminPage() {
 
       {error && (
         <p className="mt-8 text-sm text-maroon">Couldn&apos;t load requests: {error.message}</p>
+      )}
+
+      {isStaff && <DayBoard board={board} today={today} />}
+
+      {isStaff && (
+        <NewBooking
+          rooms={(roomRows ?? []).map((r) => ({
+            id: r.id,
+            name: r.name,
+            number: r.room_number,
+            rateInr: r.base_rate_inr,
+          }))}
+          depositPercent={pricing.settings.depositPercent}
+        />
       )}
 
       <Section title="Needs a reply" count={pending.length} rows={pending} empty="Nothing waiting." />

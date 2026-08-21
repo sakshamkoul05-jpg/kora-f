@@ -6,12 +6,13 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { HouseSettings } from "../HouseSettings";
 import { CouponsPanel } from "./CouponsPanel";
+import { BlocksPanel, ContentPanel, FaqPanel, RoomsPanel } from "./OperationsPanels";
 import { PackagesPanel } from "./PackagesPanel";
 import { SeasonsPanel } from "./SeasonsPanel";
 import { StaffPanel } from "./StaffPanel";
 
 export const metadata: Metadata = {
-  title: "Rates and offers — Kora House",
+  title: "Manage — Kora House",
   robots: { index: false, follow: false },
 };
 
@@ -33,9 +34,22 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
 
-  const [{ data: rooms }, { data: seasons }, { data: coupons }, { data: packages }, { data: staff }, pricing] =
+  const [
+    { data: rooms },
+    { data: seasons },
+    { data: coupons },
+    { data: packages },
+    { data: staff },
+    { data: blocks },
+    { data: content },
+    { data: faqs },
+    pricing,
+  ] =
     await Promise.all([
-      supabase.from("rooms").select("id, name, room_number, base_rate_inr").order("sort_order"),
+      supabase
+        .from("rooms")
+        .select("id, name, room_number, base_rate_inr, max_occupancy, has_kitchenette, is_active")
+        .order("sort_order"),
       supabase
         .from("rate_overrides")
         .select("id, room_id, starts_on, ends_on, nightly_rate_inr, min_nights, label, priority")
@@ -51,6 +65,12 @@ export default async function SettingsPage() {
         .select("id, slug, name, description, inclusions, min_nights, coupon_code, is_active")
         .order("sort_order"),
       supabase.rpc("list_staff"),
+      supabase
+        .from("blocked_dates")
+        .select("id, room_id, starts_on, ends_on, reason")
+        .order("starts_on"),
+      supabase.from("site_content").select("key, label, hint, kind, value").order("sort_order"),
+      supabase.from("faqs").select("id, question, answer, is_active").order("sort_order"),
       loadPricingContext(),
     ]);
 
@@ -72,9 +92,9 @@ export default async function SettingsPage() {
           <Link href="/admin" className="text-sm text-ink-soft underline underline-offset-4">
             ← Requests
           </Link>
-          <h1 className="display-lg mt-3">Rates and offers</h1>
+          <h1 className="display-lg mt-3">Manage the house</h1>
           <p className="mt-2 text-sm text-ink-soft">
-            What the site quotes, what it advertises, and who else can get in.
+            Rates, closed dates, rooms, offers, wording and who can get in.
           </p>
         </div>
         <Link
@@ -94,6 +114,28 @@ export default async function SettingsPage() {
           minNights: pricing.settings.minNights,
         }}
         startOpen
+      />
+
+      <BlocksPanel
+        rooms={roomList}
+        blocks={(blocks ?? []).map((b) => ({
+          id: b.id,
+          roomId: b.room_id,
+          startsOn: b.starts_on,
+          endsOn: b.ends_on,
+          reason: b.reason,
+        }))}
+      />
+
+      <RoomsPanel
+        rooms={(rooms ?? []).map((r) => ({
+          id: r.id,
+          name: r.name,
+          number: r.room_number,
+          maxOccupancy: r.max_occupancy,
+          hasKitchenette: r.has_kitchenette,
+          isActive: r.is_active,
+        }))}
       />
 
       <SeasonsPanel
@@ -140,6 +182,25 @@ export default async function SettingsPage() {
           isActive: p.is_active,
         }))}
         couponCodes={(coupons ?? []).map((c) => c.code)}
+      />
+
+      <ContentPanel
+        entries={(content ?? []).map((c) => ({
+          key: c.key,
+          label: c.label,
+          hint: c.hint,
+          kind: c.kind,
+          value: c.value,
+        }))}
+      />
+
+      <FaqPanel
+        faqs={(faqs ?? []).map((f) => ({
+          id: f.id,
+          question: f.question,
+          answer: f.answer,
+          isActive: f.is_active,
+        }))}
       />
 
       <StaffPanel
