@@ -64,12 +64,15 @@ export function Header() {
           </Link>
         </nav>
 
+        {/* 44px square, not the 36px it was — below that this is a miss on a
+            phone. The bars stay 20px; only the touchable area grew, and the
+            negative margin keeps it optically aligned with the edge. */}
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="flex h-9 w-9 flex-col items-center justify-center gap-[5px] md:hidden"
+          className="-mr-2 flex h-11 w-11 flex-col items-center justify-center gap-[5px] md:hidden"
         >
           <span
             className={`h-px w-5 bg-ink transition-transform ${open ? "translate-y-[3px] rotate-45" : ""}`}

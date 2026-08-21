@@ -842,3 +842,31 @@ body {
     display: none;
   }
 }
+
+/* ============================================================ touch input ===
+   Safari on iOS zooms the whole page when a focused input has a font-size
+   below 16px, and does not zoom back out. Every form on the site was at 15px,
+   so tapping any field jumped the layout and left the guest pinching to
+   recover — on the booking form especially, that is a real cost.
+
+   16px only below the `sm` breakpoint; the desktop scale is unaffected. */
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* A control small enough to miss is a control that does not work. 24px is the
+   WCAG 2.5.8 floor; standalone buttons and inputs get comfortably past it.
+   Deliberately not applied to links, which are usually inline in prose where a
+   min-height would break the line box. */
+@media (pointer: coarse) {
+  button,
+  input[type="submit"],
+  input[type="button"],
+  select {
+    min-height: 44px;
+  }
+}

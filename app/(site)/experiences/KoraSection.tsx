@@ -43,7 +43,25 @@ export function KoraSection() {
           revealed ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
         }`}
       >
-        <KoraCircuit />
+        {/*
+          The circle is hidden on phones, deliberately.
+
+          Its viewBox is 820 units wide; at 375px that scales labels down to
+          roughly 4px on screen — unreadable, not merely small, and no font
+          bump fixes a diagram that needs eight labels around a ring in less
+          than 400px. The same five stops appear as cards immediately below in
+          walking order, which is the better presentation at this width
+          anyway. Showing both would be duplication; showing the circle alone
+          would be showing nothing.
+        */}
+        <div className="hidden sm:block">
+          <KoraCircuit />
+        </div>
+
+        <p className="mx-auto max-w-md text-center text-sm text-ink-soft sm:hidden">
+          The circuit runs clockwise from the temple gate and comes back to it.
+          The five stops are below, in the order you walk them.
+        </p>
 
         <div className="mx-auto mt-8 flex max-w-2xl flex-wrap justify-center gap-x-3 gap-y-2">
           {koraNotes.map((note) => (
@@ -56,7 +74,9 @@ export function KoraSection() {
           ))}
         </div>
 
-        <p className="mx-auto mt-5 max-w-md text-center text-xs text-ink/40">
+        {/* Hidden with the diagram it describes — on phones there is nothing
+            for "not drawn to scale" to refer to. */}
+        <p className="mx-auto mt-5 hidden max-w-md text-center text-xs text-ink/40 sm:block">
           A stylised diagram of the circuit, not drawn to scale. Walking times
           are approximate.
         </p>
