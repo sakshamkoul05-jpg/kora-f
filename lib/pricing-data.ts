@@ -14,20 +14,24 @@ import { DEFAULT_SETTINGS, type PricingSettings, type RateOverride } from "@/lib
 type Loaded = {
   settings: PricingSettings;
   overrides: RateOverride[];
+  /** Kept out of PricingSettings — the pure pricing module has no use for it. */
+  holdHours: number;
   configured: boolean;
 };
 
+const DEFAULT_HOLD_HOURS = 24;
+
 export async function loadPricingContext(): Promise<Loaded> {
   if (!isSupabaseConfigured) {
-    return { settings: DEFAULT_SETTINGS, overrides: [], configured: false };
+    return { settings: DEFAULT_SETTINGS, overrides: [], holdHours: DEFAULT_HOLD_HOURS, configured: false };
   }
   const supabase = await createClient();
-  if (!supabase) return { settings: DEFAULT_SETTINGS, overrides: [], configured: false };
+  if (!supabase) return { settings: DEFAULT_SETTINGS, overrides: [], holdHours: DEFAULT_HOLD_HOURS, configured: false };
 
   const [settingsRes, overridesRes] = await Promise.all([
     supabase
       .from("settings")
-      .select("deposit_percent, tax_percent, min_nights, currency")
+      .select("deposit_percent, tax_percent, min_nights, currency, hold_hours")
       .maybeSingle(),
     supabase
       .from("rate_overrides")
@@ -44,6 +48,7 @@ export async function loadPricingContext(): Promise<Loaded> {
   const s = settingsRes.data;
   return {
     configured: true,
+    holdHours: s?.hold_hours ?? DEFAULT_HOLD_HOURS,
     settings: s
       ? {
           depositPercent: s.deposit_percent ?? DEFAULT_SETTINGS.depositPercent,

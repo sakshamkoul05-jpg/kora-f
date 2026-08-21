@@ -67,9 +67,11 @@ await check("six rooms seeded", async () => {
   if (r.rows[0].n !== 6) throw new Error(`expected 6 rooms, got ${r.rows[0].n}`);
 });
 await check("exclusion constraint exists on booking_requests", async () => {
+  // Renamed in booking_v2: it now covers accepted holds as well as confirmed
+  // stays, so the name no longer says "confirmed".
   const r = await db.query(
     `select count(*)::int n from pg_constraint
-      where conname = 'no_overlapping_confirmed_stays' and contype = 'x'`
+      where conname = 'no_overlapping_held_stays' and contype = 'x'`
   );
   if (r.rows[0].n !== 1) throw new Error("exclusion constraint not found");
 });
@@ -300,6 +302,87 @@ await rejects("check_out before check_in is refused",
 await rejects("a stay beyond 90 nights is refused",
   `select public.submit_booking_request('2028-07-01'::date, '2028-12-01'::date, 2, 0, 'Long', 'l@example.com')`,
   [], "22023");
+
+// --- 8. Booking v2: accepted holds, expiry, money -------------------------
+console.log("\nAn accepted request holds the room");
+const V2ROOM = ROOM;
+const mkPending = async (ci, co, name, rid = V2ROOM) =>
+  (await db.query(
+    `insert into public.booking_requests (check_in, check_out, guest_name, guest_email, room_id)
+     values ($1,$2,$3,'v2@example.com',$4) returning id`, [ci, co, name, rid]
+  )).rows[0].id;
+
+const heldId = await mkPending("2028-09-01", "2028-09-05", "Accepted Guest");
+await db.query(
+  `update public.booking_requests set status='accepted', accepted_at=now(),
+     hold_expires_at = now() + interval '24 hours', total_inr=10000, deposit_inr=2500
+   where id=$1`, [heldId]);
+
+await check("a second accept for overlapping dates is refused", async () => {
+  const clash = await mkPending("2028-09-02", "2028-09-04", "Clashing Guest");
+  try {
+    await db.query(`update public.booking_requests set status='accepted' where id=$1`, [clash]);
+    throw new Error("two guests were quoted the same room at once");
+  } catch (e) {
+    if (e.code !== "23P01") throw new Error(`expected 23P01, got ${e.code}: ${e.message}`);
+  }
+});
+await check("an accepted hold blocks availability", async () => {
+  const r = await db.query(`select public.is_room_taken($1,'2028-09-02','2028-09-04') t`, [V2ROOM]);
+  if (r.rows[0].t !== true) throw new Error("accepted hold did not block");
+});
+await check("a lapsed hold stops blocking even before the sweep", async () => {
+  await db.query(
+    `update public.booking_requests set hold_expires_at = now() - interval '1 hour' where id=$1`,
+    [heldId]);
+  const r = await db.query(`select public.is_room_taken($1,'2028-09-02','2028-09-04') t`, [V2ROOM]);
+  if (r.rows[0].t !== false) throw new Error("a lapsed hold still blocks the calendar");
+});
+await check("expire_stale_holds() sweeps a lapsed hold to 'expired'", async () => {
+  const n = await db.query("select public.expire_stale_holds() n");
+  if (n.rows[0].n < 1) throw new Error("swept nothing");
+  const r = await db.query(`select status::text st from public.booking_requests where id=$1`, [heldId]);
+  if (r.rows[0].st !== "expired") throw new Error(`status is ${r.rows[0].st}`);
+});
+await check("a paid hold is never expired, however late", async () => {
+  const paid = await mkPending("2028-10-01", "2028-10-03", "Paid Guest");
+  await db.query(
+    `update public.booking_requests set status='accepted',
+       hold_expires_at = now() - interval '5 hours', deposit_paid_at = now() where id=$1`, [paid]);
+  await db.query("select public.expire_stale_holds()");
+  const r = await db.query(`select status::text st from public.booking_requests where id=$1`, [paid]);
+  if (r.rows[0].st !== "accepted") throw new Error(`a paid booking was expired (now ${r.rows[0].st})`);
+});
+await check("every money and host field is stripped on insert", async () => {
+  const r = await db.query(
+    `insert into public.booking_requests
+       (check_in, check_out, guest_name, guest_email, status, total_inr, deposit_inr,
+        subtotal_inr, accepted_at, hold_expires_at, deposit_paid_at, nightly_rates, host_note)
+     values ('2028-11-01','2028-11-03','Cheeky','c@example.com','confirmed', 1, 1, 1,
+             now(), now() + interval '99 days', now(), '[]'::jsonb, 'free')
+     returning status::text st, total_inr, deposit_inr, subtotal_inr, accepted_at,
+               hold_expires_at, deposit_paid_at, nightly_rates, host_note`);
+  const b = r.rows[0];
+  if (b.st !== "pending") throw new Error(`status came back as ${b.st}`);
+  const leaked = Object.entries(b).filter(([k, v]) => k !== "st" && v !== null).map(([k]) => k);
+  if (leaked.length) throw new Error(`not stripped: ${leaked.join(", ")}`);
+});
+await check("settings and payments exist with RLS on", async () => {
+  const r = await db.query(
+    `select relname, relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace
+      where n.nspname='public' and relname in ('settings','payments','rate_overrides')`);
+  if (r.rows.length !== 3) throw new Error(`expected 3 tables, got ${r.rows.length}`);
+  const off = r.rows.filter((x) => !x.relrowsecurity).map((x) => x.relname);
+  if (off.length) throw new Error(`RLS off on ${off.join(", ")}`);
+});
+await check("anon cannot read payments", () => asAnon(async () => {
+  const r = await db.query("select * from public.payments");
+  if (r.rows.length) throw new Error(`${r.rows.length} payment rows readable by anon`);
+}));
+await check("anon can read settings and rates (prices are not secret)", () => asAnon(async () => {
+  const s = await db.query("select deposit_percent from public.settings");
+  if (s.rows.length !== 1) throw new Error("settings not readable");
+}));
 
 console.log(`\n${"=".repeat(52)}\n  ${pass} passed, ${fail} failed\n${"=".repeat(52)}`);
 process.exit(fail ? 1 : 0);

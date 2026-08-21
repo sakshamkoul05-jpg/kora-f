@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { quoteStay } from "@/lib/pricing";
+import { loadPricingContext } from "@/lib/pricing-data";
+import { isRazorpayConfigured } from "@/lib/razorpay";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { BookingRow, type BookingRequest } from "./BookingRow";
+import { HouseSettings } from "./HouseSettings";
 import { SignOut } from "./SignOut";
 
 export const metadata: Metadata = {
@@ -16,11 +20,14 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 /**
- * Host view of incoming booking requests.
+ * Host view.
  *
  * No animation anywhere in here — the build spec is explicit that the admin
  * stays still, and someone triaging a stranger's holiday at 11pm does not want
  * things moving.
+ *
+ * Three groups, in the order a host actually works: what needs a decision,
+ * what is waiting on a guest to pay, and everything already settled.
  */
 export default async function AdminPage() {
   if (!isSupabaseConfigured) {
@@ -38,28 +45,75 @@ export default async function AdminPage() {
   const supabase = await createClient();
   if (!supabase) redirect("/admin/login");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
 
-  // RLS decides what comes back. A signed-in account that isn't in `staff`
-  // gets an empty list rather than an error, which is the correct behaviour —
-  // it reveals nothing about whether any data exists.
-  const { data: requests, error } = await supabase
-    .from("booking_requests")
-    .select(
-      "id, reference, status, check_in, check_out, adults, children, guest_name, guest_email, guest_phone, guest_country, message, host_note, created_at, rooms(name, room_number)"
-    )
-    .order("created_at", { ascending: false })
-    .limit(200);
+  // Release lapsed holds before drawing the page, so a host is never looking at
+  // a room that the public site has already put back on sale.
+  await supabase.rpc("expire_stale_holds");
 
-  const { data: staffRow } = await supabase.from("staff").select("role").maybeSingle();
+  const [{ data: requests, error }, { data: staffRow }, { data: roomRows }, pricing] =
+    await Promise.all([
+      supabase
+        .from("booking_requests")
+        .select(
+          "id, reference, status, check_in, check_out, adults, children, guest_name, guest_email, guest_phone, guest_country, message, host_note, created_at, accepted_at, hold_expires_at, deposit_paid_at, total_inr, deposit_inr, room_id, rooms(name, room_number)"
+        )
+        .order("created_at", { ascending: false })
+        .limit(200),
+      supabase.from("staff").select("role").maybeSingle(),
+      supabase.from("rooms").select("id, slug, name, room_number, base_rate_inr").order("sort_order"),
+      loadPricingContext(),
+    ]);
+
   const isStaff = Boolean(staffRow);
+  const raw = (requests ?? []) as unknown as (BookingRequest & { room_id: string | null })[];
 
-  const rows = (requests ?? []) as unknown as BookingRequest[];
+  // Payment links for anything currently awaiting a deposit.
+  const acceptedIds = raw.filter((r) => r.status === "accepted").map((r) => r.id);
+  const linkByBooking = new Map<string, string>();
+  if (acceptedIds.length) {
+    const { data: pays } = await supabase
+      .from("payments")
+      .select("booking_request_id, razorpay_order_id")
+      .in("booking_request_id", acceptedIds);
+    for (const p of pays ?? []) {
+      if (p.razorpay_order_id) {
+        // Razorpay's short_url is not stored; the id is enough to rebuild the
+        // dashboard link, and the guest already has the real one.
+        linkByBooking.set(p.booking_request_id, `https://rzp.io/i/${p.razorpay_order_id}`);
+      }
+    }
+  }
+
+  const rateByRoom = new Map((roomRows ?? []).map((r) => [r.id, r.base_rate_inr]));
+
+  const rows: BookingRequest[] = raw.map((r) => {
+    const quote =
+      r.room_id !== null
+        ? quoteStay({
+            roomId: r.room_id,
+            baseRateInr: rateByRoom.get(r.room_id) ?? null,
+            checkIn: r.check_in,
+            checkOut: r.check_out,
+            overrides: pricing.overrides,
+            settings: pricing.settings,
+          })
+        : null;
+    return {
+      ...r,
+      suggestedTotalInr: quote?.kind === "priced" ? quote.totalInr : null,
+      paymentUrl: linkByBooking.get(r.id) ?? null,
+    };
+  });
+
   const pending = rows.filter((r) => r.status === "pending");
-  const decided = rows.filter((r) => r.status !== "pending");
+  const awaiting = rows.filter((r) => r.status === "accepted");
+  const settled = rows.filter(
+    (r) => !["pending", "accepted"].includes(r.status)
+  );
+
+  const noRates = (roomRows ?? []).every((r) => r.base_rate_inr === null);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-16 md:px-8">
@@ -87,38 +141,82 @@ export default async function AdminPage() {
         </div>
       )}
 
+      {isStaff && noRates && (
+        <div className="mt-8 rounded-[var(--radius-card)] border border-butter/50 bg-butter/[0.09] p-5 text-sm leading-relaxed text-ink-soft">
+          <strong className="font-medium text-ink">No rates are set.</strong> The
+          site shows &ldquo;price on request&rdquo; for every room and you have to
+          type a figure each time you accept. Set them below and prices appear
+          straight away.
+        </div>
+      )}
+
+      {isStaff && !isRazorpayConfigured && (
+        <div className="mt-4 rounded-[var(--radius-card)] border border-ink/15 bg-paper p-5 text-sm leading-relaxed text-ink-soft">
+          Razorpay isn&apos;t connected, so accepting still holds the room but no
+          payment link is generated. Add the keys and links start appearing
+          automatically — nothing else changes.
+        </div>
+      )}
+
       {error && (
         <p className="mt-8 text-sm text-maroon">Couldn&apos;t load requests: {error.message}</p>
       )}
 
-      <section className="mt-12">
-        <h2 className="display-md">
-          Needs a reply{" "}
-          <span className="font-data text-base text-ink/40">({pending.length})</span>
-        </h2>
-        {pending.length === 0 ? (
-          <p className="mt-4 text-sm text-ink-soft">Nothing waiting.</p>
-        ) : (
-          <div className="mt-6 space-y-4">
-            {pending.map((r) => (
-              <BookingRow key={r.id} request={r} />
-            ))}
-          </div>
-        )}
-      </section>
+      <Section title="Needs a reply" count={pending.length} rows={pending} empty="Nothing waiting." />
+      <Section
+        title="Awaiting deposit"
+        count={awaiting.length}
+        rows={awaiting}
+        empty="No rooms are being held."
+      />
+      <Section title="Settled" count={settled.length} rows={settled} empty={null} />
 
-      {decided.length > 0 && (
-        <section className="mt-16">
-          <h2 className="display-md">
-            Decided <span className="font-data text-base text-ink/40">({decided.length})</span>
-          </h2>
-          <div className="mt-6 space-y-4">
-            {decided.map((r) => (
-              <BookingRow key={r.id} request={r} />
-            ))}
-          </div>
-        </section>
+      {isStaff && (
+        <HouseSettings
+          rooms={(roomRows ?? []).map((r) => ({
+            id: r.id,
+            name: r.name,
+            number: r.room_number,
+            rateInr: r.base_rate_inr,
+          }))}
+          settings={{
+            depositPercent: pricing.settings.depositPercent,
+            holdHours: pricing.holdHours,
+            taxPercent: pricing.settings.taxPercent,
+            minNights: pricing.settings.minNights,
+          }}
+        />
       )}
     </div>
+  );
+}
+
+function Section({
+  title,
+  count,
+  rows,
+  empty,
+}: {
+  title: string;
+  count: number;
+  rows: BookingRequest[];
+  empty: string | null;
+}) {
+  if (count === 0 && empty === null) return null;
+  return (
+    <section className="mt-14">
+      <h2 className="display-md">
+        {title} <span className="font-data text-base text-ink/40">({count})</span>
+      </h2>
+      {count === 0 ? (
+        <p className="mt-4 text-sm text-ink-soft">{empty}</p>
+      ) : (
+        <div className="mt-6 space-y-4">
+          {rows.map((r) => (
+            <BookingRow key={r.id} request={r} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

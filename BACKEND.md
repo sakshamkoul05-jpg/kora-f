@@ -28,12 +28,27 @@ Nothing a guest can do reserves a room. This is enforced in the database, not
 just the UI — a `BEFORE INSERT` trigger forces `status='pending'` and strips the
 host-only columns, so a hand-crafted POST cannot self-confirm.
 
-**2. There is no payment flow, deliberately.** Every `nightlyRate` is still
-`null` — no rate has been confirmed for any room. There is no amount to charge,
-so Razorpay is not wired up. `rooms.base_rate_inr` and
-`booking_requests.quoted_total_inr` exist so a host can record a quote, but the
-site never computes or displays a price. **Confirm the rates before asking for
-payments.**
+**2. Money moves only after a host says yes.** The guest browses priced rooms
+like any booking site, but sending a request charges nothing. A host accepts,
+which quotes the stay and holds the room on a clock; the guest then pays a
+deposit to keep it. Declining therefore costs nothing and needs no refund —
+which is what makes it safe to actually vet guests rather than vet them
+theoretically.
+
+The states, in `booking_status`:
+
+| state | holds the room? | meaning |
+|---|---|---|
+| `pending` | no | guest asked. Several people may ask for the same dates. |
+| `accepted` | **yes, on a clock** | host said yes and quoted. Awaiting deposit. |
+| `confirmed` | yes | deposit received. The stay is real. |
+| `expired` | no | nobody paid in time. Room released automatically. |
+| `declined` | no | host said no. Nothing was ever charged. |
+| `cancelled` | no | called off after confirmation. Refund is a human decision. |
+
+**Rates are still unset.** Every `base_rate_inr` is `null`, so the site says
+"price on request" and a host types a figure when accepting. Set them in
+`/admin` → *Rates and rules* and prices appear immediately — no deploy needed.
 
 ---
 
@@ -77,6 +92,8 @@ project. Order matters either way — later files depend on earlier ones.
 | 3 | `20260819120100_rls.sql` | Row Level Security policies |
 | 4 | `20260819120200_availability.sql` | availability functions |
 | 5 | `20260819120300_seed_rooms.sql` | the six rooms |
+| 6 | `20260820100000_submit_booking_request.sql` | the submit RPC (see below) |
+| 7 | `20260821090000_booking_v2.sql` | accepted/expired states, pricing, payments |
 
 ### 4. Create the host accounts
 
@@ -184,15 +201,59 @@ the site will advertise the wrong address to search engines. The placeholder
 `korahouse.com` in `lib/seo.ts` is only a fallback for when the variable is
 unset.
 
+## Razorpay
+
+Three server-only variables, all listed in `.env.example`. **None may ever
+carry a `NEXT_PUBLIC_` prefix** — the key secret signs payment requests and the
+webhook secret authenticates incoming payment events, so either one in the
+browser bundle is a total compromise.
+
+```
+RAZORPAY_KEY_ID          Dashboard → Settings → API Keys
+RAZORPAY_KEY_SECRET      issued with the key id, shown once
+RAZORPAY_WEBHOOK_SECRET  you choose this when creating the webhook
+SUPABASE_SERVICE_ROLE_KEY  required — see below
+```
+
+Create the webhook at **Settings → Webhooks**, pointing at
+`https://your-domain/api/razorpay/webhook`, subscribed to `payment_link.paid`,
+`payment.captured` and `payment.failed`.
+
+**Without the keys the site still works.** Accepting holds the room and the
+host sends payment details themselves. Links start appearing the moment the
+keys are added; nothing else changes.
+
+### Why the webhook needs the service role key
+
+It arrives with no user session, so it has no RLS identity — and marking a
+booking paid cannot be granted to `anon`, because that would hand it to anyone
+who can guess a reference. So the webhook, and only the webhook, uses the
+service-role key.
+
+That is safe **because it verifies an HMAC signature over the raw body before
+touching the database**, and only because of that. The order in
+`app/api/razorpay/webhook/route.ts` is load-bearing: read raw bytes, verify,
+then act. Never move database work above the signature check, and never parse
+and re-serialise the body first — that changes the bytes and the signature can
+never match.
+
+Payment **links** rather than an embedded checkout, deliberately: the guest is
+paying after a conversation, often hours later, probably from a WhatsApp
+message on a phone. A link survives that; an embedded checkout does not.
+
 ## Not built yet
 
-- **Payments.** Blocked on confirmed rates, not on effort.
-- **Emails.** Confirming a request does *not* email the guest; the admin says so
-  in as many words. Wire up Resend or Supabase Auth hooks when the hosts want it.
-- **Guest accounts / "my bookings".** Step 6 of the build spec also mentions
-  these; not needed for a request-based flow.
-- **Blocked dates UI.** The `blocked_dates` table and its RLS exist; add rows by
-  SQL for now.
+- **Emails.** Accepting does *not* email the guest — the admin says so and gives
+  you a WhatsApp button with the link pre-written. Wire up Resend when the hosts
+  want it automated.
+- **Refunds.** Cancelling a confirmed booking does not refund the deposit;
+  that is a human decision, made in the Razorpay dashboard.
+- **Seasonal rates UI.** The `rate_overrides` table, its priority resolution and
+  its tests all exist and the pricing engine uses them, but rows are added by
+  SQL for now. The standing per-room rate is editable in `/admin`.
+- **Guest self-service.** No "my bookings" page. A guest has their reference and
+  the hosts' WhatsApp, which for six rooms is enough.
+- **Blocked dates UI.** The table and its RLS exist; add rows by SQL.
 
 ## Testing
 
