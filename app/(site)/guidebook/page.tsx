@@ -12,7 +12,8 @@ import {
   volunteeringIntro,
   type Place,
 } from "@/lib/guidebook";
-import { site } from "@/lib/site";
+import { loadSiteCopy } from "@/lib/content";
+
 
 export const metadata: Metadata = {
   title: "The Guidebook — Kora House, McLeodganj",
@@ -75,7 +76,8 @@ const contents = [
   { id: "practical", label: "Numbers worth having" },
 ];
 
-export default function GuidebookPage() {
+export default async function GuidebookPage() {
+  const copy = await loadSiteCopy();
   return (
     <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="The guidebook" variant="lotus" />
@@ -269,7 +271,7 @@ export default function GuidebookPage() {
               ))}
             </ul>
             <p className="mt-5 border-t border-ink/10 pt-4 text-sm text-ink-soft">
-              The house: <span className="font-data">{site.phone}</span>
+              The house: <span className="font-data">{copy.phone}</span>
             </p>
           </div>
         </div>

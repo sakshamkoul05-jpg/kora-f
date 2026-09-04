@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SectionMark } from "@/components/Ornament";
+import { loadFaqs } from "@/lib/content";
 import { site, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     "Practical answers about staying at Kora House: stairs and access, the walk to the market, housekeeping, kitchens, and how to reach the hosts.",
 };
 
-const faqs = [
+const builtInFaqs = [
   {
     q: "Is the house accessible if I have trouble with stairs?",
     a: `${site.caveats.stairs} If that's a concern, ask for the ground-floor room when you get in touch.`,
@@ -52,7 +53,17 @@ const faqs = [
   },
 ] as const;
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  // Questions a host has written come first — they are the ones being asked
+  // right now. The built-in list stays underneath because it covers the
+  // awkward things (the stairs, the market, housekeeping) that must not
+  // disappear if the table is empty or unreachable.
+  const written = await loadFaqs();
+  const faqs = [
+    ...written.map((f) => ({ q: f.question, a: f.answer })),
+    ...builtInFaqs,
+  ];
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="FAQ & policies" variant="knot" />

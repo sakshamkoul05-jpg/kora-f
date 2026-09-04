@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Ornament, SectionMark } from "@/components/Ornament";
-import { site } from "@/lib/site";
+import { loadSiteCopy } from "@/lib/content";
+
 import { LookupForm } from "./LookupForm";
 
 export const metadata: Metadata = {
@@ -19,7 +20,8 @@ export const metadata: Metadata = {
  * Not indexed: there is nothing here for a search engine, and a page that
  * takes a reference and an email should not be advertised to strangers.
  */
-export default function BookingLookupPage() {
+export default async function BookingLookupPage() {
+  const copy = await loadSiteCopy();
   return (
     <div className="mx-auto max-w-2xl px-5 py-20 md:px-8 md:py-28">
       <SectionMark eyebrow="Your booking" variant="lotus" />
@@ -38,7 +40,7 @@ export default function BookingLookupPage() {
         <p className="eyebrow text-deodar-deep">Lost your reference?</p>
         <p className="mt-3 leading-relaxed text-ink-soft">
           Message us and we&apos;ll find it in a moment — it&apos;s six rooms,
-          not six hundred. {site.phone}
+          not six hundred. {copy.phone}
         </p>
       </div>
 

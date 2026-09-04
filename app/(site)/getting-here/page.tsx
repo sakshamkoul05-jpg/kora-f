@@ -3,6 +3,7 @@ import Image from "next/image";
 import { SectionMark } from "@/components/Ornament";
 import { PhotoCredit } from "@/components/PhotoCredit";
 import { placeImages } from "@/lib/image-credits";
+import { loadSiteCopy } from "@/lib/content";
 import { approach, distances, site, whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -24,7 +25,8 @@ const practical = [
   { label: "Parking", value: "TODO_CONFIRM", known: false },
 ];
 
-export default function GettingHerePage() {
+export default async function GettingHerePage() {
+  const copy = await loadSiteCopy();
   const mapsUrl = `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}`;
   const mapsEmbedUrl = `https://www.google.com/maps?q=${site.coordinates.lat},${site.coordinates.lng}&z=15&output=embed`;
 
@@ -154,7 +156,7 @@ export default function GettingHerePage() {
           <div className="border-t border-ink/10 pt-8">
             <p className="eyebrow text-ink/45">Contact</p>
             <div className="mt-3 space-y-1.5 font-data">
-              <p>{site.phone}</p>
+              <p>{copy.phone}</p>
               <p>WhatsApp {site.whatsapp}</p>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-ink-soft">

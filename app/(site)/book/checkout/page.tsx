@@ -6,7 +6,8 @@ import { getAvailability } from "@/lib/availability";
 import { MAX_NIGHTS, nightsBetween, parseDate } from "@/lib/booking";
 import { formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
 import { loadPricingContext } from "@/lib/pricing-data";
-import { site, whatsappUrl } from "@/lib/site";
+import { loadSiteCopy } from "@/lib/content";
+import { whatsappUrl } from "@/lib/site";
 import { CheckoutPanel } from "./CheckoutPanel";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default async function CheckoutPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const copy = await loadSiteCopy();
   const sp = await searchParams;
   const one = (k: string) => (Array.isArray(sp[k]) ? sp[k][0] : sp[k]) ?? "";
 
@@ -118,7 +120,7 @@ export default async function CheckoutPage({
       />
 
       <p className="mt-8 text-center text-sm text-ink/50">
-        Prefer to talk first? {site.phone}{" "}
+        Prefer to talk first? {copy.phone}{" "}
         <a href={whatsappUrl()} className="underline hover:no-underline">
           Message us on WhatsApp
         </a>

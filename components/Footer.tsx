@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { loadSiteCopy } from "@/lib/content";
 import { nav, site } from "@/lib/site";
 import { OrnamentDivider } from "./Ornament";
 
-export function Footer() {
+export async function Footer() {
+  const copy = await loadSiteCopy();
   return (
     <footer className="band-dark relative mt-auto text-mist">
       <div className="mx-auto max-w-6xl px-5 pb-10 pt-20 md:px-8">
@@ -44,7 +46,7 @@ export function Footer() {
           <div>
             <p className="eyebrow text-butter/70">Contact</p>
             <div className="mt-4 space-y-2 text-sm text-mist/75">
-              <p className="font-data">{site.phone}</p>
+              <p className="font-data">{copy.phone}</p>
               <p className="font-data">WhatsApp {site.whatsapp}</p>
               <a
                 href={`mailto:${site.email}`}
