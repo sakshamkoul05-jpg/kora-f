@@ -77,7 +77,12 @@ export async function decideBooking(
  */
 export async function acceptBooking(
   id: string,
-  opts: { totalInrOverride?: number | null; hostNote?: string } = {}
+  opts: {
+    totalInrOverride?: number | null;
+    hostNote?: string;
+    /** Take a deposit even though the guest asked to pay on arrival. */
+    requireDeposit?: boolean;
+  } = {}
 ): Promise<{ ok: boolean; message?: string; paymentUrl?: string; depositInr?: number }> {
   const supabase = await createClient();
   if (!supabase) return { ok: false, message: "Supabase isn't configured." };
@@ -88,7 +93,7 @@ export async function acceptBooking(
   const { data: booking, error: loadError } = await supabase
     .from("booking_requests")
     .select(
-      "id, reference, room_id, check_in, check_out, guest_name, guest_email, guest_phone, status, coupon_code"
+      "id, reference, room_id, check_in, check_out, guest_name, guest_email, guest_phone, status, coupon_code, payment_preference"
     )
     .eq("id", id)
     .maybeSingle();
@@ -156,15 +161,24 @@ export async function acceptBooking(
 
   const grossInr = hasOverride ? Math.round(override) : (quote as { totalInr: number }).totalInr;
   const totalInr = Math.max(0, grossInr - discountInr);
-  const depositInr = percentOf(totalInr, pricing.settings.depositPercent);
+
+  // The guest asked to pay on arrival and the host has not overridden it.
+  // There is nothing to wait for, so this confirms outright rather than
+  // parking the booking in "accepted" behind a payment that will never come.
+  const payOnArrival =
+    booking.payment_preference === "on_arrival" && !opts.requireDeposit;
+
+  const depositInr = payOnArrival ? 0 : percentOf(totalInr, pricing.settings.depositPercent);
   const holdExpiresAt = new Date(Date.now() + pricing.holdHours * 3_600_000);
 
   const { data: updated, error } = await supabase
     .from("booking_requests")
     .update({
-      status: "accepted",
+      status: payOnArrival ? "confirmed" : "accepted",
       accepted_at: new Date().toISOString(),
-      hold_expires_at: holdExpiresAt.toISOString(),
+      // A confirmed on-arrival booking is not on a clock; leaving one set
+      // would make the sweep expire a stay that is genuinely booked.
+      hold_expires_at: payOnArrival ? null : holdExpiresAt.toISOString(),
       decided_by: user.id,
       host_note: opts.hostNote?.trim() || null,
       nightly_rates: quote.kind === "priced" ? quote.nights : null,
@@ -190,6 +204,15 @@ export async function acceptBooking(
     return { ok: false, message: "Couldn't accept that." };
   }
   if (!updated) return { ok: false, message: "You don't have permission to change that." };
+
+  if (payOnArrival) {
+    revalidatePath("/admin");
+    return {
+      ok: true,
+      depositInr: 0,
+      message: `Confirmed — ${booking.guest_name} pays ${totalInr > 0 ? "on arrival" : "on arrival"}. No deposit, no payment link.${couponNote}`,
+    };
+  }
 
   // No Razorpay keys yet: the booking is accepted and the room is held, the
   // host just sends payment details themselves. Say so rather than pretending.

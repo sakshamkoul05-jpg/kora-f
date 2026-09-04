@@ -29,6 +29,7 @@ export function CheckoutForm({
   adults,
   childCount,
   couponCode = null,
+  paymentPreference = "deposit",
 }: {
   roomSlug: string;
   roomName: string;
@@ -37,6 +38,7 @@ export function CheckoutForm({
   adults: number;
   childCount: number;
   couponCode?: string | null;
+  paymentPreference?: "deposit" | "on_arrival";
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Errors>({});
@@ -57,6 +59,7 @@ export function CheckoutForm({
       children: childCount,
       roomSlug,
       couponCode,
+      paymentPreference,
       name: String(fd.get("name") ?? ""),
       email: String(fd.get("email") ?? ""),
       phone: String(fd.get("phone") ?? ""),
@@ -118,9 +121,11 @@ export function CheckoutForm({
           </p>
         )}
         <p className="mt-4 leading-relaxed text-ink-soft">
-          One of the hosts will read it and reply, usually the same day. If they
-          accept, you&apos;ll get a link to pay the deposit and {roomName} is
-          yours from that moment. Nothing has been charged.
+          One of the hosts will read it and reply, usually the same day.{" "}
+          {paymentPreference === "on_arrival"
+            ? `You've asked to pay on arrival — if they're happy to hold ${roomName} without a deposit, they'll confirm it outright.`
+            : `If they accept, you'll get a link to pay the deposit and ${roomName} is yours from that moment.`}{" "}
+          Nothing has been charged.
         </p>
         <p className="mt-4 leading-relaxed text-ink-soft">
           Keep that reference — you can check where things stand, and pay, at{" "}

@@ -89,6 +89,7 @@ export async function POST(request: Request) {
     p_message: input.message || null,
     p_room_slug: input.roomSlug || null,
     p_coupon_code: input.couponCode || null,
+    p_payment_preference: input.paymentPreference ?? "deposit",
   });
 
   if (error) {

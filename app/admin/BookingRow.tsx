@@ -32,6 +32,7 @@ export type BookingRequest = {
   deposit_paid_at: string | null;
   total_inr: number | null;
   deposit_inr: number | null;
+  payment_preference: "deposit" | "on_arrival";
   rooms: { name: string; room_number: number } | null;
   /** What the rate card says this stay costs, if anything. Prefills the quote. */
   suggestedTotalInr: number | null;
@@ -90,6 +91,7 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
   const [info, setInfo] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(r.paymentUrl);
   const [showNote, setShowNote] = useState(false);
+  const [requireDeposit, setRequireDeposit] = useState(false);
   const [total, setTotal] = useState(
     r.suggestedTotalInr ? String(r.suggestedTotalInr) : ""
   );
@@ -112,6 +114,7 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
       const res = await acceptBooking(r.id, {
         totalInrOverride: Number.isFinite(parsed) && parsed > 0 ? parsed : null,
         hostNote: note,
+        requireDeposit,
       });
       if (!res.ok) {
         setError(res.message ?? "Couldn't accept that.");
@@ -148,6 +151,11 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
             {r.adults === 1 ? "" : "s"}
             {r.children > 0 && ` · ${r.children} child${r.children === 1 ? "" : "ren"}`}
           </p>
+          {r.payment_preference === "on_arrival" && (
+            <p className="mt-1 font-data text-[11px] uppercase tracking-wide text-butter">
+              pays on arrival
+            </p>
+          )}
           {r.total_inr !== null && (
             <p className="mt-1 font-data text-sm text-ink">
               {formatInr(r.total_inr)}
@@ -227,6 +235,25 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
             </p>
           )}
 
+          {r.payment_preference === "on_arrival" && (
+            <div className="mb-4 rounded-[var(--radius-kora)] border border-butter/50 bg-butter/[0.12] px-4 py-3">
+              <p className="text-sm text-ink">
+                <strong className="font-medium">This guest asked to pay on arrival.</strong>{" "}
+                Accepting confirms the booking outright — no deposit, no payment
+                link, and the room is held from that moment.
+              </p>
+              <label className="mt-2.5 flex items-center gap-2 text-sm text-ink-soft">
+                <input
+                  type="checkbox"
+                  checked={requireDeposit}
+                  onChange={(e) => setRequireDeposit(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Ask for a deposit anyway
+              </label>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-end gap-4">
             <label className="block">
               <span className="font-data text-[11px] uppercase tracking-wide text-ink/45">
@@ -285,8 +312,11 @@ export function BookingRow({ request: r }: { request: BookingRequest }) {
           </div>
 
           <p className="mt-3 text-xs text-ink/40">
-            Accepting holds the room and asks the guest for the deposit. The
-            guest is not emailed automatically — send them the link yourself.
+            {r.payment_preference === "on_arrival" && !requireDeposit
+              ? "Accepting confirms this booking with nothing taken now."
+              : "Accepting holds the room and asks the guest for the deposit."}{" "}
+            The guest is not emailed automatically — send them the link
+            yourself.
           </p>
         </div>
       )}

@@ -59,7 +59,7 @@ export default async function AdminPage() {
       supabase
         .from("booking_requests")
         .select(
-          "id, reference, status, check_in, check_out, adults, children, guest_name, guest_email, guest_phone, guest_country, message, host_note, created_at, accepted_at, hold_expires_at, deposit_paid_at, total_inr, deposit_inr, room_id, rooms(name, room_number)"
+          "id, reference, status, check_in, check_out, adults, children, guest_name, guest_email, guest_phone, guest_country, message, host_note, created_at, accepted_at, hold_expires_at, deposit_paid_at, total_inr, deposit_inr, payment_preference, room_id, rooms(name, room_number)"
         )
         .order("created_at", { ascending: false })
         .limit(200),

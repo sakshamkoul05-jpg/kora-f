@@ -84,6 +84,10 @@ export const nav = [
   { label: "Guidebook", href: "/guidebook" },
   { label: "Getting Here", href: "/getting-here" },
   { label: "Book", href: "/book" },
+  // A guest coming back to check on a request, or to pay, arrives with a
+  // reference and no idea where to put it. Worth a place in the navigation
+  // rather than only a footer link.
+  { label: "My Booking", href: "/booking" },
 ] as const;
 
 /**

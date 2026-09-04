@@ -23,6 +23,7 @@ type Booking = {
   discountInr: number | null;
   holdExpiresAt: string | null;
   depositPaidAt: string | null;
+  paymentPreference: "deposit" | "on_arrival";
   paymentUrl: string | null;
 };
 
@@ -179,7 +180,7 @@ function Result({
       )}
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
-        {b.status === "accepted" && !b.depositPaidAt && (
+        {b.status === "accepted" && !b.depositPaidAt && b.paymentPreference === "deposit" && (
           <RazorpayCheckout
             reference={b.reference}
             email={email}
@@ -201,7 +202,7 @@ function Result({
         </button>
       </div>
 
-      {b.status === "accepted" && !b.depositPaidAt && (
+      {b.status === "accepted" && !b.depositPaidAt && b.paymentPreference === "deposit" && (
         <p className="mt-4 text-xs leading-relaxed text-ink/45">
           Payment is handled by Razorpay. We never see or store your card
           details.
@@ -259,19 +260,22 @@ function StatusBlock({ booking: b, hoursLeft }: { booking: Booking; hoursLeft: n
       <>
         <p className="display-sm text-deodar-deep">Your room is held.</p>
         <p className="mt-2 leading-relaxed text-ink-soft">
-          A host will send you payment details shortly. Message us if you&apos;d
-          rather sort it out now.
+          {b.paymentPreference === "on_arrival"
+            ? "A host is just confirming the last details. Nothing is owed online."
+            : "A host will send you payment details shortly. Message us if you'd rather sort it out now."}
         </p>
       </>
     );
   }
   if (b.status === "confirmed") {
+    const onArrival = b.paymentPreference === "on_arrival" && !b.depositPaidAt;
     return (
       <>
         <p className="display-sm text-deodar-deep">You&apos;re booked.</p>
         <p className="mt-2 leading-relaxed text-ink-soft">
-          Deposit received and the room is yours. We&apos;ll see you on the
-          hillside.
+          {onArrival
+            ? "The room is yours and nothing is owed until you get here. We'll see you on the hillside."
+            : "Deposit received and the room is yours. We'll see you on the hillside."}
         </p>
       </>
     );

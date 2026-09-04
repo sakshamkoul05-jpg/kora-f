@@ -104,6 +104,7 @@ export async function POST(request: Request) {
       discountInr: row.discount_inr,
       holdExpiresAt: row.hold_expires_at,
       depositPaidAt: row.deposit_paid_at,
+      paymentPreference: row.payment_preference ?? "deposit",
       paymentUrl: row.payment_url,
     },
   });

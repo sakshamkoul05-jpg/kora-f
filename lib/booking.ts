@@ -82,6 +82,11 @@ export const bookingRequestSchema = z
       .max(24, "That code is too long")
       .transform((v) => (v ? v.toUpperCase() : ""))
       .nullish(),
+    /**
+     * What the guest would rather do. A host still decides what actually
+     * happens, so this is a preference and never an instruction.
+     */
+    paymentPreference: z.enum(["deposit", "on_arrival"]).nullish(),
     /** Honeypot. Real people leave it empty; bots fill everything in. */
     website: z.string().max(0, "Rejected").optional().or(z.literal("")),
   })
