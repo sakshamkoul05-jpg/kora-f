@@ -149,3 +149,73 @@ export function verifyPaymentSignature(opts: {
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
 }
+
+/** The key id is safe in the browser — Standard Checkout needs it there. */
+export const RAZORPAY_KEY_ID = KEY_ID;
+
+export type RazorpayOrder = {
+  id: string;
+  amountPaise: number;
+  currency: string;
+};
+
+/**
+ * Creates an order for Standard Checkout.
+ *
+ * The amount is a parameter, but every caller MUST derive it from the booking
+ * row rather than from anything the browser sent. Razorpay's own integration
+ * guide shows the frontend posting an amount; doing that here would let a
+ * guest pay one rupee for a fifteen-hundred-rupee deposit by editing a number
+ * in devtools. See app/api/payments/order/route.ts, which reads it from the
+ * database.
+ *
+ * `receipt` carries the booking reference so a payment can always be traced
+ * back to a stay from the Razorpay dashboard alone.
+ */
+export async function createOrder(opts: {
+  amountInr: number;
+  receipt: string;
+  notes?: Record<string, string>;
+}): Promise<{ ok: true; order: RazorpayOrder } | { ok: false; error: string; status: number }> {
+  if (!isRazorpayConfigured) return { ok: false, error: "not_configured", status: 503 };
+
+  const amountPaise = toPaise(opts.amountInr);
+  // Razorpay's floor. A booking cheaper than one rupee is a bug upstream.
+  if (!Number.isFinite(amountPaise) || amountPaise < 100) {
+    return { ok: false, error: "Amount must be at least ₹1.", status: 400 };
+  }
+
+  try {
+    const res = await fetch(`${API}/orders`, {
+      method: "POST",
+      headers: { Authorization: authHeader(), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: amountPaise,
+        currency: "INR",
+        // Razorpay caps this at 40 characters.
+        receipt: opts.receipt.slice(0, 40),
+        notes: opts.notes ?? {},
+      }),
+    });
+
+    const body = await res.json().catch(() => ({}));
+
+    if (res.status === 401) {
+      console.error("[razorpay] order rejected: bad credentials");
+      return { ok: false, error: "Payment provider rejected our credentials.", status: 401 };
+    }
+    if (!res.ok) {
+      const msg = body?.error?.description ?? `Razorpay returned ${res.status}`;
+      console.error("[razorpay] order failed:", msg);
+      return { ok: false, error: msg, status: 500 };
+    }
+
+    return {
+      ok: true,
+      order: { id: body.id, amountPaise: body.amount, currency: body.currency },
+    };
+  } catch (e) {
+    console.error("[razorpay] order threw:", (e as Error).message);
+    return { ok: false, error: "Could not reach Razorpay.", status: 500 };
+  }
+}

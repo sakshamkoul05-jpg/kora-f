@@ -35,7 +35,24 @@ const SUPABASE_ORIGIN = (() => {
 })();
 
 /** Routes that are server-rendered per request, and can therefore carry a nonce. */
-const NONCE_ROUTES = ["/admin", "/book"];
+const NONCE_ROUTES = ["/admin", "/book", "/booking"];
+
+/**
+ * Razorpay Standard Checkout, which needs four separate allowances:
+ * the script itself, the iframe the modal renders into, the endpoints it calls
+ * (including lumberjack, its telemetry — blocked, it retries and slows
+ * checkout), and its card-network artwork.
+ *
+ * On nonce routes `'strict-dynamic'` makes the script-src host list moot, since
+ * a script inserted by an already-trusted script is trusted. It stays for the
+ * routes without a nonce, where the host list is the only thing permitting it.
+ */
+const RAZORPAY = {
+  script: "https://checkout.razorpay.com",
+  frame: "https://api.razorpay.com https://checkout.razorpay.com",
+  connect: "https://api.razorpay.com https://lumberjack.razorpay.com",
+  img: "https://cdn.razorpay.com",
+};
 
 export function routeNeedsNonce(pathname: string): boolean {
   return NONCE_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
@@ -54,22 +71,25 @@ export function buildCsp({
 
   const scriptSrc = nonce
     ? `'self' 'nonce-${nonce}' 'strict-dynamic'${devEval}`
-    : `'self' 'unsafe-inline'${devEval}`;
+    : `'self' 'unsafe-inline' ${RAZORPAY.script}${devEval}`;
 
   // The browser talks to Supabase directly — signing a host in, checking a
   // coupon — so its origin has to be reachable.
-  const connect = ["'self'", SUPABASE_ORIGIN].filter(Boolean).join(" ");
+  const connect = ["'self'", SUPABASE_ORIGIN, RAZORPAY.connect].filter(Boolean).join(" ");
 
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}`,
     "style-src 'self' 'unsafe-inline'",
     // blob: and data: are next/image's placeholders, not third-party content.
-    "img-src 'self' blob: data:",
+    `img-src 'self' blob: data: ${RAZORPAY.img}`,
     // next/font self-hosts everything at build time; nothing is fetched from
     // Google at runtime.
     "font-src 'self'",
     `connect-src ${connect}`,
+    // Without this the checkout modal — an iframe — is refused outright, and
+    // there is no console error that says so plainly.
+    `frame-src 'self' ${RAZORPAY.frame}`,
     "object-src 'none'",
     "base-uri 'self'",
     // A booking form must not be able to post a guest's details elsewhere.

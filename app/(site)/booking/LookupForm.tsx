@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { RazorpayCheckout } from "@/components/RazorpayCheckout";
 import { BowlRing } from "@/components/motion/BowlRing";
 import { nightsBetween } from "@/lib/booking";
 import { formatRange, guestsLabel, nightsLabel } from "@/lib/dates";
@@ -74,7 +75,12 @@ export function LookupForm() {
 
   if (booking) {
     return (
-      <Result booking={booking} hoursLeft={hoursLeft} onBack={() => setBooking(null)} />
+      <Result
+        booking={booking}
+        email={email}
+        hoursLeft={hoursLeft}
+        onBack={() => setBooking(null)}
+      />
     );
   }
 
@@ -133,10 +139,12 @@ export function LookupForm() {
 
 function Result({
   booking: b,
+  email,
   hoursLeft,
   onBack,
 }: {
   booking: Booking;
+  email: string;
   hoursLeft: number | null;
   onBack: () => void;
 }) {
@@ -171,15 +179,12 @@ function Result({
       )}
 
       <div className="mt-7 flex flex-wrap items-center gap-3">
-        {b.paymentUrl && (
-          <BowlRing className="rounded-[var(--radius-kora)]">
-            <a
-              href={b.paymentUrl}
-              className="block rounded-[var(--radius-kora)] bg-deodar-deep px-6 py-3.5 font-medium text-paper"
-            >
-              Pay {b.depositInr !== null ? formatInr(b.depositInr) : "the deposit"} now
-            </a>
-          </BowlRing>
+        {b.status === "accepted" && !b.depositPaidAt && (
+          <RazorpayCheckout
+            reference={b.reference}
+            email={email}
+            depositInr={b.depositInr}
+          />
         )}
         <a
           href={whatsappUrl(`Hello — about my booking ${b.reference}.`)}
@@ -196,9 +201,20 @@ function Result({
         </button>
       </div>
 
-      {b.paymentUrl && (
+      {b.status === "accepted" && !b.depositPaidAt && (
         <p className="mt-4 text-xs leading-relaxed text-ink/45">
-          Payment is handled by Razorpay. We never see or store your card details.
+          Payment is handled by Razorpay. We never see or store your card
+          details.
+          {b.paymentUrl && (
+            <>
+              {" "}
+              Prefer to pay later or on another device?{" "}
+              <a href={b.paymentUrl} className="underline underline-offset-2">
+                Use this payment link
+              </a>
+              .
+            </>
+          )}
         </p>
       )}
 

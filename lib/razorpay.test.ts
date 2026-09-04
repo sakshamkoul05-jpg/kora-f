@@ -12,8 +12,13 @@ process.env.RAZORPAY_WEBHOOK_SECRET = WEBHOOK_SECRET;
 process.env.RAZORPAY_KEY_ID = "rzp_test_key";
 process.env.RAZORPAY_KEY_SECRET = KEY_SECRET;
 
-const { verifyWebhookSignature, verifyPaymentSignature, toPaise, isRazorpayConfigured } =
-  await import("./razorpay.ts");
+const {
+  verifyWebhookSignature,
+  verifyPaymentSignature,
+  toPaise,
+  isRazorpayConfigured,
+  createOrder,
+} = await import("./razorpay.ts");
 
 const sign = (body: string, secret = WEBHOOK_SECRET) =>
   createHmac("sha256", secret).update(body).digest("hex");
@@ -77,4 +82,34 @@ test("a payment signature for a different payment is rejected", () => {
     verifyPaymentSignature({ orderId: "order_1", paymentId: "pay_2", signature: good }),
     false
   );
+});
+
+test("createOrder refuses anything under Razorpay's one-rupee floor", async () => {
+  // The floor is checked before any network call, so this needs no fixture.
+  // 0.4 rounds to zero paise; 0.5 would round UP to a legitimate 100, which is
+  // why it is not in this list.
+  for (const amount of [0, -100, 0.4]) {
+    const r = await createOrder({ amountInr: amount, receipt: "KH-TEST" });
+    assert.equal(r.ok, false, `accepted ${amount}`);
+    if (!r.ok) assert.equal(r.status, 400);
+  }
+});
+
+test("createOrder rejects a non-finite amount rather than sending NaN", async () => {
+  const r = await createOrder({ amountInr: Number.NaN, receipt: "KH-TEST" });
+  assert.equal(r.ok, false);
+});
+
+test("the key id is exported for the browser; the secret is not", async () => {
+  const mod = await import("./razorpay.ts");
+  assert.equal(typeof mod.RAZORPAY_KEY_ID, "string");
+  // A secret reaching the client bundle would be a total compromise, so assert
+  // the module simply has no export that could carry it.
+  const exported = Object.keys(mod);
+  for (const name of exported) {
+    assert.ok(
+      !/SECRET/i.test(name),
+      `razorpay.ts exports "${name}" — nothing with SECRET in the name may leave this module`
+    );
+  }
 });
