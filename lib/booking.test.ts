@@ -127,3 +127,40 @@ test("optional fields may be omitted entirely", () => {
   delete (p as Record<string, unknown>).website;
   assert.ok(bookingRequestSchema.safeParse(p).success);
 });
+
+test("a booking with no coupon validates — couponCode may be null", () => {
+  // The checkout form sends null when no code is applied. `.optional()` alone
+  // rejects that, which failed every booking that did not use a discount.
+  const base = {
+    checkIn: "2027-09-05",
+    checkOut: "2027-09-06",
+    adults: 2,
+    children: 0,
+    roomSlug: "zangskar",
+    name: "A Guest",
+    email: "guest@example.com",
+    phone: "7018659162",
+    country: "India",
+    message: "no",
+    website: "",
+  };
+  for (const coupon of [null, undefined, ""]) {
+    const parsed = bookingRequestSchema.safeParse({ ...base, couponCode: coupon });
+    assert.equal(parsed.success, true, `rejected couponCode ${String(coupon)}`);
+  }
+});
+
+test("a real coupon code is still uppercased", () => {
+  const parsed = bookingRequestSchema.safeParse({
+    checkIn: "2027-09-05",
+    checkOut: "2027-09-06",
+    adults: 2,
+    children: 0,
+    name: "A Guest",
+    email: "guest@example.com",
+    couponCode: "monsoon",
+    website: "",
+  });
+  assert.equal(parsed.success, true);
+  if (parsed.success) assert.equal(parsed.data.couponCode, "MONSOON");
+});

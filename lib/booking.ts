@@ -70,13 +70,19 @@ export const bookingRequestSchema = z
     phone: z.string().trim().max(40).optional().or(z.literal("")),
     country: z.string().trim().max(80).optional().or(z.literal("")),
     message: z.string().trim().max(2000).optional().or(z.literal("")),
-    /** Honeypot. Real people leave it empty; bots fill everything in. */
+    /**
+     * Nullish, not optional. The checkout form sends `couponCode: null` when
+     * no code is applied, and `.optional()` alone rejects null — which failed
+     * EVERY booking that did not use a discount, with an error keyed to a
+     * field the guest cannot see.
+     */
     couponCode: z
       .string()
       .trim()
       .max(24, "That code is too long")
       .transform((v) => (v ? v.toUpperCase() : ""))
-      .optional(),
+      .nullish(),
+    /** Honeypot. Real people leave it empty; bots fill everything in. */
     website: z.string().max(0, "Rejected").optional().or(z.literal("")),
   })
   .superRefine((v, ctx) => {

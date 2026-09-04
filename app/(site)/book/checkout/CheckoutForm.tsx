@@ -6,6 +6,9 @@ import { BowlRing } from "@/components/motion/BowlRing";
 import { whatsappUrl } from "@/lib/site";
 
 type Errors = Record<string, string>;
+
+/** The fields this form actually draws, and can therefore highlight. */
+const VISIBLE_FIELDS = ["name", "email", "phone", "country", "message"];
 type Status = "idle" | "sending" | "sent" | "error";
 
 /**
@@ -75,8 +78,26 @@ export function CheckoutForm({
         setStatus("sent");
         return;
       }
-      if (body.errors) setErrors(body.errors);
-      setFormError(body.message ?? "Something went wrong. Please try WhatsApp.");
+      // An error keyed to a field this form does not render — a coupon, a
+      // date chosen on the previous screen — would otherwise show as "check
+      // the highlighted fields" with nothing highlighted, which is impossible
+      // to act on. Anything unattachable is said out loud instead.
+      const returned: Errors = body.errors ?? {};
+      const onScreen = Object.fromEntries(
+        Object.entries(returned).filter(([k]) => VISIBLE_FIELDS.includes(k))
+      );
+      const hidden = Object.entries(returned)
+        .filter(([k]) => !VISIBLE_FIELDS.includes(k))
+        .map(([, v]) => v);
+
+      setErrors(onScreen);
+      setFormError(
+        hidden.length > 0
+          ? hidden.join(" ")
+          : Object.keys(onScreen).length > 0
+            ? (body.message ?? "Please check the highlighted fields.")
+            : (body.message ?? "Something went wrong. Please try WhatsApp.")
+      );
       setStatus("error");
     } catch {
       setFormError(
