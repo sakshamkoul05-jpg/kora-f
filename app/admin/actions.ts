@@ -227,6 +227,7 @@ export async function acceptBooking(
   const { error: payError } = await supabase.from("payments").insert({
     booking_request_id: id,
     razorpay_order_id: link.link.id,
+    payment_url: link.link.url,
     amount_inr: depositInr,
     status: "created",
   });

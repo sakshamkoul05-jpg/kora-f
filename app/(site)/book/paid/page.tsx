@@ -66,6 +66,12 @@ export default async function PaidPage({
           Message us on WhatsApp
         </a>
         <Link
+          href="/booking"
+          className="rounded-[var(--radius-kora)] border border-ink/20 px-5 py-2.5 text-sm text-ink transition-colors hover:border-ink/40"
+        >
+          Check my booking
+        </Link>
+        <Link
           href="/"
           className="rounded-[var(--radius-kora)] border border-ink/20 px-5 py-2.5 text-sm text-ink transition-colors hover:border-ink/40"
         >

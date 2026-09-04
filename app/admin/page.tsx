@@ -77,14 +77,13 @@ export default async function AdminPage() {
   if (acceptedIds.length) {
     const { data: pays } = await supabase
       .from("payments")
-      .select("booking_request_id, razorpay_order_id")
+      .select("booking_request_id, payment_url")
       .in("booking_request_id", acceptedIds);
     for (const p of pays ?? []) {
-      if (p.razorpay_order_id) {
-        // Razorpay's short_url is not stored; the id is enough to rebuild the
-        // dashboard link, and the guest already has the real one.
-        linkByBooking.set(p.booking_request_id, `https://rzp.io/i/${p.razorpay_order_id}`);
-      }
+      // The real short_url Razorpay returned. An earlier version rebuilt this
+      // as rzp.io/i/<order_id>, which is not how Razorpay forms short URLs —
+      // the link shown to hosts was simply wrong.
+      if (p.payment_url) linkByBooking.set(p.booking_request_id, p.payment_url);
     }
   }
 

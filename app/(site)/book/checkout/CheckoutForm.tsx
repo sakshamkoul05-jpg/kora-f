@@ -101,7 +101,20 @@ export function CheckoutForm({
           accept, you&apos;ll get a link to pay the deposit and {roomName} is
           yours from that moment. Nothing has been charged.
         </p>
+        <p className="mt-4 leading-relaxed text-ink-soft">
+          Keep that reference — you can check where things stand, and pay, at{" "}
+          <Link href="/booking" className="underline underline-offset-4">
+            your booking
+          </Link>{" "}
+          any time.
+        </p>
         <div className="mt-7 flex flex-wrap gap-3">
+          <Link
+            href="/booking"
+            className="rounded-[var(--radius-kora)] border border-ink/20 px-5 py-2.5 text-sm text-ink transition-colors hover:border-ink/40"
+          >
+            Check my booking
+          </Link>
           <Link
             href="/"
             className="rounded-[var(--radius-kora)] border border-ink/20 px-5 py-2.5 text-sm text-ink transition-colors hover:border-ink/40"

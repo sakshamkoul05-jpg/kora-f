@@ -95,6 +95,9 @@ export function Footer() {
                   {item.label}
                 </Link>
               ))}
+              <Link href="/booking" className="text-sm text-mist/65 transition-colors hover:text-mist">
+                Your booking
+              </Link>
               <Link href="/faq" className="text-sm text-mist/65 transition-colors hover:text-mist">
                 FAQ &amp; policies
               </Link>
