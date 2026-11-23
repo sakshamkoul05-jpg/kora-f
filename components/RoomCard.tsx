@@ -2,10 +2,10 @@ import Link from "next/link";
 import type { Room } from "@/lib/rooms";
 import { PhotoPending } from "./PhotoPending";
 import Image from "next/image";
-import { roomPhotos } from "@/lib/room-photos";
+import { roomHeroes } from "@/lib/room-heroes";
 
 export function RoomCard({ room }: { room: Room }) {
-  const photo = roomPhotos[room.slug]?.[0];
+  const photo = roomHeroes[room.slug];
   return (
     <Link
       href={`/rooms/${room.slug}`}
