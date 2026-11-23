@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Ornament, SectionMark } from "@/components/Ornament";
 import { RoomsFilterGrid } from "@/components/RoomsFilterGrid";
 import { rooms, sharedSpaces } from "@/lib/rooms";
+import Image from "next/image";
+import { sittingRoomPhotos } from "@/lib/room-photos";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -61,6 +63,42 @@ export default function RoomsIndexPage() {
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">{space.description}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-12">
+          <p className="eyebrow text-ink/45">The sitting room, as it is</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {sittingRoomPhotos.slice(0, 3).map((p) => (
+              <div
+                key={p.alt}
+                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {sittingRoomPhotos.slice(3).map((p) => (
+              <div
+                key={p.alt}
+                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

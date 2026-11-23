@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Ornament } from "@/components/Ornament";
 import { PhotoPending } from "@/components/PhotoPending";
+import Image from "next/image";
+import { roomPhotos } from "@/lib/room-photos";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { getRoomBySlug, rooms } from "@/lib/rooms";
 import { site } from "@/lib/site";
@@ -34,6 +36,8 @@ export default async function RoomDetailPage({
   const room = getRoomBySlug(slug);
   if (!room) notFound();
 
+  const photos = roomPhotos[room.slug] ?? [];
+
   const metaParts = [
     room.occupancy ? `Sleeps ${room.occupancy}` : null,
     room.beds,
@@ -50,14 +54,62 @@ export default async function RoomDetailPage({
         ← All rooms
       </Link>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-3">
-        <PhotoPending
-          label="Photo coming soon"
-          className="aspect-[4/3] rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2 sm:aspect-auto"
-        />
-        <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
-        <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
-      </div>
+      {photos.length > 0 ? (
+        <>
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2 sm:aspect-auto">
+              <Image
+                src={photos[0].src}
+                alt={photos[0].alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 66vw"
+              />
+            </div>
+            {photos.slice(1, 3).map((p) => (
+              <div
+                key={p.alt}
+                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+            ))}
+          </div>
+          {photos.length > 3 && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {photos.slice(3).map((p) => (
+                <div
+                  key={p.alt}
+                  className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
+                >
+                  <Image
+                    src={p.src}
+                    alt={p.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          <PhotoPending
+            label="Photo coming soon"
+            className="aspect-[4/3] rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2 sm:aspect-auto"
+          />
+          <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
+          <PhotoPending className="aspect-[4/3] rounded-[var(--radius-card)]" />
+        </div>
+      )}
 
       <div className="mt-14 grid gap-14 md:grid-cols-[1fr_370px]">
         <div>
