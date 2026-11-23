@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Ornament } from "@/components/Ornament";
 import { PhotoPending } from "@/components/PhotoPending";
-import Image from "next/image";
 import { roomPhotos } from "@/lib/room-photos";
+import { RoomGallery } from "@/components/RoomGallery";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { getRoomBySlug, rooms } from "@/lib/rooms";
 import { site } from "@/lib/site";
@@ -55,51 +55,7 @@ export default async function RoomDetailPage({
       </Link>
 
       {photos.length > 0 ? (
-        <>
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] sm:col-span-2 sm:row-span-2 sm:aspect-auto">
-              <Image
-                src={photos[0].src}
-                alt={photos[0].alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 66vw"
-              />
-            </div>
-            {photos.slice(1, 3).map((p) => (
-              <div
-                key={p.alt}
-                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
-              >
-                <Image
-                  src={p.src}
-                  alt={p.alt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-              </div>
-            ))}
-          </div>
-          {photos.length > 3 && (
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              {photos.slice(3).map((p) => (
-                <div
-                  key={p.alt}
-                  className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
-                >
-                  <Image
-                    src={p.src}
-                    alt={p.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </>
+        <RoomGallery photos={photos} />
       ) : (
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <PhotoPending
