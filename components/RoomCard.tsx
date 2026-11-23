@@ -1,14 +1,29 @@
 import Link from "next/link";
 import type { Room } from "@/lib/rooms";
 import { PhotoPending } from "./PhotoPending";
+import Image from "next/image";
+import { roomPhotos } from "@/lib/room-photos";
 
 export function RoomCard({ room }: { room: Room }) {
+  const photo = roomPhotos[room.slug]?.[0];
   return (
     <Link
       href={`/rooms/${room.slug}`}
       className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-ink/10 bg-paper-raised transition-colors duration-300 hover:border-ink/25"
     >
-      <PhotoPending label="Photo coming soon" className="aspect-[4/3] w-full" />
+      {photo ? (
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
+      ) : (
+        <PhotoPending label="Photo coming soon" className="aspect-[4/3] w-full" />
+      )}
 
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div className="flex items-baseline justify-between gap-3">
