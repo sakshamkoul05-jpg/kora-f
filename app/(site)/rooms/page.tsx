@@ -4,7 +4,7 @@ import { Ornament, SectionMark } from "@/components/Ornament";
 import { RoomsFilterGrid } from "@/components/RoomsFilterGrid";
 import { rooms, sharedSpaces } from "@/lib/rooms";
 import Image from "next/image";
-import { sittingRoomPhotos } from "@/lib/room-photos";
+import { sittingRoomPhotos } from "@/lib/sitting-photos";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
