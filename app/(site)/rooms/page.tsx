@@ -3,7 +3,7 @@ import { Ornament, SectionMark } from "@/components/Ornament";
 import { RoomsFilterGrid } from "@/components/RoomsFilterGrid";
 import { rooms, sharedSpaces } from "@/lib/rooms";
 import Image from "next/image";
-import { sittingRoomPhotos, commonAreaPhotos } from "@/lib/sitting-photos";
+import { sittingRoomPhotos, commonAreaPhotos, diningRoomPhotos } from "@/lib/sitting-photos";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -104,6 +104,26 @@ export default function RoomsIndexPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <p className="eyebrow text-ink/45">The dining room, as it is</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {diningRoomPhotos.map((p) => (
+              <div
+                key={p.alt}
+                className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"
+              >
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
             ))}
