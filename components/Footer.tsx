@@ -25,7 +25,7 @@ export async function Footer() {
               <span className="display-md text-mist">{site.name}</span>
             </div>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-mist/55">
-              Six rooms on Buddha House Road, on the Lingkhor — the pilgrim&apos;s
+              Five rooms on Buddha House Road, on the Lingkhor — the pilgrim&apos;s
               path that circles the temple.
             </p>
             <address className="mt-6 space-y-0.5 text-sm not-italic text-mist/70">
