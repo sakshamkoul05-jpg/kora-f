@@ -96,7 +96,7 @@ export default async function RoomDetailPage({
             What this room looks out at, its bed configuration, size and rate
             are still being confirmed with the hosts. Rather than guess, we&apos;d
             rather you asked — message the house and they&apos;ll tell you which
-            of the six suits your stay.
+            of the five suits your stay.
           </p>
 
           <div className="mt-14 border-t border-ink/10 pt-10">

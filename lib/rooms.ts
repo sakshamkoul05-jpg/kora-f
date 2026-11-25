@@ -105,21 +105,6 @@ export const rooms: Room[] = [
     nightlyRate: null,
     todoConfirm: baseTodo,
   },
-  {
-    slug: "mani",
-    number: 6,
-    name: "Mani",
-    floor: "Ground",
-    hasKitchenette: false,
-    nameNote: "For the mani stones set along the wall of the path outside.",
-    notes:
-      "On the ground floor of the house — though you still climb the steps from the car park to reach it.",
-    occupancy: null,
-    beds: null,
-    sizeSqm: null,
-    nightlyRate: null,
-    todoConfirm: baseTodo,
-  },
 ];
 
 export function getRoomBySlug(slug: string): Room | undefined {
